@@ -1,0 +1,6 @@
+Id,Name,Description,IsEquipable,DamageModifier,DefenseModifier,YippeeModifier
+0,None,,TRUE,0,0,0
+1,NoNoise Headphones,Headphones that block sounds throughout the galaxy,TRUE,0,10.5,2
+2,Yo-yo,Just a random Yo-yo you found,TRUE,2,1,1
+3,Rune of Special Interests,"Legends say that staring into the rune long enough will show your deepest, most passionate interests... at a cost.",TRUE,0,-4,5.5
+4,Olfactory Key,This Key literally smells horrendous...,FALSE,0,0,0
