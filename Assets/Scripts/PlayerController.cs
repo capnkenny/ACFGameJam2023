@@ -4,57 +4,95 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    //public GameObject PrefabForGameManager;
+    [Header("GameObject References")]
     public PlayerInput PlayerInputComponent;
-    
-    public float ControlRateForYippeeMeter;
-    public float ControlRateForHealth;
+    public Item BodyEquipment;
+    public Item RangedWeapon;
+    public Item MeleeWeapon;
+    public Sprite PlayerSprite;
+    public SpriteRenderer renderer;
 
-    public float YippeeMeter;
-    public float SensoryMeter;
+    [Header("Base Player Stats")]
     public float Health;
-    public float MovementScale;
+    public float SensoryMeter;
+    public float YippeeMeter;
+    public int DabloonCount;
+    public List<Item> Inventory;
 
-    public bool IsAllowedToMove;
+    [Header("Predefined Controls")]
+    public bool Visible;
+    public float MovementSpeed;
+    public float YippeeMeterFactor;
+    public float MaxYippeeMeter;
+    public float MaxHealth;
+    public float MaxSensoryMeter;
 
-    public Sprite playerSprite;
+    //Randomized / Internal Player Stats
+    private float _tasteFactor;
+    private float _smellFactor;
+    private float _sightFactor;
+    private float _hearingFactor;
+    private float _touchFactor;
+    private bool _sensoryOverload;
+    
+    //Private members
+    private Vector2 _movement;
 
-    public List<Item> Inventory = new();
-    private Item BodyEquipment;
-    private Item WeaponA;
-    private Item WeaponB;
-    private int DabloonCount = 0;
-
-    public float speed;
-    public Rigidbody2D rb2d;
-    //private Transform transform;
-    private Vector2 movement;
-
+    void Awake()
+    {
+        renderer.sprite = PlayerSprite;
+	_movement = new Vector2(0,0);
+	_sensoryOverload = false;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        IsAllowedToMove = false;
-        GetComponent<SpriteRenderer>().sprite = playerSprite;
-        //transform = GetComponent<Transform>();
-        movement = new Vector2(0, 0);
+	//If inventory not provided already, we should clear it
+	if(Inventory == null)
+	    Inventory = new List<Item>();
+	
+	//Randomize senses to give uniqueness to character/playthrough
+        _tasteFactor = Random.Range(0.0, 1.5);
+        _smellFactor = Random.Range(0.0, 1.5);
+        _sightFactor = Random.Range(0.0, 1.5);
+        _hearingFactor = Random.Range(0.0, 1.5);
+	_touchFactor = Random.Range(0.0, 1.5);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //transform.position += (Vector3)movement;
-    }
-
-    private void FixedUpdate()
-    {
-        rb2d.velocity = movement;
+	if(Visible)
+	{
+            rb2d.velocity = movement;
+	}
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        movement = context.ReadValue<Vector2>() * speed;
-        Debug.Log($"{movement.x},{movement.y}");
+        _movement = context.ReadValue<Vector2>() * MovementSpeed;
+    }
+
+    public void AddSensoryInput(float taste, float smell, float sight, float hearing, float touch)
+    {
+         _tasteFactor += taste;
+	 _smellFactor += smell;
+	 _sightFactor += sight;
+	 _hearingFactor += hearing;
+	 _touchFactor += touch;
+    }
+
+    public void RemoveSensoryInput(float taste, float smell, float sight, float hearing, float touch)
+    {
+         _tasteFactor -= taste;
+	 _smellFactor -= smell;
+	 _sightFactor -= sight;
+	 _hearingFactor -= hearing;
+	 _touchFactor -= touch;
+
+	 if(_tasteFactor < -1.0)
+		 _tasteFactor = -1.0;
     }
 
 }
