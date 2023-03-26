@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 6762940431723730721}
   - component: {fileID: 6762940431723730750}
   - component: {fileID: 3789871931892134444}
+  - component: {fileID: 5829676698653637007}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,16 +49,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerInputComponent: {fileID: 3789871931892134444}
-  ControlRateForYippeeMeter: 1
-  ControlRateForHealth: 1
-  YippeeMeter: 0
+  BodyEquipment: {fileID: 0}
+  RangedWeapon: {fileID: 0}
+  MeleeWeapon: {fileID: 0}
+  PlayerSprite: {fileID: 21300000, guid: 7ac814b4083a9c543b1e9c15e0276e6b, type: 3}
+  renderer: {fileID: 6762940431723730750}
+  rb2d: {fileID: 6762940431723730721}
+  Health: 100
   SensoryMeter: 0
-  Health: 0
-  IsAllowedToMove: 1
-  playerSprite: {fileID: 21300000, guid: 7ac814b4083a9c543b1e9c15e0276e6b, type: 3}
+  YippeeMeter: 0
+  DabloonCount: 0
   Inventory: []
-  speed: 0
-  position: {x: 0, y: 0}
+  Visible: 0
+  MovementSpeed: 5
+  YippeeMeterFactor: 1
+  MaxYippeeMeter: 50
+  MaxHealth: 100
+  MaxSensoryMeter: 50
 --- !u!50 &6762940431723730721
 Rigidbody2D:
   serializedVersion: 4
@@ -161,3 +169,33 @@ MonoBehaviour:
   m_DefaultActionMap: gameplay
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!60 &5829676698653637007
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6762940431723730722}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0, y: 1}
+      - {x: -0.95105654, y: 0.30901697}
+      - {x: -0.5877852, y: -0.80901706}
+      - {x: 0.58778536, y: -0.80901694}
+      - {x: 0.9510565, y: 0.30901712}
