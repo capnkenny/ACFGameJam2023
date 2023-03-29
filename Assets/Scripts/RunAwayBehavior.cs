@@ -29,79 +29,117 @@ public class RunAwayBehavior : EnemyBehavior
     private float  _runAwayDistance;
     private bool _cooldownMode;
     private float _deltaTime;
+
+	  private bool _running;
+    private bool _flipChar;
     
     void Awake()
     {
-	_runningAnimHash = Animator.StringToHash(_runningAnimName);
-        _player = GameObject.FindWithTag("Player");
-	_runningAway = false;
-	_runAwayDistance = _collider.radius;
-	_deltaTime = 0.0f;
+      _runningAnimHash = Animator.StringToHash(_runningAnimName);
+      _player = GameObject.FindWithTag("Player");
+      _runningAway = _running = false;
+      _flipChar = false;
+      _runAwayDistance = _collider.radius;
+      _deltaTime = 0.0f;
     }
 
     void Update()
-    {
-	    //Debug.Log($"Found: {_found}, RunningAway: {_runningAway}");
-	    
+    {   
 	    //Set animation stuff
 	    _animator.SetBool("WasFound", _found);
 	    _animator.SetBool("RunningAway", _runningAway);
-	    if(_found)
-	    {
-		float distance = Vector2.Distance((Vector2)_enemyTransform.position, (Vector2)_player.transform.position);
-		var direction = _player.transform.position - _enemyTransform.position;
-		Debug.Log($"Direction: {direction}, Distance: {distance}, Runaway @: {_runAwayDistance}");
-		
-		if(_runningAway)
-		{
-		Debug.Log("Running away...");
-		//var direction = _player.transform.position - _enemyTransform.position;
-		//Debug.Log($"Direction: {direction}, Distance: {distance}, Runaway @: {_runAwayDistance}");
-		Debug.DrawRay(_enemyTransform.position, -direction, Color.green);
-		Debug.DrawRay(_enemyTransform.position, direction, Color.red);
-     	        _rigidbody.velocity = (Vector2)((-direction)*controller.MovementSpeed);
-		}
-		
-		else
-		{
-		    Debug.Log("Not Running away, but is found");
-		    CheckCooldownStatus(Time.deltaTime, false, distance);
-		}
-	    }
+      
+      if(_flipChar)
+      {
+        float yAxis = 180;
+        _flipChar = false;
+        if(transform.rotation.y >= 180)
+        {
+          yAxis = -yAxis;
+        }
+        transform.Rotate(0,yAxis,0);
+      }
+      
+      //Handle movement and reaction
+      
+      float distance = Vector2.Distance((Vector2)_enemyTransform.position, (Vector2)_player.transform.position);
+      var direction = _player.transform.position - _enemyTransform.position;
+        
+      if(_found && !_runningAway)
+      {
+        if(distance <= _collider.radius)
+        {
+          _runningAway = true;
+          return;
+        }	
+      }
+
+      if(_runningAway && !_running)
+      {
+        _rigidbody.velocity = (Vector2)((-direction)*controller.MovementSpeed);
+        
+        _running = true;
+      }
+
+      if(_runningAway)
+      {
+        Debug.Log($"Velocity: {_rigidbody.velocity}");
+        if(_rigidbody.velocity.x < 0 && transform.rotation.y == 0)
+          _flipChar = true;
+      }
+    
+
     }
 
-    private void CheckCooldownStatus(float delta, bool enteringCooldown = false, float distance = 0)
+    void OnCollisionEnter2D(Collision2D col)
     {
-	if(enteringCooldown)
-	{
-	    _runningAway = false;
-	    _cooldownMode = true;
-	    _rigidbody.velocity = Vector2.zero;
-	    return;
-	}
-	else
-	{
-	   _deltaTime += delta;
-	   if(distance <= _collider.radius)
-	   {
-		   //re-alert mikey to run away
-	       _runningAway = true;
-	       _cooldownMode = false;
-	   }
+      if(col.gameObject.tag == "Collision_L")
+      {
+        if(transform.rotation.y != 0)
+          _flipChar = true;
+        
+       if(_rigidbody.velocity.y < 0.00f)
+       {
+          _rigidbody.velocity = _rigidbody.velocity + new Vector2(0, 1);
+       }
 
-	   if(_deltaTime >= _cooldownTime)
-	   {
-	      _found = false;
-	      _cooldownMode = false;
-	      _deltaTime = 0.0f;
-	      return;
-	   }
-	}
+      }
+      if(col.gameObject.tag == "Collision_R")
+      {
+        if(transform.rotation.y == 0)
+          _flipChar = true;
+        
+       if(_rigidbody.velocity.y < 0.00f)
+       {
+          _rigidbody.velocity = _rigidbody.velocity + new Vector2(0, -1);
+       }
+
+      }
+
+      if(col.gameObject.tag == "Collision_T")
+      {
+        
+       if(_rigidbody.velocity.x < 0.00f)
+       {
+          _rigidbody.velocity = _rigidbody.velocity + new Vector2(-1, 0);
+       }
+
+      }
+
+      if(col.gameObject.tag == "Collision_B")
+      {
+        
+       if(_rigidbody.velocity.x < 0.00f)
+       {
+          _rigidbody.velocity = _rigidbody.velocity + new Vector2(1, 0);
+       }
+
+      }
     }
+
 
     public override void PerformBehavior()
     {
-	    Debug.Log("RunningAway-PerformBehavior called");
 	    _found = true;
     }
     

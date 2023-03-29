@@ -42,8 +42,8 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         renderer.sprite = PlayerSprite;
-	_movement = new Vector2(0,0);
-	_sensoryOverload = false;
+        _movement = new Vector2(0,0);
+        _sensoryOverload = false;
     }
 
     // Start is called before the first frame update
@@ -58,16 +58,16 @@ public class PlayerController : MonoBehaviour
         _smellFactor = Random.Range(0.0f, 1.5f);
         _sightFactor = Random.Range(0.0f, 1.5f);
         _hearingFactor = Random.Range(0.0f, 1.5f);
-	_touchFactor = Random.Range(0.0f, 1.5f);
+	    _touchFactor = Random.Range(0.0f, 1.5f);
     }
 
     // Update is called once per frame
     void Update()
     {
-	if(Visible)
-	{
-            rb2d.velocity = _movement;
-	}
+        if(Visible)
+        {
+                rb2d.velocity = _movement;
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -77,23 +77,23 @@ public class PlayerController : MonoBehaviour
 
     public void AddSensoryInput(float taste, float smell, float sight, float hearing, float touch)
     {
-         _tasteFactor += taste;
-	 _smellFactor += smell;
-	 _sightFactor += sight;
-	 _hearingFactor += hearing;
-	 _touchFactor += touch;
+        _tasteFactor += taste;
+        _smellFactor += smell;
+        _sightFactor += sight;
+        _hearingFactor += hearing;
+        _touchFactor += touch;
     }
 
     public void RemoveSensoryInput(float taste, float smell, float sight, float hearing, float touch)
     {
-         _tasteFactor -= taste;
-	 _smellFactor -= smell;
-	 _sightFactor -= sight;
-	 _hearingFactor -= hearing;
-	 _touchFactor -= touch;
+        _tasteFactor -= taste;
+        _smellFactor -= smell;
+        _sightFactor -= sight;
+        _hearingFactor -= hearing;
+        _touchFactor -= touch;
 
 	 if(_tasteFactor < -1.0f)
-		 _tasteFactor = -1.0f;
+		_tasteFactor = -1.0f;
     }
 
 }
