@@ -8,6 +8,8 @@ TagManager:
   - Collision_R
   - Collision_T
   - Collision_B
+  - Detection
+  - Enemy
   layers:
   - Default
   - TransparentFX
