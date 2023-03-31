@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
+using System.Collections.Generic;
+using System;
 using System.Linq;
 
 public class LevelGenerator : MonoBehaviour
@@ -26,7 +27,7 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     private int _diagonalDirectionWeight;
 
-    private Array<Array<RoomData>> _roomMatrix;
+    private List<List<RoomData>> _roomMatrix;
 
     void Awake()
     {
@@ -36,10 +37,10 @@ public class LevelGenerator : MonoBehaviour
             _gridWidth = 5;
         int roomNumber = 1;
 
-        _roomMatrix = new Array<Array<RoomData>>(_gridHeight);
+        _roomMatrix = new List<List<RoomData>>(_gridHeight);
         for(int h = 0; h < _gridHeight; h++)
         {
-            _roomMatrix[h] = new Array<RoomData>(_gridWidth);
+            _roomMatrix[h] = new List<RoomData>(_gridWidth);
             for(int w = 0; w < _gridWidth; w++)
             {
                 _roomMatrix[h][w] = new RoomData 
@@ -143,8 +144,8 @@ public class LevelGenerator : MonoBehaviour
                     neighbor.EndCost = GetDistance(neighbor, target);
                     neighbor.Parent = current;
     
-                    if (!openSet.Contains(neighbor))
-                        openSet.Add(neighbor);
+                    if (!open.Contains(neighbor))
+                        open.Add(neighbor);
                 }
             }
         }

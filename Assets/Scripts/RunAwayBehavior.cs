@@ -16,6 +16,8 @@ public class RunAwayBehavior : EnemyBehavior
     [SerializeField]
     private Animator _animator;
     [SerializeField]
+    private Animator _secondaryAnimator;
+    [SerializeField]
     private bool _found;
     [SerializeField]
     private string _runningAnimName;
@@ -43,11 +45,12 @@ public class RunAwayBehavior : EnemyBehavior
     {
       // Check if dead
       _isDead = controller.Health == 0;
-      Debug.Log($"Health: {controller.Health}, Found: {_found}, Running Away: {_runningAway}, Dead: {_isDead}");
+      //Debug.Log($"Health: {controller.Health}, Found: {_found}, Running Away: {_runningAway}, Dead: {_isDead}");
         //Set animation stuff
       _animator.SetBool("WasFound", _found);
       _animator.SetBool("RunningAway", _runningAway);
       _animator.SetBool("IsDead", _isDead);
+      _secondaryAnimator.SetBool("IsRunning", _runningAway);
 
         if (_flipChar)
         {
