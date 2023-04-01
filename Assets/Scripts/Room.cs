@@ -4,6 +4,11 @@ using System.Collections;
 
 public class Room : MonoBehaviour
 {
+    public int RoomNumber;
+
+    public int X;
+
+    public int Y;
 
     void Awake()
     {

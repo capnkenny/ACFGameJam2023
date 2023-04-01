@@ -22,10 +22,22 @@ public class LevelGenerator : MonoBehaviour
     private float _xSnapDistanceForCamera;
 
     [SerializeField]
+    private float _yDistanceForPrefab;
+
+    [SerializeField]
+    private float _xDistanceForPrefab;
+
+    [SerializeField]
     private int _cardinalDirectionWeight;
 
     [SerializeField]
     private int _diagonalDirectionWeight;
+
+    [SerializeField]
+    private Vector2 _startPoint;
+
+    [SerializeField]
+    private Vector2 _endPoint;
 
     private List<List<RoomData>> _roomMatrix;
 
@@ -56,6 +68,40 @@ public class LevelGenerator : MonoBehaviour
                 roomNumber++;
             }
         }
+
+        if(_startPoint != null)
+        {
+            if(_startPoint.x < 0 || _startPoint.x > _gridWidth)
+            {
+                throw new ArgumentOutOfRangeException("_startPoint.x");
+            }
+            if(_startPoint.y < 0 || _startPoint.y > _gridHeight)
+            {
+                throw new ArgumentOutOfRangeException("_startPoint.y");
+            }
+
+            if(_roomMatrix[_startPoint.y][_startPoint.x] != null)
+            {
+                Instantiate(_roomPrefab, new Vector(_startPoint.x * _xDistanceForPrefab, _startPoint.y * _yDistanceForPrefab, 0), Quaternion.identity);
+            }
+        }
+
+        if(_endPoint != null)
+        {
+            if(_endPoint.x < 0 || _endPoint.x > _gridWidth)
+            {
+                throw new ArgumentOutOfRangeException("_endPoint.x");
+            }
+            if(_endPoint.y < 0 || _endPoint.y > _gridHeight)
+            {
+                throw new ArgumentOutOfRangeException("_endPoint.y");
+            }
+
+            if(_roomMatrix[_endPoint.y][_endPoint.x] != null)
+            {
+                Instantiate(_roomPrefab, new Vector(_endPoint.x * _xDistanceForPrefab, _endPoint.y * _yDistanceForPrefab, 0), Quaternion.identity);
+            }
+        }
     }
 
     void Start()
@@ -67,6 +113,130 @@ public class LevelGenerator : MonoBehaviour
     void Update()
     {
 
+    }
+
+    public List<RoomData> GetNeighbors(int x, int y)
+    {
+        List<RoomData> neighbors = new();
+
+        if(y == 0)
+        {
+            if(x == 0)
+            {
+                if(_roomMatrix[y][x+1] != null && _roomMatrix[y][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x+1]);
+                if(_roomMatrix[y+1][x+1] != null && _roomMatrix[y+1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x+1]);
+                if(_roomMatrix[y+1][x] != null && _roomMatrix[y+1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x]);
+            }
+            else if(x == _roomMatrix[y].Count - 1)
+            {
+                if(_roomMatrix[y][x-1] != null && _roomMatrix[y][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x-1]);
+                if(_roomMatrix[y+1][x-1] != null && _roomMatrix[y+1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x-1]);
+                if(_roomMatrix[y+1][x] != null && _roomMatrix[y+1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x]);
+            }
+            else
+            {
+                if(_roomMatrix[y][x+1] != null && _roomMatrix[y][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x+1]);
+                if(_roomMatrix[y][x-1] != null && _roomMatrix[y][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x-1]);
+                if(_roomMatrix[y+1][x+1] != null && _roomMatrix[y+1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x+1]);
+                if(_roomMatrix[y+1][x-1] != null && _roomMatrix[y+1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x-1]);
+                if(_roomMatrix[y+1][x] != null && _roomMatrix[y+1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x]);
+            }
+        }
+        else if(y == _roomMatrix.Count - 1)
+        {
+            if(x == 0)
+            {
+                if(_roomMatrix[y-1][x] != null && _roomMatrix[y-1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x]);
+                if(_roomMatrix[y][x+1] != null && _roomMatrix[y][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x+1]);
+                if(_roomMatrix[y-1][x+1] != null && _roomMatrix[y-1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x+1]);
+            }
+            else if(x == _roomMatrix[y].Count - 1)
+            {
+                if(_roomMatrix[y-1][x] != null && _roomMatrix[y-1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x]);
+                if(_roomMatrix[y][x-1] != null && _roomMatrix[y][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x-1]);
+                if(_roomMatrix[y-1][x-1] != null && _roomMatrix[y-1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x-1]);
+            }
+            else
+            {
+                if(_roomMatrix[y][x+1] != null && _roomMatrix[y][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x+1]);
+                if(_roomMatrix[y][x-1] != null && _roomMatrix[y][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x-1]);
+                if(_roomMatrix[y-1][x+1] != null && _roomMatrix[y-1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x+1]);
+                if(_roomMatrix[y-1][x-1] != null && _roomMatrix[y-1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x-1]);
+                if(_roomMatrix[y-1][x] != null && _roomMatrix[y-1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x]);
+            }
+        }
+        else
+        {
+            if(x == 0)
+            {
+                if(_roomMatrix[y][x+1] != null && _roomMatrix[y][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x+1]);
+                if(_roomMatrix[y+1][x+1] != null && _roomMatrix[y+1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x+1]);
+                if(_roomMatrix[y-1][x] != null && _roomMatrix[y-1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x]);
+                if(_roomMatrix[y][x+1] != null && _roomMatrix[y][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x+1]);
+                if(_roomMatrix[y-1][x+1] != null && _roomMatrix[y-1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x+1]);
+            }
+            else if(x == _roomMatrix[y].Count - 1)
+            {
+                if(_roomMatrix[y+1][x] != null && _roomMatrix[y+1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x]);
+                if(_roomMatrix[y][x-1] != null && _roomMatrix[y][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x-1]);
+                if(_roomMatrix[y+1][x-1] != null && _roomMatrix[y+1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x-1]);
+                if(_roomMatrix[y-1][x-1] != null && _roomMatrix[y-1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x-1]);
+                if(_roomMatrix[y][x-1] != null && _roomMatrix[y][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x-1]);
+            }
+            else
+            {
+                if(_roomMatrix[y+1][x+1] != null && _roomMatrix[y+1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x+1]);
+                if(_roomMatrix[y+1][x-1] != null && _roomMatrix[y+1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x-1]);
+                if(_roomMatrix[y-1][x-1] != null && _roomMatrix[y-1][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x-1]);
+                if(_roomMatrix[y-1][x+1] != null && _roomMatrix[y-1][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x+1]);
+                if(_roomMatrix[y][x-1] != null && _roomMatrix[y][x-1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x-1]);
+                if(_roomMatrix[y][x+1] != null && _roomMatrix[y][x+1].Enabled)
+                    neighbors.Add(_roomMatrix[y][x+1]);
+                if(_roomMatrix[y+1][x] != null && _roomMatrix[y+1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y+1][x]);
+                if(_roomMatrix[y-1][x] != null && _roomMatrix[y-1][x].Enabled)
+                    neighbors.Add(_roomMatrix[y-1][x]);
+            }
+        }
+    
+        return neighbors;
     }
 
     private void SetWeightsForMatrix(RoomData start, RoomData end)
