@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using System.Collections;
 
 public class Room : MonoBehaviour
 {
@@ -9,6 +7,8 @@ public class Room : MonoBehaviour
     public int X;
 
     public int Y;
+
+    public int EnemyCount;
 
     void Awake()
     {
