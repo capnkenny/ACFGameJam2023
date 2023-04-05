@@ -9,6 +9,12 @@ public class RoomData
 
     public bool Enabled {get; set;}
 
+    public bool Spawn {get; set;}
+
+    public bool End {get; set;}
+
+    public bool Bonus {get; set;}
+
     public RoomData Parent {get; set;}
 
     public int StartCost {get; set;}

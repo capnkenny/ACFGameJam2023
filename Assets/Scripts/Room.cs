@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class Room : MonoBehaviour
 {
@@ -10,12 +11,20 @@ public class Room : MonoBehaviour
 
     public int EnemyCount;
 
+    public TextMeshPro Text;
+
+    public bool SpawnRoom;
+
+    public bool EndRoom;
+
     void Awake()
     {
+       
     }
 
     void Start()
     {
+        Text.text = $"Room # {RoomNumber}";
     }
 
     void Update()
