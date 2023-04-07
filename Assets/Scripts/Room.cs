@@ -4,18 +4,22 @@ using TMPro;
 public class Room : MonoBehaviour
 {
     public int RoomNumber;
-
     public int X;
-
     public int Y;
+    
+    public int Cost;
+    public int Distance;
+    public int CostDistance => Cost = Distance;
 
+    public Room Parent;
+    
+    
     public int EnemyCount;
-
-    public TextMeshPro Text;
-
     public bool SpawnRoom;
-
     public bool EndRoom;
+
+
+    public GameObject RoomPrefab;
 
     void Awake()
     {
@@ -24,12 +28,10 @@ public class Room : MonoBehaviour
 
     void Start()
     {
-        Text.text = $"Room # {RoomNumber}";
     }
 
     void Update()
     {
-
     }
 
 }

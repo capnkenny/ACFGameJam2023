@@ -3,9 +3,27 @@ using System.Text;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
 
 public class LevelGenerator : MonoBehaviour
 {
+    #region Room constants
+    
+    #endregion Room constants
+    
+    #region Defaults
+
+    private const int DEFAULT_GRID_SIZE = 8;
+    private const int DEFAULT_CARDINAL_WEIGHT = 10;
+    private const int DEFAULT_DIAGONAL_WEIGHT = 14;
+
+    private const float DEFAULT_GENERATION_SEED = 2.6f;
+
+    #endregion Defaults
+
+    #region Serialized Fields
+
     [SerializeField]
     private GameObject _roomPrefab;
 
@@ -15,17 +33,14 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     private int _levelNumber;
 
-    [SerializeField]
+    //[SerializeField]
+    private float _levelGenerationSeed;
+
+    //[SerializeField]
     private int _gridWidth;
 
-    [SerializeField]
+    //[SerializeField]
     private int _gridHeight;
-    
-    [SerializeField]
-    private float _ySnapDistanceForCamera;
-
-    [SerializeField]
-    private float _xSnapDistanceForCamera;
 
     [SerializeField]
     private float _yDistanceForPrefab;
@@ -34,153 +49,420 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     private float _xDistanceForPrefab;
     //35.41
-
-    [SerializeField]
-    private int _cardinalDirectionWeight;
-
-    [SerializeField]
-    private int _diagonalDirectionWeight;
-
-    [SerializeField]
-    private Vector2 _startPoint;
-
-    [SerializeField]
-    private bool _useStartPoint;
-
-    [InspectorButton("OnRegenerate")]
-    public bool RegenerateLevel;
-
-    private List<List<RoomData>> _roomMatrix;
-    private int _numberOfRooms;
-    private List<RoomData> _enabledRooms;
     
-    private List<RoomData> _path;
+    #endregion Serialized Fields
 
-    void Start()
+    #region Private members
+    
+    private int _numberOfRooms;
+
+    private List<List<RoomData>> _grid;
+
+    private Vector2Int _startingRoom;
+
+    private Vector2Int _endRoom;
+
+    private List<RoomData> _validPath;
+
+    private GameObject debug;
+
+    private GameObject RoomParent;
+
+    private bool finished = false;
+
+    private List<RoomData> _extraRooms;
+
+	#endregion Private members
+
+	private void Update()
+	{
+        if(finished)
+            DrawLine();
+	}
+
+	void Awake()
     {
-        if(_gridHeight < 1)
-            _gridHeight = 7;
-        if(_gridWidth < 1)
-            _gridWidth = 7;
+        //Validation
+        //if(_gridHeight == 0)
+        //    _gridHeight = DEFAULT_GRID_SIZE;
+        //if(_gridWidth == 0)
+        //    _gridWidth = DEFAULT_GRID_SIZE;
+        if(_levelNumber == 0)
+            _levelNumber++;
+        //if(_levelGenerationSeed == 0.0f || _levelGenerationSeed > 10.0f)
+        _levelGenerationSeed = UnityEngine.Random.Range(5.5f, 10.0f);
+
+        _extraRooms = new List<RoomData>();
+
+        debug = new GameObject("DebugLayer");
+        RoomParent = new GameObject("Rooms");
+
+		//Initialize Grid
+		
+		StringBuilder sb = new StringBuilder();
+
+		sb.AppendLine("Initial Values");
+		sb.AppendFormat("Level: {0}", _levelNumber).AppendLine();
+		sb.AppendFormat("Seed: {0}", _levelGenerationSeed).AppendLine();
+
+		float n = (float)_levelNumber / 2.0f;
+        float u = _levelGenerationSeed * n;
+        int m = (int)(u + 8);
+
+		sb.AppendFormat("N: {0}, U: {1}, M: {2}", n,u,m).AppendLine();
+
+        _gridHeight = _gridWidth = m;
+        _numberOfRooms = (m - 2);
+		//Debug Output
+		
+        
+		sb.AppendFormat("Number of Rooms: {0}", _numberOfRooms).AppendLine();
+		sb.AppendFormat("Grid Size: {0}, {1}", _gridWidth, _gridHeight).AppendLine();
+
+		Debug.Log(sb.ToString());
+		sb.Clear();
+		InitializeGrid();
+
+		sb.AppendFormat("Start Room: {0}, {1}", _startingRoom.x, _startingRoom.y).AppendLine();
+		sb.AppendFormat("End Room: {0}, {1}", _endRoom.x, _endRoom.y).AppendLine();
+		Debug.Log(sb.ToString());
+        sb.Clear();
+
+		
+		DebugLayers();
+
+    	//Determine Neighbors
+	    var found = Search();
+
+        
+		_validPath = FindPathToEnd();
+
+        AdjustGrid();
+
+		GenerateLevel();
+        finished = true;
+		//AdjustGrid();
+
+
+	}
+
+    private void InitializeGrid()
+    {
+        _validPath = new List<RoomData>();
+        _grid = new List<List<RoomData>>();
         int roomNumber = 1;
-        if(_levelNumber <= 0)
-            throw new ArgumentException("The Level Number must be greater than or equal to 1!");
-
-        if(_cardinalDirectionWeight <= 0)
-            _cardinalDirectionWeight = UnityEngine.Random.Range(5,21);
-        if(_diagonalDirectionWeight <= 0)
-            _diagonalDirectionWeight = UnityEngine.Random.Range(5,21);
-
-        //Generate number of rooms
-        _numberOfRooms = (int)(UnityEngine.Random.Range(1,3) + _levelNumber + 5 * 2.6);
-        _roomMatrix = new List<List<RoomData>>(_gridHeight);
-        _path = new List<RoomData>();
-        _enabledRooms = new List<RoomData>();
-
-        for(int h = 0; h < _gridHeight; h++)
+        int sX = 0;
+        int sY = 0;
+        for(int i = 0; i < _gridHeight; i++)
         {
-            _roomMatrix.Add(new List<RoomData>(_gridWidth));
-            //_roomMatrix[h] = new List<RoomData>(_gridWidth);
-            for(int w = 0; w < _gridWidth; w++)
+            sX = 0;
+            _grid.Add(new List<RoomData>());
+            for(int j = 0; j < _gridWidth; j++)
             {
-                _roomMatrix[h].Add(new RoomData 
-                { 
-                    X = w, 
-                    Y = h,
-                    RoomNumber = roomNumber, 
-                    Enabled = false, 
-                    Parent = null, 
-                    StartCost = 0, 
-                    EndCost = 0,
-                    Spawn = false,
-                    End = false,
-                    Bonus = false
-                });
-                // var go = Instantiate(_debugPrefab, new Vector2(w * _xDistanceForPrefab, h * _yDistanceForPrefab), Quaternion.identity, transform);
-                // var goRoom = go.GetComponent<Room>();
-                // goRoom.RoomNumber = roomNumber;
-                // goRoom.X = w;
-                // goRoom.Y = h;
-                //Debug.LogFormat("Generated room # {0}", roomNumber);
+                _grid[i].Add(new RoomData
+                    { 
+                        X = sX, 
+                        Y = sY, 
+                        RoomNumber = roomNumber, 
+                        Enabled = true, 
+                        Spawn = false, 
+                        End = false, 
+                        Bonus = false,
+                        Parent = null
+                    }
+                );
                 roomNumber++;
+                sX++;
+            }
+            sY++;
+        }
+
+        //Get starting room
+        int x = UnityEngine.Random.Range(0, _gridWidth);
+        int y = UnityEngine.Random.Range(0, _gridHeight);
+		_startingRoom = new Vector2Int(x, y);
+		_grid[y][x].Spawn = true;        
+
+        //Get End room
+        int eX = UnityEngine.Random.Range(0, _gridWidth);
+        int eY = UnityEngine.Random.Range(0, _gridHeight);
+        //Make sure its not the same as the starting room
+        while(eX == x && eY == y || HeuristicCost(x,y,eX,eY) < (_numberOfRooms * DEFAULT_CARDINAL_WEIGHT))
+        {
+            eX = UnityEngine.Random.Range(0, _gridWidth);
+            eY = UnityEngine.Random.Range(0, _gridHeight);
+        }
+        _grid[eY][eX].End = true;
+        _endRoom = new Vector2Int(eX, eY);
+
+        foreach (var arr in _grid)
+            foreach (var room in arr)
+            {
+                room.GivenCost = DetermineGivenCost(_grid[room.Y][room.X]);
+				room.HeuristicCost = DetermineHeuristicCost(_grid[room.Y][room.X]);
+			}
+                
+
+		//Disable a random bunch of rooms
+		int toDisable = UnityEngine.Random.Range(2, 8);
+        for(int i = 0; i < toDisable; i++)
+        {
+            int dX = UnityEngine.Random.Range(0, _gridWidth);
+            int dY = UnityEngine.Random.Range(0, _gridHeight);
+
+            bool matchesEnd = (dX == eX) && (dY == eY);
+            bool matchesSpawn = (dX == x) && (dY == y);
+            while(matchesEnd || matchesSpawn)
+            {
+                dX = UnityEngine.Random.Range(0, _gridWidth);
+                dY = UnityEngine.Random.Range(0, _gridHeight);
+                matchesEnd = (dX == eX) && (dY == eY);
+                matchesSpawn = (dX == x) && (dY == y);
+            }
+
+            _grid[dY][dX].Enabled = false;
+            Debug.LogFormat("Disabled Room {0}", _grid[dY][dX].RoomNumber);
+        }
+    }
+
+    private bool Search()
+    {
+        //Create an open list to check, and a closed list of rooms
+        // we don't need to check anymore.
+        var openList = new List<RoomData>();
+        var closedList = new List<RoomData>();
+
+        //Add the starting room to the list
+        openList.Add(_grid[_startingRoom.y][_startingRoom.x]);
+
+		//Recursion begins
+		while (openList.Count > 0 && !openList.Any(r => r.RoomNumber == _grid[_endRoom.y][_endRoom.x].RoomNumber))
+        {
+            UpdateDebugLayers();
+            //Get lowest F cost
+            var room = openList.OrderBy(r => r.FullCost).First();
+            //Debug.LogFormat("Room {0}, Cost: {1}", room.RoomNumber, room.FullCost);
+            
+            //Remove lowest cost and move to closed list
+            openList.Remove(room);
+            closedList.Add(room);
+
+			//Check da naybuhs
+			DetermineNeighbors(room, ref openList, ref closedList);
+            
+            if(closedList.Any(r => r.RoomNumber == _grid[_endRoom.y][_endRoom.x].RoomNumber))
+            {
+                Debug.Log("Completed search!");
+                return true;
             }
         }
 
-        //Set start point if defined
-        int x = (int)_startPoint.x;
-        int y = (int)_startPoint.y;
-        RoomData startRoom = null;
-        if(_useStartPoint)
+        return false;
+    }
+    
+    private void DetermineNeighbors(RoomData room, ref List<RoomData> openList, ref List<RoomData> closed)
+    {
+        //Check if east neighbor is valid
+        if(room.X + 1 < _gridWidth)
         {
-            if(x < 0 || x > _gridWidth)
+            //Check if east neighbor is walkable
+            if(_grid[room.Y][room.X + 1].Enabled && !closed.Any(r => r.RoomNumber == _grid[room.Y][room.X + 1].RoomNumber))
             {
-                throw new ArgumentOutOfRangeException("_startPoint.x");
-            }
-            if(y < 0 || y > _gridHeight)
-            {
-                throw new ArgumentOutOfRangeException("_startPoint.y");
-            }
-            try
-            {
-                Debug.LogFormat("Setting starting room to room # {0} @ {1}, {2}", _roomMatrix[y][x].RoomNumber, _roomMatrix[y][x].X, _roomMatrix[y][x].Y);
-                _roomMatrix[y][x].Enabled = true;
-                _roomMatrix[y][x].Spawn = true;
-                startRoom = _roomMatrix[y][x];
-                _numberOfRooms--;
-            }
-            catch
-            {
-                int newX = UnityEngine.Random.Range(0, _gridWidth);
-                int newY = UnityEngine.Random.Range(0, _gridHeight);
-                _startPoint = new Vector2(newX, newY);
-                _roomMatrix[newY][newX].Enabled = true;
-                _roomMatrix[newY][newX].Spawn = true;
-                startRoom = _roomMatrix[newY][newX];
-                Debug.LogFormat("Setting starting room to room # {0} @ {1}, {2}", _roomMatrix[newY][newX].RoomNumber, newX, newY);
-                _numberOfRooms--;
-            }
-            _enabledRooms.Add(startRoom);
-        }
-        else
-        {
-            x = UnityEngine.Random.Range(0, _gridWidth);
-            y = UnityEngine.Random.Range(0, _gridHeight);
-            _startPoint = new Vector2(x, y);
-            _roomMatrix[y][x].Enabled = true;
-            _roomMatrix[y][x].Spawn = true;
-            startRoom = _roomMatrix[y][x];
-            Debug.LogFormat("Setting starting room to room # {0} @ {1}, {2}", _roomMatrix[y][x].RoomNumber, x, y);
-            _numberOfRooms--;
-        }
-
-        GenerateRooms(ref startRoom);
-
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Matrix: ");
-        foreach(var row in _roomMatrix)
-        {
-            sb.Append("|");
-            foreach(var col in row)
-            {
-                if(_path.Where(r => r.RoomNumber == col.RoomNumber).Count() > 0)
+                if(!openList.Any(r => r.RoomNumber == _grid[room.Y][room.X + 1].RoomNumber))
                 {
-                    sb.Append("x");
-                    CreateRoomPrefab(col);
+                    _grid[room.Y][room.X + 1].Parent = _grid[room.Y][room.X];
+                    _grid[room.Y][room.X + 1].GivenCost = DetermineGivenCost(_grid[room.Y][room.X + 1]);
+                    _grid[room.Y][room.X + 1].HeuristicCost = DetermineHeuristicCost(_grid[room.Y][room.X + 1]);
+                    openList.Add(_grid[room.Y][room.X + 1]);
                 }
                 else
-                    sb.Append("-");
+                {
+                    var foundRoom = openList.First(r => r.RoomNumber == _grid[room.Y][room.X + 1].RoomNumber);
+                    int newCost = DetermineGivenCost(_grid[room.Y][room.X]) + 10;
+                    if(newCost < foundRoom.GivenCost)
+                    {
+                        foundRoom.Parent = _grid[room.Y][room.X];
+                        foundRoom.GivenCost = newCost;
+                    }
+                }
+                
             }
-            sb.AppendLine("|");
+        }   
+        //North neighbor
+        if(room.Y + 1 < _gridHeight)
+        {
+            if(_grid[room.Y + 1][room.X].Enabled && !closed.Any(r => r.RoomNumber == _grid[room.Y + 1][room.X].RoomNumber))
+            {
+                if(!openList.Any(r => r.RoomNumber == _grid[room.Y + 1][room.X].RoomNumber))
+                {
+                    _grid[room.Y + 1][room.X].Parent = _grid[room.Y][room.X];
+                    _grid[room.Y + 1][room.X].GivenCost = DetermineGivenCost(_grid[room.Y + 1][room.X]);
+                    _grid[room.Y + 1][room.X].HeuristicCost = DetermineHeuristicCost(_grid[room.Y + 1][room.X]);
+                    openList.Add(_grid[room.Y + 1][room.X]);
+				}
+                else
+                {
+                    var foundRoom = openList.First(r => r.RoomNumber == _grid[room.Y + 1][room.X].RoomNumber);
+                    int newCost = DetermineGivenCost(_grid[room.Y][room.X]) + 10;
+                    if(newCost < foundRoom.GivenCost)
+                    {
+                        foundRoom.Parent = _grid[room.Y][room.X];
+                        foundRoom.GivenCost = newCost;
+                    }
+                }
+            }
         }
-        Debug.Log(sb.ToString());
+        //West neighbor
+        if(room.X - 1 >= 0)
+        {
+            if(_grid[room.Y][room.X - 1].Enabled && !closed.Any(r => r.RoomNumber == _grid[room.Y][room.X - 1].RoomNumber))
+            {
+                if(!openList.Any(r => r.RoomNumber == _grid[room.Y][room.X - 1].RoomNumber))
+                {
+                    _grid[room.Y][room.X - 1].Parent = _grid[room.Y][room.X];
+                    _grid[room.Y][room.X - 1].GivenCost = DetermineGivenCost(_grid[room.Y][room.X - 1]);
+                    _grid[room.Y][room.X - 1].HeuristicCost = DetermineHeuristicCost(_grid[room.Y][room.X - 1]);
+                    openList.Add(_grid[room.Y][room.X - 1]);
+				}
+                else
+                {
+                    var foundRoom = openList.First(r => r.RoomNumber == _grid[room.Y][room.X - 1].RoomNumber);
+                    int newCost = DetermineGivenCost(_grid[room.Y][room.X]) + 10;
+                    if(newCost < foundRoom.GivenCost)
+                    {
+                        foundRoom.Parent = _grid[room.Y][room.X];
+                        foundRoom.GivenCost = newCost;
+                    }
+                }
+            }
+        }
+        //South Neighbor   
+        if(room.Y - 1 >= 0)
+        {
+            if(_grid[room.Y - 1][room.X].Enabled && !closed.Any(r => r.RoomNumber == _grid[room.Y - 1][room.X].RoomNumber))
+            {
+                if(!openList.Any(r => r.RoomNumber == _grid[room.Y - 1][room.X].RoomNumber))
+                {
+                    _grid[room.Y - 1][room.X].Parent = _grid[room.Y][room.X];
+                    _grid[room.Y - 1][room.X].GivenCost = DetermineGivenCost(_grid[room.Y - 1][room.X]);
+                    _grid[room.Y - 1][room.X].HeuristicCost = DetermineHeuristicCost(_grid[room.Y - 1][room.X]);
+                    openList.Add(_grid[room.Y - 1][room.X]);
+				}
+                else
+                {
+                    var foundRoom = openList.First(r => r.RoomNumber == _grid[room.Y - 1][room.X].RoomNumber);
+                    int newCost = DetermineGivenCost(_grid[room.Y][room.X]) + 10;
+                    if(newCost < foundRoom.GivenCost)
+                    {
+                        foundRoom.Parent = _grid[room.Y][room.X];
+                        foundRoom.GivenCost = newCost;
+                    }
+                }
+            }
+        }
+    }
 
-        var cam = GameObject.FindGameObjectWithTag("MainCamera");
-        cam.transform.position = new Vector3(startRoom.X * _xSnapDistanceForCamera , startRoom.Y * _ySnapDistanceForCamera, -10);
+    private int DetermineGivenCost(RoomData target)
+    {
+        int xDiff = Math.Abs(_startingRoom.x - target.X);
+        int yDiff = Math.Abs(_startingRoom.y - target.Y);
+        int diff = Math.Abs(xDiff - yDiff);
+
+        if(diff == 0)
+            return 0;
+        if(xDiff == 0 || yDiff == 0)
+            return ((xDiff + yDiff) * DEFAULT_CARDINAL_WEIGHT);
+        
+        //Diagonal
+        if(xDiff == yDiff)
+            return xDiff * DEFAULT_DIAGONAL_WEIGHT;
+        else if(xDiff > yDiff)
+            return (yDiff * DEFAULT_DIAGONAL_WEIGHT) + (diff * DEFAULT_CARDINAL_WEIGHT);
+        else
+            return (xDiff * DEFAULT_DIAGONAL_WEIGHT) + (diff * DEFAULT_CARDINAL_WEIGHT);
+    }
+
+    private int DetermineHeuristicCost(RoomData start)
+    {
+        //Manhattan-based estimation says to ignore all obstacles, and count
+        // both number of vertical spaces plus horizontal spaces to get from
+        // start to finish, like if you were counting city blocks (a la Manhattan, NY).
+        int x = Math.Abs(start.X - _endRoom.x);
+        int y = Math.Abs(start.Y - _endRoom.y);
+
+        if (x == 0 && y == 0)
+            return 0;
+        
+        return (x+y) * DEFAULT_CARDINAL_WEIGHT;
+    }
+
+    private int HeuristicCost(int x, int y, int ex, int ey)
+    {
+        int dx = Math.Abs(x - ex);
+        int dy = Math.Abs(y - ey);
+
+        return (dx + dy) * DEFAULT_CARDINAL_WEIGHT;
+    }
+
+    private List<RoomData> FindPathToEnd()
+    {
+        List<RoomData> path = new List<RoomData>();
+        RoomData currentRoom = _grid[_endRoom.y][_endRoom.x];
+        while(currentRoom != null)
+        {
+            path.Add(_grid[currentRoom.Y][currentRoom.X]);
+            currentRoom = currentRoom.Parent;
+        }
+        
+        return path;
+    }
+
+    private void GenerateLevel()
+    {
+        foreach (var column in _grid)
+        {
+            foreach (var room in column)
+            {
+                if (!_validPath.Any(a => a.RoomNumber == room.RoomNumber) && !_extraRooms.Any(a => a.RoomNumber == room.RoomNumber))
+                    _grid[room.Y][room.X].Enabled = false;
+                else
+                {
+                    CreateRoomPrefab(room);
+                }
+            }
+        }
+
+        //StringBuilder stringBuilder = new StringBuilder();
+        //stringBuilder.AppendLine("Grid:");
+        //foreach (var arr in _grid)
+        //{
+        //    stringBuilder.Append("|");
+        //    foreach (var room in arr)
+        //    {
+        //        if (room.Bonus)
+        //            stringBuilder.Append('B');
+        //        else if (room.Spawn)
+        //            stringBuilder.Append('S');
+        //        else if (room.End)
+        //            stringBuilder.Append('E');
+        //        else if (room.Enabled)
+        //            stringBuilder.Append('X');
+        //        else
+        //            stringBuilder.Append('-');
+        //    }
+        //    stringBuilder.AppendLine("|");
+        //}
+        //Debug.Log(stringBuilder.ToString());
+
+        //foreach(var room in _validPath)
+        //{
+        //    //CreateRoomPrefab(room);
+        //}
     }
 
     private void CreateRoomPrefab(RoomData data)
     {
-        var gameObject = Instantiate(_roomPrefab, new Vector2(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab), Quaternion.identity, transform);
+        var gameObject = Instantiate(_roomPrefab, new Vector2(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab), Quaternion.identity, RoomParent.transform);
         gameObject.name = $"Room{data.RoomNumber}";
         var comp = gameObject.GetComponent<Room>();
         if(comp == null)
@@ -206,298 +488,136 @@ public class LevelGenerator : MonoBehaviour
             var render = floor.GetComponent<SpriteRenderer>();
             render.color = Color.yellow;
         }
+        if (!data.Enabled)
+        {
+			var floor = gameObject.transform.Find("Floor");
+			var render = floor.GetComponent<SpriteRenderer>();
+			render.color = Color.black;
+		}
     }
 
-    private void GenerateInitialLayout(ref RoomData start)
+    private void UpdateDebugLayers()
     {
-        RoomData current = start;
-        _path.Add(start);
-
-        //Set the initial direction
-        int direction = UnityEngine.Random.Range(1,5);
-
-        // Generate the remaining rooms until
-        // we have none left
-        for(int n = 0; n < _numberOfRooms; n++)
-        {
-            Debug.LogFormat("{0} rooms remaining", (_numberOfRooms - n));
-            bool okay = false;
-            int x = current.X;
-            int y = current.Y;
-            while(!okay)
-            {
-                direction = UnityEngine.Random.Range(1,5);
-                switch(direction)
+		foreach (var arr in _grid)
+		{
+			foreach (var data in arr)
+			{
+                var parent = transform.Find("DebugLayer");
+                if (parent != null)
                 {
-                    case 1: // North
-                    {
-                        y++;
-                        break;
-                    }
-                    case 2: // East
-                    {
-                        x++;
-                        break;
-                    }
-                    case 3: // South
-                    {
-                        y--;
-                        break;
-                    }
-                    case 4: // West
-                    {
-                        x--;
-                        break;
-                    }
+                    var gameObject = parent.Find($"Debug{data.RoomNumber}");
+                    gameObject.transform.Find("RoomNumber").GetComponent<TextMeshPro>().text = $"Room {data.RoomNumber}";
+                    gameObject.transform.Find("G").GetComponent<TextMeshPro>().text = $"{data.GivenCost}";
+                    gameObject.transform.Find("H").GetComponent<TextMeshPro>().text = $"{data.HeuristicCost}";
+                    gameObject.transform.Find("F").GetComponent<TextMeshPro>().text = $"{data.FullCost}";
                 }
-                if(y >= 0 && y < _gridHeight)
+			}
+		}
+	}
+
+    private void DebugLayers()
+    {
+        debug.tag = "DebugLayer";
+        foreach (var arr in _grid)
+        {
+            foreach (var data in arr)
+            {
+				var gameObject = Instantiate(_debugPrefab, new Vector2(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab), Quaternion.identity, debug.transform);
+				gameObject.name = $"Debug{data.RoomNumber}";
+                gameObject.transform.Find("RoomNumber").GetComponent<TextMeshPro>().text = $"Room {data.RoomNumber}";
+				gameObject.transform.Find("G").GetComponent<TextMeshPro>().text = $"{data.GivenCost}";
+				gameObject.transform.Find("H").GetComponent<TextMeshPro>().text = $"{data.HeuristicCost}";
+				gameObject.transform.Find("F").GetComponent<TextMeshPro>().text = $"{data.FullCost}";
+				if (data.Spawn)
+				{
+					var floor = gameObject.transform.Find("DebugSquare");
+					var render = floor.GetComponent<SpriteRenderer>();
+					render.color = Color.green;
+				}
+				if (data.End)
+				{
+					var floor = gameObject.transform.Find("DebugSquare");
+					var render = floor.GetComponent<SpriteRenderer>();
+					render.color = Color.red;
+				}
+				if (data.Bonus)
+				{
+					var floor = gameObject.transform.Find("DebugSquare");
+					var render = floor.GetComponent<SpriteRenderer>();
+					render.color = Color.yellow;
+				}
+				if (!data.Enabled)
+				{
+					var floor = gameObject.transform.Find("DebugSquare");
+					var render = floor.GetComponent<SpriteRenderer>();
+					render.color = Color.black;
+				}
+			}    
+        }
+		
+	}
+
+    private void DrawLine()
+    {
+        var gameObject = GameObject.FindGameObjectWithTag("DebugLayer");
+		foreach (var arr in _grid)
+		{
+			foreach (var data in arr)
+			{
+                if (gameObject != null)
                 {
-                    if(x >= 0 && x < _gridWidth)
-                    {
-                        if(!_roomMatrix[y][x].Enabled)
-                        {
-                            Debug.LogFormat("Enabling Room {0}", _roomMatrix[y][x].RoomNumber);
-                            _roomMatrix[y][x].Enabled = true;
-                            _path.Add(_roomMatrix[y][x]);
-                            okay = true;
-                        }
-                    }
-                }
-            }
-        }
-        
-        //Set the end room
-        Vector2 endRoom = new Vector2(_path[_path.Count - 1].X, _path[_path.Count - 1].Y);
-        _roomMatrix[(int)endRoom.y][(int)endRoom.x].End = true;
-    }
+                    var go = gameObject.transform.Find($"Debug{data.RoomNumber}");
+                    if (go != null && !_validPath.Any(v => v.RoomNumber == data.RoomNumber))
+                        go.gameObject.SetActive(false);
+				}
 
-    private void GenerateRooms(ref RoomData start)
-    {
-        GenerateInitialLayout(ref start);
-    }
-    public List<RoomData> GetNeighbors(int x, int y)
-    {
-        List<RoomData> neighbors = new();
+				if (data.Parent != null && _validPath.Any(r => r.RoomNumber == data.RoomNumber))
+					Debug.DrawLine(new Vector3(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab, 0), new Vector3(data.Parent.X * _xDistanceForPrefab, data.Parent.Y * _yDistanceForPrefab, -3), Color.blue);
 
-        if(y == 0)
+			}
+		}
+
+		foreach (var room in _validPath)
         {
-            
-            if(x == 0)
-            {
-                if(_roomMatrix[y][x+1] != null)
-                    neighbors.Add(_roomMatrix[y][x+1]);
-                if(_roomMatrix[y+1][x] != null)
-                    neighbors.Add(_roomMatrix[y+1][x]);
-            }
-            else if(x == _roomMatrix[y].Count - 1)
-            {
-                if(_roomMatrix[y][x-1] != null)
-                    neighbors.Add(_roomMatrix[y][x-1]);
-                if(_roomMatrix[y+1][x] != null)
-                    neighbors.Add(_roomMatrix[y+1][x]);
-            }
-            else
-            {
-                if(_roomMatrix[y][x+1] != null)
-                    neighbors.Add(_roomMatrix[y][x+1]);
-                if(_roomMatrix[y][x-1] != null)
-                    neighbors.Add(_roomMatrix[y][x-1]);
-                if(_roomMatrix[y+1][x] != null)
-                    neighbors.Add(_roomMatrix[y+1][x]);
-            }
-        }
-        else if(y == _roomMatrix.Count - 1)
-        {
-            if(x == 0)
-            {
-                if(_roomMatrix[y-1][x] != null)
-                    neighbors.Add(_roomMatrix[y-1][x]);
-                if(_roomMatrix[y][x+1] != null)
-                    neighbors.Add(_roomMatrix[y][x+1]);
-            }
-            else if(x == _roomMatrix[y].Count - 1)
-            {
-                if(_roomMatrix[y-1][x] != null)
-                    neighbors.Add(_roomMatrix[y-1][x]);
-                if(_roomMatrix[y][x-1] != null)
-                    neighbors.Add(_roomMatrix[y][x-1]);
-            }
-            else
-            {
-                if(_roomMatrix[y][x+1] != null)
-                    neighbors.Add(_roomMatrix[y][x+1]);
-                if(_roomMatrix[y][x-1] != null)
-                    neighbors.Add(_roomMatrix[y][x-1]);
-                if(_roomMatrix[y-1][x] != null)
-                    neighbors.Add(_roomMatrix[y-1][x]);
-            }
-        }
-        else
-        {
-            if(x == 0)
-            {
-                if(_roomMatrix[y][x+1] != null)
-                    neighbors.Add(_roomMatrix[y][x+1]);
-                if(_roomMatrix[y-1][x] != null)
-                    neighbors.Add(_roomMatrix[y-1][x]);
-                if(_roomMatrix[y][x+1] != null)
-                    neighbors.Add(_roomMatrix[y][x+1]);
-            }
-            else if(x == _roomMatrix[y].Count - 1)
-            {
-                if(_roomMatrix[y+1][x] != null)
-                    neighbors.Add(_roomMatrix[y+1][x]);
-                if(_roomMatrix[y][x-1] != null)
-                    neighbors.Add(_roomMatrix[y][x-1]);
-                if(_roomMatrix[y][x-1] != null)
-                    neighbors.Add(_roomMatrix[y][x-1]);
-            }
-            else
-            {
-                if(_roomMatrix[y][x-1] != null)
-                    neighbors.Add(_roomMatrix[y][x-1]);
-                if(_roomMatrix[y][x+1] != null)
-                    neighbors.Add(_roomMatrix[y][x+1]);
-                if(_roomMatrix[y+1][x] != null)
-                    neighbors.Add(_roomMatrix[y+1][x]);
-                if(_roomMatrix[y-1][x] != null)
-                    neighbors.Add(_roomMatrix[y-1][x]);
-            }
-        }
+			var go = gameObject.transform.Find($"Debug{room.RoomNumber}");
+			if (go != null)
+				go.gameObject.SetActive(true);
+		}
+	}
     
-        return neighbors;
-    }
-    private int GetDistance(RoomData roomA, RoomData roomB)
+    private void AdjustGrid()
     {
-        if(roomA.RoomNumber == roomB.RoomNumber)
-            return 0;
+  //      int count = _validPath.Count();
+  //      int roomsLeft = _numberOfRooms - count;
 
-        int x = Math.Abs(roomA.X - roomB.X);
-        int y = Math.Abs(roomA.Y - roomB.Y);
+  //      var open = new List<RoomData>();
+  //      var closed = new List<RoomData>();
 
-        int weight = 0;
-        
-        if(x > y)
-            weight = (_diagonalDirectionWeight * y + _cardinalDirectionWeight * (x - y));
-        else
-            weight = (_diagonalDirectionWeight * x + _cardinalDirectionWeight * (y - x));
-        
-        return weight;
+  //      if (roomsLeft <= 0)
+  //          return;
+
+  //      int diff = 0;
+  //      int previousCount = 0;
+
+  //      while (roomsLeft > 0)
+  //      {
+  //          Debug.Log($"{roomsLeft} rooms left");
+  //          previousCount = closed.Count;
+            
+  //          int mid = _validPath.Count / 2;
+
+  //          mid += UnityEngine.Random.Range(0, _validPath.Count / 4);
+
+  //          DetermineNeighbors(_validPath[mid], ref open, ref closed);
+			
+  //          diff = Math.Abs(closed.Count - previousCount);
+  //          roomsLeft -= diff;
+		//}
+
+  //      foreach (var room in closed)
+  //      {
+  //          _extraRooms.Add(_grid[room.Y][room.X]);
+  //      }
     }
-    private void OnRegenerate()
-    {
-        _numberOfRooms = (int)(UnityEngine.Random.Range(1,3) + _levelNumber + 5 * 2.6);
-        _enabledRooms = new List<RoomData>();
-        int roomNumber = 0;
-        //_roomMatrix.Clear();
-        _roomMatrix = new List<List<RoomData>>(_gridHeight);
 
-        int childrenCount = transform.childCount;
-        for(int i = 0; i < childrenCount; i++)
-        {
-            GameObject.Destroy(transform.GetChild(i).gameObject);
-        }
-
-        for(int h = 0; h < _gridHeight; h++)
-        {
-            _roomMatrix.Add(new List<RoomData>(_gridWidth));
-            for(int w = 0; w < _gridWidth; w++)
-            {
-                _roomMatrix[h].Add(new RoomData 
-                { 
-                    X = w, 
-                    Y = h,
-                    RoomNumber = roomNumber, 
-                    Enabled = false, 
-                    Parent = null, 
-                    StartCost = 0, 
-                    EndCost = 0,
-                    Spawn = false,
-                    End = false,
-                    Bonus = false
-                });
-                roomNumber++;
-            }
-        }
-
-        int x = UnityEngine.Random.Range(0, _gridWidth);
-        int y = UnityEngine.Random.Range(0, _gridHeight);
-        RoomData startRoom = null;
-
-        if(x < 0 || x > _gridWidth)
-        {
-            throw new ArgumentOutOfRangeException("_startPoint.x");
-        }
-        if(y < 0 || y > _gridHeight)
-        {
-            throw new ArgumentOutOfRangeException("_startPoint.y");
-        }
-        try
-        {
-            Debug.LogFormat("Setting starting room to room # {0} @ {1}, {2}", _roomMatrix[y][x].RoomNumber, _roomMatrix[y][x].X, _roomMatrix[y][x].Y);
-            _roomMatrix[y][x].Enabled = true;
-            _roomMatrix[y][x].Spawn = true;
-            startRoom = _roomMatrix[y][x];
-            _numberOfRooms--;
-        }
-        catch
-        {
-            int newX = UnityEngine.Random.Range(0, _gridWidth);
-            int newY = UnityEngine.Random.Range(0, _gridHeight);
-            _startPoint = new Vector2(newX, newY);
-            _roomMatrix[newY][newX].Enabled = true;
-            _roomMatrix[newY][newX].Spawn = true;
-            startRoom = _roomMatrix[newY][newX];
-            Debug.LogFormat("Setting starting room to room # {0} @ {1}, {2}", _roomMatrix[newY][newX].RoomNumber, newX, newY);
-            //Instantiate(_roomPrefab, new Vector2(newX * _xDistanceForPrefab, newY * _yDistanceForPrefab), Quaternion.identity, transform);
-            _numberOfRooms--;
-        }
-        _enabledRooms.Add(startRoom);
-
-        //Create end point randomly
-        bool endPointValid = false;
-        RoomData endRoom = null;
-        while(!endPointValid)
-        {
-            int endX = UnityEngine.Random.Range(0, _gridWidth);
-            int endY = UnityEngine.Random.Range(0, _gridHeight);
-            endRoom = _roomMatrix[endY][endX];
-            endRoom.End = true;
-            endRoom.Enabled = true;
-            int distance = GetDistance(startRoom, endRoom);
-            Debug.LogFormat("End Room Distance: {0}", distance);
-            if(distance > 10)
-            {
-                endPointValid = true;
-                _enabledRooms.Add(endRoom);
-                _numberOfRooms--;
-            }
-            else
-            {
-                endRoom.End = endRoom.Enabled = false;
-            }
-        }
-
-        GenerateRooms(ref startRoom);
-
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Matrix: ");
-        foreach(var row in _roomMatrix)
-        {
-            sb.Append("|");
-            foreach(var col in row)
-            {
-                if(col.Enabled)
-                {
-                    sb.Append("x");
-                    CreateRoomPrefab(col);
-                }
-                else
-                    sb.Append("-");
-            }
-            sb.AppendLine("|");
-        }
-        Debug.Log(sb.ToString());
-
-    }
 }

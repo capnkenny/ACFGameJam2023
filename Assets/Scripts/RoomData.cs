@@ -17,10 +17,10 @@ public class RoomData
 
     public RoomData Parent {get; set;}
 
-    public int StartCost {get; set;}
+    public int GivenCost {get; set;}
 
-    public int EndCost {get; set;}
-    public int FullCost { get { return StartCost + EndCost; } }
+    public int HeuristicCost {get; set;}
+    public int FullCost { get { return GivenCost + HeuristicCost; } }
 
     public List<RoomData> Neighbors = new List<RoomData>();
 }

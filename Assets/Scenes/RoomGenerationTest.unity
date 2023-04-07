@@ -254,14 +254,5 @@ MonoBehaviour:
   _roomPrefab: {fileID: 6016449896291690768, guid: dfc250b724e42494e8198d49a929aec1, type: 3}
   _debugPrefab: {fileID: 6016449896291690768, guid: d09a1e5de032a75488a4c4ee29c2d6ac, type: 3}
   _levelNumber: 1
-  _gridWidth: 8
-  _gridHeight: 8
-  _ySnapDistanceForCamera: 13.4
-  _xSnapDistanceForCamera: 35.3
-  _yDistanceForPrefab: 13.68
-  _xDistanceForPrefab: 35.41
-  _cardinalDirectionWeight: 10
-  _diagonalDirectionWeight: 14
-  _startPoint: {x: 0, y: 0}
-  _useStartPoint: 0
-  RegenerateLevel: 0
+  _yDistanceForPrefab: 113.68
+  _xDistanceForPrefab: 135.41
