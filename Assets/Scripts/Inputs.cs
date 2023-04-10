@@ -167,6 +167,45 @@ public partial class @Inputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""ui"",
+            ""id"": ""dbc8f829-79c1-4d7d-892d-061c903323e3"",
+            ""actions"": [
+                {
+                    ""name"": ""click"",
+                    ""type"": ""Button"",
+                    ""id"": ""8d22f9e8-0fe2-421a-a2f8-f95a7573a665"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""337c16f4-f4af-40e3-9a06-5032dc721f9c"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""332fd9d6-7360-4330-b856-00165b416a79"",
+                    ""path"": ""<VirtualMouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -176,6 +215,9 @@ public partial class @Inputs: IInputActionCollection2, IDisposable
         m_gameplay_move = m_gameplay.FindAction("move", throwIfNotFound: true);
         m_gameplay_attack = m_gameplay.FindAction("attack", throwIfNotFound: true);
         m_gameplay_altattack = m_gameplay.FindAction("altattack", throwIfNotFound: true);
+        // ui
+        m_ui = asset.FindActionMap("ui", throwIfNotFound: true);
+        m_ui_click = m_ui.FindAction("click", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -295,10 +337,60 @@ public partial class @Inputs: IInputActionCollection2, IDisposable
         }
     }
     public GameplayActions @gameplay => new GameplayActions(this);
+
+    // ui
+    private readonly InputActionMap m_ui;
+    private List<IUiActions> m_UiActionsCallbackInterfaces = new List<IUiActions>();
+    private readonly InputAction m_ui_click;
+    public struct UiActions
+    {
+        private @Inputs m_Wrapper;
+        public UiActions(@Inputs wrapper) { m_Wrapper = wrapper; }
+        public InputAction @click => m_Wrapper.m_ui_click;
+        public InputActionMap Get() { return m_Wrapper.m_ui; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UiActions set) { return set.Get(); }
+        public void AddCallbacks(IUiActions instance)
+        {
+            if (instance == null || m_Wrapper.m_UiActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_UiActionsCallbackInterfaces.Add(instance);
+            @click.started += instance.OnClick;
+            @click.performed += instance.OnClick;
+            @click.canceled += instance.OnClick;
+        }
+
+        private void UnregisterCallbacks(IUiActions instance)
+        {
+            @click.started -= instance.OnClick;
+            @click.performed -= instance.OnClick;
+            @click.canceled -= instance.OnClick;
+        }
+
+        public void RemoveCallbacks(IUiActions instance)
+        {
+            if (m_Wrapper.m_UiActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IUiActions instance)
+        {
+            foreach (var item in m_Wrapper.m_UiActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_UiActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public UiActions @ui => new UiActions(this);
     public interface IGameplayActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnAltattack(InputAction.CallbackContext context);
+    }
+    public interface IUiActions
+    {
+        void OnClick(InputAction.CallbackContext context);
     }
 }

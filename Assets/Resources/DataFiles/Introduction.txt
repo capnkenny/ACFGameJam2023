@@ -1,0 +1,20 @@
+The Koi Caverns...
+
+A peaceful sanctuary... a strange, other-worldly labyrinth for everyone to relax in.
+Home to the thousands of Koi that flourish in the streams within.
+
+
+/w 2At least it was.
+
+
+/w 2Some said that this place was once brimming with life and cozy vibes.
+/w 1Now... it's a hollow shell of its former self.
+/w 1It's up to you to restore the peace here...To bring back the tranquility
+from whatever has disturbed this sanctum.
+
+ 
+You've never been here before./w 1
+You only have second-hand information about here./w 1
+That won't stop you though./w 1
+You've got this.../w 2 
+/c./w 1./w 1./w 1right?/w 3
