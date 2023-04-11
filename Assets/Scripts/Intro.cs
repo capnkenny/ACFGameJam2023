@@ -16,7 +16,13 @@ public class Intro : MonoBehaviour
         if (writer.Done)
         {
             Debug.Log("Time to go!");
-            StartCoroutine(loader.LoadLevel(NextLevelIndex));
+            var level = GameObject.FindGameObjectWithTag("GameManager");
+            if(level != null) 
+            {
+                var gm = level.GetComponent<GameManager>();
+				StartCoroutine(loader.LoadLevel(gm.HomeHubIndex));
+			}
+            
         }
     }
 }

@@ -11,6 +11,7 @@ TagManager:
   - Detection
   - Enemy
   - DebugLayer
+  - GameManager
   layers:
   - Default
   - TransparentFX
