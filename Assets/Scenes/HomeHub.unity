@@ -258,7 +258,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3225425955107588596, guid: 022968b623e9c614f8770516079dd79c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3225425955107588599, guid: 022968b623e9c614f8770516079dd79c, type: 3}
       propertyPath: m_RootOrder
@@ -510,5 +510,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hub
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7667021992985450254, guid: ebd20b68f7d25444fa756fdc67212a3f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ebd20b68f7d25444fa756fdc67212a3f, type: 3}

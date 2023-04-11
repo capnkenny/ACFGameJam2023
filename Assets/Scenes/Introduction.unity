@@ -499,7 +499,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   writer: {fileID: 996559261}
   loader: {fileID: 1541777091}
-  NextLevelIndex: 3
+  NextLevelIndex: 4
 --- !u!1001 &1541777090
 PrefabInstance:
   m_ObjectHideFlags: 0

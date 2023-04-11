@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,8 +18,11 @@ public class LevelLoad : MonoBehaviour
     
     private int _index = 1;
     private float degreesRotated = 0;
+    public bool callAction = false;
 
     private Dictionary<int, Sprite> sprites = new Dictionary<int, Sprite>();
+
+    public Action LoadEndFunction;
 
 	private void Start()
 	{
@@ -31,22 +35,31 @@ public class LevelLoad : MonoBehaviour
 
 	private void Update()
 	{
-        var rotate = -90 * Time.deltaTime;
-        Koi.transform.Rotate(0, 0, rotate);
-        degreesRotated += rotate;
-
-        if (degreesRotated < -90)
+        if (callAction)
         {
-            _index++;
-            degreesRotated = 0;
+            LoadEndFunction();
+            callAction = false;
         }
 
-        if (_index > 4)
-            _index = 1;
-
-        if (sprites[_index].name != Koi.GetComponent<UnityEngine.UI.Image>().name)
+        if (transition.GetCurrentAnimatorStateInfo(0).IsName("LoadLevel"))
         {
-            Koi.GetComponent<UnityEngine.UI.Image>().sprite = sprites[_index];
+            var rotate = -90 * Time.deltaTime;
+            Koi.transform.Rotate(0, 0, rotate);
+            degreesRotated += rotate;
+
+            if (degreesRotated < -90)
+            {
+                _index++;
+                degreesRotated = 0;
+            }
+
+            if (_index > 4)
+                _index = 1;
+
+            if (sprites[_index].name != Koi.GetComponent<UnityEngine.UI.Image>().name)
+            {
+                Koi.GetComponent<UnityEngine.UI.Image>().sprite = sprites[_index];
+            }
         }
 	}
 
