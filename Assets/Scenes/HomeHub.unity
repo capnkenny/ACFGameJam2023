@@ -510,6 +510,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hub
       objectReference: {fileID: 0}
+    - target: {fileID: 7705049791814500084, guid: ebd20b68f7d25444fa756fdc67212a3f, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7705049791814500084, guid: ebd20b68f7d25444fa756fdc67212a3f, type: 3}
+      propertyPath: m_Color.g
+      value: 0.27058825
+      objectReference: {fileID: 0}
+    - target: {fileID: 7705049791814500084, guid: ebd20b68f7d25444fa756fdc67212a3f, type: 3}
+      propertyPath: m_Color.r
+      value: 0.6627451
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7667021992985450254, guid: ebd20b68f7d25444fa756fdc67212a3f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ebd20b68f7d25444fa756fdc67212a3f, type: 3}

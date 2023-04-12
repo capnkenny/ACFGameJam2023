@@ -12,6 +12,7 @@ TagManager:
   - Enemy
   - DebugLayer
   - GameManager
+  - NPC
   layers:
   - Default
   - TransparentFX
