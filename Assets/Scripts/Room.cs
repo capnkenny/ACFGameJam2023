@@ -12,8 +12,12 @@ public class Room : MonoBehaviour
     public int CostDistance => Cost = Distance;
 
     public Room Parent;
-    
-    
+    public GameObject NorthDoor;
+    public GameObject EastDoor;
+    public GameObject SouthDoor;
+    public GameObject WestDoor;
+
+
     public int EnemyCount;
     public bool SpawnRoom;
     public bool EndRoom;
