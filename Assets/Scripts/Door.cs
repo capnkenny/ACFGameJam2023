@@ -5,6 +5,8 @@ public class Door : MonoBehaviour
     public bool DoorOpened;
     public bool DoorEnabled;
 
+    public Travelpoint DoorPoint;
+
     [SerializeField]
     private SpriteRenderer DoorFrame;
     [SerializeField]

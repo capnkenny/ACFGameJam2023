@@ -253,7 +253,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3247916371494306409}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
   m_LocalScale: {x: 42.28, y: 42.28, z: 42.28}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -872,6 +872,10 @@ MonoBehaviour:
   Cost: 0
   Distance: 0
   Parent: {fileID: 0}
+  NorthDoor: {fileID: 0}
+  EastDoor: {fileID: 0}
+  SouthDoor: {fileID: 0}
+  WestDoor: {fileID: 0}
   EnemyCount: 0
   SpawnRoom: 0
   EndRoom: 0
@@ -2635,7 +2639,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5780637233685282120, guid: dcf2814e05cb08e45bd10f3affe62ff7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5780637233685282120, guid: dcf2814e05cb08e45bd10f3affe62ff7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3702,6 +3706,14 @@ PrefabInstance:
     - target: {fileID: 2418377092514589806, guid: 91975de5826a9dc4f9ee63fd1f14f679, type: 3}
       propertyPath: m_Name
       value: TopWall
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801791119691328862, guid: 91975de5826a9dc4f9ee63fd1f14f679, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.78
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801791119691328862, guid: 91975de5826a9dc4f9ee63fd1f14f679, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 7.37
       objectReference: {fileID: 0}
     - target: {fileID: 3150130292484241420, guid: 91975de5826a9dc4f9ee63fd1f14f679, type: 3}
       propertyPath: m_Color.b
@@ -5903,6 +5915,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1629748692808573104}
     m_Modifications:
+    - target: {fileID: 726403251279179358, guid: fc3a7bdcfefad1941881025de8c11fd8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 726403251279179358, guid: fc3a7bdcfefad1941881025de8c11fd8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.67
+      objectReference: {fileID: 0}
     - target: {fileID: 1750870559970134151, guid: fc3a7bdcfefad1941881025de8c11fd8, type: 3}
       propertyPath: m_Color.b
       value: 0
@@ -9345,6 +9365,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1629748692808573104}
     m_Modifications:
+    - target: {fileID: 726403251279179358, guid: b5bb0fc8f6bf91d448097e60a3e99be7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 726403251279179358, guid: b5bb0fc8f6bf91d448097e60a3e99be7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.63
+      objectReference: {fileID: 0}
     - target: {fileID: 1750870559970134151, guid: b5bb0fc8f6bf91d448097e60a3e99be7, type: 3}
       propertyPath: m_Color.b
       value: 0

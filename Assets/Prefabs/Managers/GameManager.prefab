@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 6032117589248991546}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: Untagged
+  m_TagString: GameManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -178,10 +178,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75eb23e50128d434bbf4aa27934f559f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loader: {fileID: 0}
+  Loader: {fileID: 0}
   playerData:
     Level: 1
-    Inventory: []
     Score: 0
     Koiency: 0
     Difficulty: 1
@@ -192,9 +191,13 @@ MonoBehaviour:
   state: 1
   IntroIndex: 3
   HomeHubIndex: 4
-  ShopIndex: 0
-  Level1Index: 5
-  AJIndex: 0
+  ShopIndex: 4
+  Level1dot1Index: 5
+  Level1dot2Index: 6
+  Level1dot3Index: 7
+  Level1dot4Index: 8
+  AJIndex: 9
+  TFPIndex: 10
   Loaded: 0
 --- !u!1 &7804031527174104059
 GameObject:
