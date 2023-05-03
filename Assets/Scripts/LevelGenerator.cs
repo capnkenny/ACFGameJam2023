@@ -107,16 +107,10 @@ public class LevelGenerator : MonoBehaviour
             
 	}
 
-	void Awake()
+	void Start()
     {
-        //Validation
-        //if(_gridHeight == 0)
-        //    _gridHeight = DEFAULT_GRID_SIZE;
-        //if(_gridWidth == 0)
-        //    _gridWidth = DEFAULT_GRID_SIZE;
         if(_levelNumber == 0)
             _levelNumber++;
-        //if(_levelGenerationSeed == 0.0f || _levelGenerationSeed > 10.0f)
         _levelGenerationSeed = UnityEngine.Random.Range(5.5f, 10.0f);
 
         _extraRooms = new List<RoomData>();
@@ -161,16 +155,15 @@ public class LevelGenerator : MonoBehaviour
     	//Determine Neighbors
 	    var found = Search();
 
-        
+        //Find valid path
 		ValidPath = FindPathToEnd();
 
-        AdjustGrid();
-
+        //Generate the mazzeeeeeeeee
 		GenerateLevel();
-        FinishedLoading = true;
-		//AdjustGrid();
+        
+		//SetupDoors();
 
-
+		FinishedLoading = true;
 	}
 
     private void InitializeGrid()
@@ -581,6 +574,7 @@ public class LevelGenerator : MonoBehaviour
             room.Neighbors = DetermineNeighborsWithoutPathfinding(room);
             //Debug.Log($"Room {room.RoomNumber} has {room.Neighbors.Count} neighbors");
             var roomObject = GameObject.Find($"Room{room.RoomNumber}");
+            bool spawn = room.Spawn;
             foreach (var neighbor in room.Neighbors)
             {
                 int x = room.X - neighbor.X;
@@ -590,29 +584,35 @@ public class LevelGenerator : MonoBehaviour
                     if (x > 0)
                     {
                         roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorEnabled = true;
-                        roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorOpened = false;
+                        roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorOpened = true;
+                        roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.WEST);
                     }
                     else
                     {
                         roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorEnabled = true;
-                        roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorOpened = false;
-                    }
+                        roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorOpened = true;
+						roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.EAST);
+					}
                 }
                 else
                 {
                     if (y < 0)
                     {
                         roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorEnabled = true;
-                        roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorOpened = false;
-                    }
+                        roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorOpened = true;
+						roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.NORTH);
+					}
                     else
                     {
                         roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorEnabled = true;
-                        roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorOpened = false;
-                    }
+                        roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorOpened = true;
+						roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.SOUTH);
+					}
                 }
 
             }
+
+
         }
         
     }
@@ -710,14 +710,51 @@ public class LevelGenerator : MonoBehaviour
         }
 	}
     
-    private void AdjustGrid()
-    {
 
-    }
-
-    private void SnapCamera(RoomData room)
+    private void SnapCamera(RoomData room, bool moveCharacter = false, Direction dir = Direction.NORTH)
     {
         Debug.Log($"Snapping to room {room.RoomNumber}");
         Camera.transform.position = new Vector3(room.X * _xDistanceForCam, room.Y * _yDistanceForCam, Camera.transform.position.z);
+
+        if (moveCharacter)
+        {
+			var roomObject = GameObject.Find($"Room{room.RoomNumber}");
+            if(roomObject != null)
+            {
+                Vector3 pos;
+
+                switch (dir)
+                {
+                    case Direction.WEST:
+                        {
+                            pos = roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+                        }
+					case Direction.SOUTH:
+						{
+							pos = roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+						}
+					case Direction.EAST:
+						{
+							pos = roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+						}
+					case Direction.NORTH:
+                    default:
+						{
+							pos = roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+						}
+				}
+               
+                Debug.Log($"Door position: {pos}");
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null)
+                {
+                    player.transform.SetPositionAndRotation(pos, Quaternion.identity);
+                }
+            }
+		}
     }
 }
