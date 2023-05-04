@@ -6,7 +6,7 @@ public class MusicPlayer : MonoBehaviour
 
     public AudioSource source;
 
-
+    public bool IsPlaying { get { return source.isPlaying; } }
 	public void PlayMusic()
     {
         Debug.LogWarning("Playing requested source");
