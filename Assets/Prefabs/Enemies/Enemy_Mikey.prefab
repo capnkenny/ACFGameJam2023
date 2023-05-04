@@ -157,6 +157,7 @@ MonoBehaviour:
   _rigidbody: {fileID: 7823373400383345411}
   _animator: {fileID: 7095606302902038128}
   _secondaryAnimator: {fileID: 1124889701594228502}
+  _secondaryCollider: {fileID: 4350894686703438572}
   _found: 0
   _runningAnimName: Base Layer.MikeyRunning
   spotlight: {fileID: 1711677123342351361}

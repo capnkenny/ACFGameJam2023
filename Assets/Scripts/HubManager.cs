@@ -20,6 +20,7 @@ public class HubManager : MonoBehaviour
     private GameManager _mgr;
 
     private bool loaded = false;
+    private bool sceneRequested = false;
 
     private void Awake()
     {
@@ -49,6 +50,7 @@ public class HubManager : MonoBehaviour
 
             loaded = true;
             _levelLoader.transition.SetTrigger("DoneLoad");
+            _mgr.state = GameState.HUB;
         }
 
         if (loaded && !_music.IsPlaying)
@@ -61,8 +63,13 @@ public class HubManager : MonoBehaviour
 
     void LoadToLevel(int level)
     {
-        _levelLoader.transition.SetTrigger("Loading");
-        _mgr.TransitionToLevel(level);
+        if (!sceneRequested)
+        {
+            _levelLoader.transition.SetTrigger("Loading");
+            _mgr.TransitionToLevel(level);
+            sceneRequested = true;
+        }
+        
     }
 
 }

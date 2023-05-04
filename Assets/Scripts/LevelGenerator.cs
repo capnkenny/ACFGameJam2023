@@ -152,7 +152,7 @@ public class LevelGenerator : MonoBehaviour
         sb.Clear();
 
 		
-		DebugLayers();
+		//DebugLayers();
 
     	//Determine Neighbors
 	    var found = Search();
@@ -170,6 +170,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void InitializeGrid()
     {
+        Debug.Log("Initializing Grid");
         ValidPath = new List<RoomData>();
         _grid = new List<List<RoomData>>();
         int roomNumber = 1;
@@ -249,6 +250,7 @@ public class LevelGenerator : MonoBehaviour
 
     private bool Search()
     {
+        Debug.Log("Searching...");
         //Create an open list to check, and a closed list of rooms
         // we don't need to check anymore.
         var openList = new List<RoomData>();
@@ -428,6 +430,7 @@ public class LevelGenerator : MonoBehaviour
 
     private List<RoomData> FindPathToEnd()
     {
+        Debug.Log("Finding valid path...");
         List<RoomData> path = new List<RoomData>();
         RoomData currentRoom = _grid[EndRoom.y][EndRoom.x];
         while(currentRoom != null)
@@ -765,6 +768,21 @@ public class LevelGenerator : MonoBehaviour
                 {
                     player.transform.SetPositionAndRotation(pos, Quaternion.identity);
                 }
+                //else
+                //{
+                //    var mgro = GameObject.FindGameObjectWithTag("GameManager");
+                //    if (mgro != null)
+                //    {
+                //        var mg = mgro.GetComponent<GameManager>();
+                //        if (mg != null)
+                //        {
+                //             var pc = mg.SpawnPlayer();
+                //            player = pc.gameObject;
+                //            player.transform.SetPositionAndRotation(pos, Quaternion.identity);
+                //            pc.SetPlayerStats(mg.playerData);
+                //        }
+                //    }
+                //}
             }
 		}
         var mgr = GameObject.FindGameObjectWithTag("LvlMgr");

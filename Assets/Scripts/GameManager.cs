@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour
     //private ItemDatabase itemDb;
 
     public PlayerData playerData;
+    public GameObject playerPrefab;
 
     public GameState state;
 
@@ -47,6 +49,7 @@ public class GameManager : MonoBehaviour
                         state = GameState.PLAYING;
                     break;
                 }
+            case GameState.HUB:
             case GameState.PLAYING:
                 {
                     break;
@@ -58,7 +61,34 @@ public class GameManager : MonoBehaviour
                 }
             default: break;
         }
+    }
 
+    private void Update()
+    {
+        switch (state)
+        {
+            case GameState.INITIALLOAD:
+            case GameState.LOADING:
+                {
+                    HandleLoading();
+                    if (InitialLoad)
+                        state = GameState.INITIALLOAD;
+                    else
+                        state = GameState.PLAYING;
+                    break;
+                }
+            case GameState.HUB:
+            case GameState.PLAYING:
+                {
+                    break;
+                }
+            case GameState.EXITING:
+                {
+                    HandleExit();
+                    break;
+                }
+            default: break;
+        }
     }
 
     public void SetCamera(Camera cam)
@@ -95,10 +125,20 @@ public class GameManager : MonoBehaviour
                 TransitionToLevel(-2);
             }
         }
+        else
+        {
+            if (SceneManager.GetActiveScene().buildIndex == HomeHubIndex)
+            { }
+            else
+            {
+                state = GameState.PLAYING;
+            }
+        }
     }
 
     public void TransitionToLevel(int level)
     {
+        state = GameState.LOADING;
         int index = 0;
 
         switch (level)
@@ -116,6 +156,24 @@ public class GameManager : MonoBehaviour
         Debug.LogFormat("Transition called - navigating to scene {0}", index);
 
         StartCoroutine(Loader.LoadLevel(index));
+    }
+
+    public PlayerController SpawnPlayer()
+    {
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject == null)
+        {
+            playerObject = Instantiate(playerPrefab);
+            var player = playerObject.GetComponent<PlayerController>();
+            player.SetPlayerStats(playerData);
+            return player;
+        }
+        else
+        {
+            var player = playerObject.GetComponent<PlayerController>();
+            player.SetPlayerStats(playerData);
+            return player;
+        }
     }
 
     private void HandleExit()
