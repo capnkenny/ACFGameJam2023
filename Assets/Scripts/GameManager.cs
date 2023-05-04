@@ -30,8 +30,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Setting to not destroy on transition");
         DontDestroyOnLoad(this.gameObject);
         Loaded = false;
-        state = GameState.LOADING;
-        
     }
 
     void Start()
@@ -39,6 +37,7 @@ public class GameManager : MonoBehaviour
         Loader.transition.SetTrigger("Loading");
         switch (state)
         {
+            case GameState.INITIALLOAD:
             case GameState.LOADING:
                 {
                     HandleLoading();
@@ -73,6 +72,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleLoading()
     {
+        Debug.Log("Loading player data...");
 		playerData = Save.LoadPlayer();
 		if (playerData == null)
 		{
@@ -83,12 +83,17 @@ public class GameManager : MonoBehaviour
 
         if (state == GameState.INITIALLOAD)
         {
+            Debug.Log("Initial load detected");
             if (playerData.ViewedIntro)
             {
-                StartCoroutine(Loader.LoadLevel(HomeHubIndex));
+                Debug.Log("Skipping intro");
+                TransitionToLevel(-1);
             }
             else
-                StartCoroutine(Loader.LoadLevel(IntroIndex));
+            {
+                Debug.Log("Going to intro");
+                TransitionToLevel(-2);
+            }
         }
     }
 
@@ -98,13 +103,17 @@ public class GameManager : MonoBehaviour
 
         switch (level)
         {
+            case -2: index = IntroIndex; break;
             case 1: index = Level1dot1Index; break;
             case 2: index = Level1dot2Index; break;
             case 3: index = Level1dot3Index; break;
             case 4: index = Level1dot4Index; break;
             case 5: index = AJIndex; break;
+            case -1:
             default: index = HomeHubIndex; break;
         }
+
+        Debug.LogFormat("Transition called - navigating to scene {0}", index);
 
         StartCoroutine(Loader.LoadLevel(index));
     }

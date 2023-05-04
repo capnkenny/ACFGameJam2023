@@ -9,6 +9,7 @@ public static class Save
 
     public static PlayerData SaveNewPlayer()
     {
+		Debug.Log("Creating new player data");
         PlayerData data = new PlayerData();
         try
 		{
@@ -25,7 +26,7 @@ public static class Save
 		}
 		catch (Exception e)
 		{
-			Debug.LogFormat("Error when saving new player data - {0}", e.Message);
+			Debug.LogWarningFormat("Error when saving new player data - {0}", e.Message);
 		}
 		
         return data;
@@ -46,9 +47,9 @@ public static class Save
 
 	}
 
-	public static PlayerData LoadPlayer()
+	public static PlayerData? LoadPlayer()
     {
-		PlayerData data = new PlayerData();
+		PlayerData data = null;
         string path = Application.persistentDataPath + "/player.koi";
         if(File.Exists(path))
         {
