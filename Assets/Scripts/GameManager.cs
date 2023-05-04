@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    private LevelLoad loader;
+    public LevelLoad Loader;
 
     //[SerializeField]
     //private ItemDatabase itemDb;
@@ -15,11 +14,16 @@ public class GameManager : MonoBehaviour
     public int IntroIndex;
     public int HomeHubIndex;
     public int ShopIndex;
-    public int Level1Index;
+    public int Level1dot1Index;
+    public int Level1dot2Index;
+    public int Level1dot3Index;
+    public int Level1dot4Index;
     //public int Level2Index;
     public int AJIndex;
+    public int TFPIndex;
 
     public bool Loaded;
+    public bool InitialLoad = false;
 
     void Awake()
     {
@@ -27,16 +31,21 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
         Loaded = false;
         state = GameState.LOADING;
-        loader.transition.SetTrigger("Loading");
+        
     }
 
     void Start()
     {
+        Loader.transition.SetTrigger("Loading");
         switch (state)
         {
             case GameState.LOADING:
                 {
                     HandleLoading();
+                    if (InitialLoad)
+                        state = GameState.INITIALLOAD;
+                    else
+                        state = GameState.PLAYING;
                     break;
                 }
             case GameState.PLAYING:
@@ -71,14 +80,34 @@ public class GameManager : MonoBehaviour
 		}
 
 		Loaded = true;
-        state = GameState.PLAYING;
-		if (playerData.ViewedIntro)
-		{
-			StartCoroutine(loader.LoadLevel(HomeHubIndex));
-		}
-		else
-			StartCoroutine(loader.LoadLevel(IntroIndex));
-	}
+
+        if (state == GameState.INITIALLOAD)
+        {
+            if (playerData.ViewedIntro)
+            {
+                StartCoroutine(Loader.LoadLevel(HomeHubIndex));
+            }
+            else
+                StartCoroutine(Loader.LoadLevel(IntroIndex));
+        }
+    }
+
+    public void TransitionToLevel(int level)
+    {
+        int index = 0;
+
+        switch (level)
+        {
+            case 1: index = Level1dot1Index; break;
+            case 2: index = Level1dot2Index; break;
+            case 3: index = Level1dot3Index; break;
+            case 4: index = Level1dot4Index; break;
+            case 5: index = AJIndex; break;
+            default: index = HomeHubIndex; break;
+        }
+
+        StartCoroutine(Loader.LoadLevel(index));
+    }
 
     private void HandleExit()
     {

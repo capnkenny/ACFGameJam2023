@@ -186,7 +186,7 @@ MonoBehaviour:
   Health: 100
   SensoryMeter: 0
   YippeeMeter: 0
-  DabloonCount: 0
+  Koiency: 0
   Inventory: []
   Visible: 1
   MovementSpeed: 5
@@ -194,6 +194,7 @@ MonoBehaviour:
   MaxYippeeMeter: 50
   MaxHealth: 100
   MaxSensoryMeter: 50
+  MaxShield: 0
 --- !u!61 &4226875623385688732
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -218,7 +219,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.68, y: 0.71}
+  m_Size: {x: 0.54, y: 0.54}
   m_EdgeRadius: 0
 --- !u!1 &8621670138655050830
 GameObject:

@@ -1,10 +1,9 @@
-using UnityEngine;
-using System.Text;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using TMPro;
-using Unity.VisualScripting;
+using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -44,52 +43,76 @@ public class LevelGenerator : MonoBehaviour
 
     [SerializeField]
     private float _yDistanceForPrefab;
-    //13.68
+    //113.68
 
     [SerializeField]
     private float _xDistanceForPrefab;
-    //35.41
-    
+    //135.41
+
+    [SerializeField]
+    private bool _debugEnabled;
+
+    [SerializeField]
+    private float _yDistanceForCam;
+    //113.64
+
+    [SerializeField]
+    private float _xDistanceForCam;
+    //135.32
+
     #endregion Serialized Fields
 
     #region Private members
-    
+
     private int _numberOfRooms;
 
     private List<List<RoomData>> _grid;
-
-    private Vector2Int _startingRoom;
-
-    private Vector2Int _endRoom;
-
-    private List<RoomData> _validPath;
 
     private GameObject debug;
 
     private GameObject RoomParent;
 
-    private bool finished = false;
-
     private List<RoomData> _extraRooms;
 
-	#endregion Private members
+    private bool disabledDebug = false;
 
-	private void Update()
+    private int _numberOfEnemies;
+
+    #endregion Private members
+
+    public GameObject Camera;
+
+    public Vector2Int StartingRoom;
+
+    public Vector2Int EndRoom;
+
+    public List<RoomData> ValidPath;
+
+    public bool FinishedLoading = false;
+
+    private void Update()
 	{
-        if(finished)
-            DrawLine();
+        if (FinishedLoading)
+        {
+            if (!disabledDebug)
+            {
+                var debugObject = GameObject.Find("DebugLayer");
+                if (debugObject != null)
+                {
+                    debugObject.SetActive(_debugEnabled);
+                    disabledDebug = true;
+                }
+            }
+            
+            //DrawLine();
+        }
+            
 	}
 
-	void Awake()
+	void Start()
     {
-        //Validation
-        //if(_gridHeight == 0)
-        //    _gridHeight = DEFAULT_GRID_SIZE;
-        //if(_gridWidth == 0)
-        //    _gridWidth = DEFAULT_GRID_SIZE;
         if(_levelNumber == 0)
             _levelNumber++;
-        //if(_levelGenerationSeed == 0.0f || _levelGenerationSeed > 10.0f)
         _levelGenerationSeed = UnityEngine.Random.Range(5.5f, 10.0f);
 
         _extraRooms = new List<RoomData>();
@@ -113,8 +136,8 @@ public class LevelGenerator : MonoBehaviour
 
         _gridHeight = _gridWidth = m;
         _numberOfRooms = (m - 2);
+        
 		//Debug Output
-		
         
 		sb.AppendFormat("Number of Rooms: {0}", _numberOfRooms).AppendLine();
 		sb.AppendFormat("Grid Size: {0}, {1}", _gridWidth, _gridHeight).AppendLine();
@@ -123,8 +146,8 @@ public class LevelGenerator : MonoBehaviour
 		sb.Clear();
 		InitializeGrid();
 
-		sb.AppendFormat("Start Room: {0}, {1}", _startingRoom.x, _startingRoom.y).AppendLine();
-		sb.AppendFormat("End Room: {0}, {1}", _endRoom.x, _endRoom.y).AppendLine();
+		sb.AppendFormat("Start Room: {0}, {1}", StartingRoom.x, StartingRoom.y).AppendLine();
+		sb.AppendFormat("End Room: {0}, {1}", EndRoom.x, EndRoom.y).AppendLine();
 		Debug.Log(sb.ToString());
         sb.Clear();
 
@@ -134,21 +157,20 @@ public class LevelGenerator : MonoBehaviour
     	//Determine Neighbors
 	    var found = Search();
 
-        
-		_validPath = FindPathToEnd();
+        //Find valid path
+		ValidPath = FindPathToEnd();
 
-        AdjustGrid();
-
+        //Generate the mazzeeeeeeeee
 		GenerateLevel();
-        finished = true;
-		//AdjustGrid();
+        
+		//SetupDoors();
 
-
+		FinishedLoading = true;
 	}
 
     private void InitializeGrid()
     {
-        _validPath = new List<RoomData>();
+        ValidPath = new List<RoomData>();
         _grid = new List<List<RoomData>>();
         int roomNumber = 1;
         int sX = 0;
@@ -180,7 +202,7 @@ public class LevelGenerator : MonoBehaviour
         //Get starting room
         int x = UnityEngine.Random.Range(0, _gridWidth);
         int y = UnityEngine.Random.Range(0, _gridHeight);
-		_startingRoom = new Vector2Int(x, y);
+		StartingRoom = new Vector2Int(x, y);
 		_grid[y][x].Spawn = true;        
 
         //Get End room
@@ -193,7 +215,7 @@ public class LevelGenerator : MonoBehaviour
             eY = UnityEngine.Random.Range(0, _gridHeight);
         }
         _grid[eY][eX].End = true;
-        _endRoom = new Vector2Int(eX, eY);
+        EndRoom = new Vector2Int(eX, eY);
 
         foreach (var arr in _grid)
             foreach (var room in arr)
@@ -233,10 +255,10 @@ public class LevelGenerator : MonoBehaviour
         var closedList = new List<RoomData>();
 
         //Add the starting room to the list
-        openList.Add(_grid[_startingRoom.y][_startingRoom.x]);
+        openList.Add(_grid[StartingRoom.y][StartingRoom.x]);
 
 		//Recursion begins
-		while (openList.Count > 0 && !openList.Any(r => r.RoomNumber == _grid[_endRoom.y][_endRoom.x].RoomNumber))
+		while (openList.Count > 0 && !openList.Any(r => r.RoomNumber == _grid[EndRoom.y][EndRoom.x].RoomNumber))
         {
             UpdateDebugLayers();
             //Get lowest F cost
@@ -250,7 +272,7 @@ public class LevelGenerator : MonoBehaviour
 			//Check da naybuhs
 			DetermineNeighbors(room, ref openList, ref closedList);
             
-            if(closedList.Any(r => r.RoomNumber == _grid[_endRoom.y][_endRoom.x].RoomNumber))
+            if(closedList.Any(r => r.RoomNumber == _grid[EndRoom.y][EndRoom.x].RoomNumber))
             {
                 Debug.Log("Completed search!");
                 return true;
@@ -364,8 +386,8 @@ public class LevelGenerator : MonoBehaviour
 
     private int DetermineGivenCost(RoomData target)
     {
-        int xDiff = Math.Abs(_startingRoom.x - target.X);
-        int yDiff = Math.Abs(_startingRoom.y - target.Y);
+        int xDiff = Math.Abs(StartingRoom.x - target.X);
+        int yDiff = Math.Abs(StartingRoom.y - target.Y);
         int diff = Math.Abs(xDiff - yDiff);
 
         if(diff == 0)
@@ -387,8 +409,8 @@ public class LevelGenerator : MonoBehaviour
         //Manhattan-based estimation says to ignore all obstacles, and count
         // both number of vertical spaces plus horizontal spaces to get from
         // start to finish, like if you were counting city blocks (a la Manhattan, NY).
-        int x = Math.Abs(start.X - _endRoom.x);
-        int y = Math.Abs(start.Y - _endRoom.y);
+        int x = Math.Abs(start.X - EndRoom.x);
+        int y = Math.Abs(start.Y - EndRoom.y);
 
         if (x == 0 && y == 0)
             return 0;
@@ -407,7 +429,7 @@ public class LevelGenerator : MonoBehaviour
     private List<RoomData> FindPathToEnd()
     {
         List<RoomData> path = new List<RoomData>();
-        RoomData currentRoom = _grid[_endRoom.y][_endRoom.x];
+        RoomData currentRoom = _grid[EndRoom.y][EndRoom.x];
         while(currentRoom != null)
         {
             path.Add(_grid[currentRoom.Y][currentRoom.X]);
@@ -423,7 +445,7 @@ public class LevelGenerator : MonoBehaviour
         {
             foreach (var room in column)
             {
-                if (!_validPath.Any(a => a.RoomNumber == room.RoomNumber) && !_extraRooms.Any(a => a.RoomNumber == room.RoomNumber))
+                if (!ValidPath.Any(a => a.RoomNumber == room.RoomNumber) && !_extraRooms.Any(a => a.RoomNumber == room.RoomNumber))
                     _grid[room.Y][room.X].Enabled = false;
                 else
                 {
@@ -431,37 +453,17 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
-
-        //StringBuilder stringBuilder = new StringBuilder();
-        //stringBuilder.AppendLine("Grid:");
-        //foreach (var arr in _grid)
-        //{
-        //    stringBuilder.Append("|");
-        //    foreach (var room in arr)
-        //    {
-        //        if (room.Bonus)
-        //            stringBuilder.Append('B');
-        //        else if (room.Spawn)
-        //            stringBuilder.Append('S');
-        //        else if (room.End)
-        //            stringBuilder.Append('E');
-        //        else if (room.Enabled)
-        //            stringBuilder.Append('X');
-        //        else
-        //            stringBuilder.Append('-');
-        //    }
-        //    stringBuilder.AppendLine("|");
-        //}
-        //Debug.Log(stringBuilder.ToString());
-
-        //foreach(var room in _validPath)
-        //{
-        //    //CreateRoomPrefab(room);
-        //}
+        
+        SetDoors();
+        AssignEnemyCounts();
+        SnapCamera(_grid[StartingRoom.y][StartingRoom.x]);
     }
 
     private void CreateRoomPrefab(RoomData data)
     {
+        foreach (var n in data.Neighbors)
+            Debug.Log($"{data.RoomNumber} neighbor: {n.RoomNumber}");
+
         var gameObject = Instantiate(_roomPrefab, new Vector2(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab), Quaternion.identity, RoomParent.transform);
         gameObject.name = $"Room{data.RoomNumber}";
         var comp = gameObject.GetComponent<Room>();
@@ -470,38 +472,169 @@ public class LevelGenerator : MonoBehaviour
         comp.RoomNumber = data.RoomNumber;
         comp.X = data.X;
         comp.Y = data.Y;
-        if(data.Spawn)
+    }
+
+    private List<RoomData> DetermineNeighborsWithoutPathfinding(RoomData room, bool enabled = true)
+    {
+        List<RoomData> neighbors = new List<RoomData>();
+        var center = _grid[room.Y][room.X];
+        //Debug.Log($"Checking neighbors for room {center.RoomNumber} at {center.X}, {center.Y}");
+        if (room.Y == 0)
         {
-            var floor = gameObject.transform.Find("Floor");
-            var render = floor.GetComponent<SpriteRenderer>();
-            render.color = Color.green;
+            //Check north
+            if (_grid[room.Y + 1][room.X].Enabled == enabled)
+                neighbors.Add(_grid[room.Y + 1][room.X]);
+
+            if (room.X == 0)
+            {
+                //Never check west when x = 0
+                if (_grid[room.Y][room.X + 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X + 1]);
+            }
+            else if (room.X == _gridWidth-1)
+            {
+                //Never check east if x == grid width
+                if (_grid[room.Y][room.X - 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X - 1]);
+            }
+            else
+            {
+                //Check east and west
+                if (_grid[room.Y][room.X - 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X - 1]);
+                if (_grid[room.Y][room.X + 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X + 1]);
+            }
         }
-        if(data.End)
+        else if (room.Y == _gridHeight-1)
         {
-            var floor = gameObject.transform.Find("Floor");
-            var render = floor.GetComponent<SpriteRenderer>();
-            render.color = Color.red;
+            //Check south
+            if (_grid[room.Y - 1][room.X].Enabled == enabled)
+                neighbors.Add(_grid[room.Y - 1][room.X]);
+
+            if (room.X == 0)
+            {
+                //Never check west when x = 0
+                if (_grid[room.Y][room.X + 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X + 1]);
+            }
+            else if (room.X == _gridWidth-1)
+            {
+                //Never check east if x == grid width
+                if (_grid[room.Y][room.X - 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X - 1]);
+            }
+            else
+            {
+                //Check east and west
+                if (_grid[room.Y][room.X - 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X - 1]);
+                if (_grid[room.Y][room.X + 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X + 1]);
+            }
         }
-        if(data.Bonus)
+        else
         {
-            var floor = gameObject.transform.Find("Floor");
-            var render = floor.GetComponent<SpriteRenderer>();
-            render.color = Color.yellow;
+            //Check north
+            if (_grid[room.Y + 1][room.X].Enabled == enabled)
+                neighbors.Add(_grid[room.Y + 1][room.X]);
+
+            //Check south
+            if (_grid[room.Y - 1][room.X].Enabled == enabled)
+                neighbors.Add(_grid[room.Y - 1][room.X]);
+
+            if (room.X == 0)
+            {
+                //Never check west when x = 0
+                if (_grid[room.Y][room.X + 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X + 1]);
+            }
+            else if (room.X == _gridWidth-1)
+            {
+                //Never check east if x == grid width
+                if (_grid[room.Y][room.X - 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X - 1]);
+            }
+            else
+            {
+                //Check east and west
+                if (_grid[room.Y][room.X - 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X - 1]);
+                if (_grid[room.Y][room.X + 1].Enabled == enabled)
+                    neighbors.Add(_grid[room.Y][room.X + 1]);
+            }
         }
-        if (!data.Enabled)
+
+        return neighbors;
+    }
+
+
+    private void SetDoors()
+    {
+        for (int i = 0; i < ValidPath.Count; i++)
         {
-			var floor = gameObject.transform.Find("Floor");
-			var render = floor.GetComponent<SpriteRenderer>();
-			render.color = Color.black;
-		}
+            var room = ValidPath[i];
+            room.Neighbors = DetermineNeighborsWithoutPathfinding(room);
+            var roomObject = GameObject.Find($"Room{room.RoomNumber}");
+            foreach (var neighbor in room.Neighbors)
+            {
+                int x = room.X - neighbor.X;
+                int y = room.Y - neighbor.Y;
+                if (y == 0)
+                {
+                    if (x > 0)
+                    {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - west door");
+                        roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorEnabled = true;
+                        roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorOpened = true;
+                        roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.WEST);
+                    }
+                    else
+                    {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - east door");
+                        roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorEnabled = true;
+                        roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorOpened = true;
+						roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.EAST);
+					}
+                }
+                else
+                {
+                    if (y < 0)
+                    {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - north door");
+                        roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorEnabled = true;
+                        roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorOpened = true;
+						roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.NORTH);
+					}
+                    else
+                    {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - south door");
+                        roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorEnabled = true;
+                        roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorOpened = true;
+						roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.SOUTH);
+					}
+                }
+
+            }
+
+            if (room.Spawn)
+            {
+                roomObject.GetComponent<Room>().EnemyCount = 0;
+                roomObject.GetComponent<Room>().SpawnRoom = true;
+            }
+
+            if (room.End)
+                roomObject.GetComponent<Room>().EndRoom = true;
+        }
+        
     }
 
     private void UpdateDebugLayers()
     {
-		foreach (var arr in _grid)
-		{
-			foreach (var data in arr)
-			{
+        foreach (var arr in _grid)
+        {
+            foreach (var data in arr)
+            {
                 var parent = transform.Find("DebugLayer");
                 if (parent != null)
                 {
@@ -511,8 +644,9 @@ public class LevelGenerator : MonoBehaviour
                     gameObject.transform.Find("H").GetComponent<TextMeshPro>().text = $"{data.HeuristicCost}";
                     gameObject.transform.Find("F").GetComponent<TextMeshPro>().text = $"{data.FullCost}";
                 }
-			}
-		}
+            }
+        }
+        
 	}
 
     private void DebugLayers()
@@ -559,65 +693,144 @@ public class LevelGenerator : MonoBehaviour
 
     private void DrawLine()
     {
-        var gameObject = GameObject.FindGameObjectWithTag("DebugLayer");
-		foreach (var arr in _grid)
-		{
-			foreach (var data in arr)
-			{
-                if (gameObject != null)
-                {
-                    var go = gameObject.transform.Find($"Debug{data.RoomNumber}");
-                    if (go != null && !_validPath.Any(v => v.RoomNumber == data.RoomNumber))
-                        go.gameObject.SetActive(false);
-				}
-
-				if (data.Parent != null && _validPath.Any(r => r.RoomNumber == data.RoomNumber))
-					Debug.DrawLine(new Vector3(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab, 0), new Vector3(data.Parent.X * _xDistanceForPrefab, data.Parent.Y * _yDistanceForPrefab, -3), Color.blue);
-
-			}
-		}
-
-		foreach (var room in _validPath)
+        if (_debugEnabled)
         {
-			var go = gameObject.transform.Find($"Debug{room.RoomNumber}");
-			if (go != null)
-				go.gameObject.SetActive(true);
-		}
+            var gameObject = GameObject.FindGameObjectWithTag("DebugLayer");
+            foreach (var arr in _grid)
+            {
+                foreach (var data in arr)
+                {
+                    if (gameObject != null)
+                    {
+                        var go = gameObject.transform.Find($"Debug{data.RoomNumber}");
+                        if (go != null && !ValidPath.Any(v => v.RoomNumber == data.RoomNumber))
+                            go.gameObject.SetActive(false);
+                    }
+
+                    if (data.Parent != null && ValidPath.Any(r => r.RoomNumber == data.RoomNumber))
+                        Debug.DrawLine(new Vector3(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab, 0), new Vector3(data.Parent.X * _xDistanceForPrefab, data.Parent.Y * _yDistanceForPrefab, -3), Color.blue);
+
+                }
+            }
+
+            foreach (var room in ValidPath)
+            {
+                var go = gameObject.transform.Find($"Debug{room.RoomNumber}");
+                if (go != null)
+                    go.gameObject.SetActive(true);
+            }
+        }
 	}
-    
-    private void AdjustGrid()
+
+    private void SnapCamera(RoomData room, bool moveCharacter = false, Direction dir = Direction.NORTH)
     {
-  //      int count = _validPath.Count();
-  //      int roomsLeft = _numberOfRooms - count;
+        //Debug.Log($"Snapping to room {room.RoomNumber}");
+        Camera.transform.position = new Vector3(room.X * _xDistanceForCam, room.Y * _yDistanceForCam, Camera.transform.position.z);
 
-  //      var open = new List<RoomData>();
-  //      var closed = new List<RoomData>();
+        if (moveCharacter)
+        {
+			var roomObject = GameObject.Find($"Room{room.RoomNumber}");
+            if(roomObject != null)
+            {
+                Vector3 pos;
 
-  //      if (roomsLeft <= 0)
-  //          return;
-
-  //      int diff = 0;
-  //      int previousCount = 0;
-
-  //      while (roomsLeft > 0)
-  //      {
-  //          Debug.Log($"{roomsLeft} rooms left");
-  //          previousCount = closed.Count;
-            
-  //          int mid = _validPath.Count / 2;
-
-  //          mid += UnityEngine.Random.Range(0, _validPath.Count / 4);
-
-  //          DetermineNeighbors(_validPath[mid], ref open, ref closed);
-			
-  //          diff = Math.Abs(closed.Count - previousCount);
-  //          roomsLeft -= diff;
-		//}
-
-  //      foreach (var room in closed)
-  //      {
-  //          _extraRooms.Add(_grid[room.Y][room.X]);
-  //      }
+                switch (dir)
+                {
+                    case Direction.WEST:
+                        {
+                            pos = roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+                        }
+					case Direction.SOUTH:
+						{
+							pos = roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+						}
+					case Direction.EAST:
+						{
+							pos = roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+						}
+					case Direction.NORTH:
+                    default:
+						{
+							pos = roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().SnapPoint.transform.position;
+							break;
+						}
+				}
+               
+                //Debug.Log($"Door position: {pos}");
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null)
+                {
+                    player.transform.SetPositionAndRotation(pos, Quaternion.identity);
+                }
+            }
+		}
+        var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
+        if (mgr != null)
+        {
+            mgr.GetComponent<LevelManager>().CurrentRoomNumber = room.RoomNumber;
+        }
     }
 
+    private void AssignEnemyCounts()
+    {
+        _numberOfEnemies = (int)(ValidPath.Count * 1.75);
+        int counter = _numberOfEnemies;
+        bool firstPass = true;
+        while (counter > 0)
+        {
+            int r = 0;
+            if (firstPass)
+            {
+                for (int i = r; i < ValidPath.Count; i++)
+                {
+                    var room = ValidPath[i];
+                    var rc = GameObject.Find($"Room{room.RoomNumber}").GetComponent<Room>();
+                    if (room.Spawn)
+                        continue;
+                    rc.EnemyCount++;
+                    counter--;
+                }
+            }
+            else
+            {
+                r = UnityEngine.Random.Range(0, 3);
+                int endSub = UnityEngine.Random.Range((int)(ValidPath.Count / 2), ValidPath.Count);
+                for (int i = r; i <= endSub; i++)
+                {
+                    var room = ValidPath[i];
+                    var rc = GameObject.Find($"Room{room.RoomNumber}").GetComponent<Room>();
+                    if (room.Spawn)
+                        continue;
+                    rc.EnemyCount++;
+                    counter--;
+                }
+            }
+            if (counter <= 0)
+                return;
+        }
+    }
+
+    public void CompleteLevel(PlayerData data)
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        var gmo = GameObject.FindGameObjectWithTag("GameManager");
+        if (gmo != null)
+        {
+            var gm = gmo.GetComponent<GameManager>();
+            var pc = player.GetComponent<PlayerController>();
+            gm.playerData = pc.UpdatePlayerData(data);
+        }
+
+        LoadToLevel(4); //fix later maybe ¯\_(ツ)_/¯
+    }
+
+    private void LoadToLevel(int level)
+    {
+        var lvlload = GameObject.Find("LevelLoader").GetComponent<LevelLoad>();
+        lvlload.transition.SetTrigger("Loading");
+        lvlload.LoadLevel(level); 
+    }
 }

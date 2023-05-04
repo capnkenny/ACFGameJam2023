@@ -12,10 +12,21 @@ public class PlayerData
     // 1 = Normal
     // 2 = Hard
     public int Difficulty;
-    public int MaxSensory;
-    public int MaxHealth;
-    public int MaxShield;
+    public float MaxSensory;
+    public float MaxHealth;
+    public float MaxShield;
     public bool ViewedIntro;
+
+    public float CurrentHealth;
+    public float CurrentSensory;
+
+    public float Taste;
+    public float Smell;
+    public float Sight;
+    public float Hearing;
+    public float Touch;
+
+    public int SoakerLevel;
 
     public PlayerData()
     {
@@ -28,5 +39,16 @@ public class PlayerData
         MaxHealth = 100;
         MaxShield = 100;
         ViewedIntro = false;
+
+        CurrentHealth = 100;
+        CurrentSensory = 0;
+
+        Taste = 0;
+        Smell = 0;
+        Sight = 0;
+        Hearing = 0;
+        Touch = 0;
+
+        SoakerLevel = 1;
     }
 }

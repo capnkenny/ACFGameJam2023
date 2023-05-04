@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class RunAwayBehavior : EnemyBehavior
 {
@@ -21,6 +22,8 @@ public class RunAwayBehavior : EnemyBehavior
     private bool _found;
     [SerializeField]
     private string _runningAnimName;
+    [SerializeField]
+    private Light2D spotlight;
 
     private int _runningAnimHash;
     private bool _runningAway;
@@ -39,6 +42,12 @@ public class RunAwayBehavior : EnemyBehavior
         _flipChar = false;
         _runAwayDistance = _collider.radius;
         _isDead = false;
+    }
+
+    private void Start()
+    {
+        _rigidbody.bodyType = RigidbodyType2D.Static;
+        spotlight.enabled = false;
     }
 
     void Update()
@@ -69,9 +78,23 @@ public class RunAwayBehavior : EnemyBehavior
         float distance = Vector2.Distance((Vector2)_enemyTransform.position, (Vector2)_player.transform.position);
         var direction = _player.transform.position - _enemyTransform.position;
 
+        if (!_found)
+        {
+            var p = GameObject.FindGameObjectWithTag("Player");
+            if (_collider.bounds.Contains(p.transform.position))
+            {
+                _found = true;
+                _rigidbody.velocity = Vector2.zero;
+                _rigidbody.bodyType = RigidbodyType2D.Dynamic;
+                _collider.enabled = false;
+                spotlight.enabled = true;
+                return;
+            }
+        }
+
         if (_found && !_runningAway)
         {
-          Debug.Log("found!");
+          Debug.LogFormat("distance - {0}, radius: {1}", distance, _collider.radius);
             if (distance <= _collider.radius)
             {
                 _runningAway = true;
@@ -94,24 +117,30 @@ public class RunAwayBehavior : EnemyBehavior
           var state = _animator.GetCurrentAnimatorStateInfo(0);
           if(state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
           {
-            GameObject.Destroy(this.gameObject);
+                var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
+                var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
+                if (levelManager != null)
+                {
+                    levelManager.SignalEnemyDied();
+                }
+                GameObject.Destroy(this.gameObject);
           }
         }
     }
 
     void OnCollisionEnter2D(Collision2D col)
     {
-      if(col.otherCollider.tag == "Detection")
-      {
-        _found = true;
-        Debug.Log(col.otherCollider.name);
-        col.otherCollider.enabled = false;
-      }
+        if(col.otherCollider.tag.Contains("Detection"))
+            Debug.LogFormat("MIKEY - Collided with {0}", col.gameObject.tag);
 
-      if (col.otherCollider.tag == "Enemy")
-      {
-        Debug.Log(col.otherCollider.name);
-        if (col.gameObject.tag == "Collision_L")
+        if (col.gameObject.tag == "Collision_B" && _running)
+        {
+            if (_rigidbody.velocity.x < 0.00f)
+            {
+                _rigidbody.velocity = _rigidbody.velocity + new Vector2(1, 0);
+            }
+        }
+        if (col.gameObject.tag == "Collision_L" && _running)
         {
             if (transform.rotation.y != 0)
                 _flipChar = true;
@@ -120,9 +149,8 @@ public class RunAwayBehavior : EnemyBehavior
             {
                 _rigidbody.velocity = _rigidbody.velocity + new Vector2(0, 1);
             }
-
         }
-        if (col.gameObject.tag == "Collision_R")
+        if (col.gameObject.tag == "Collision_R" && _running)
         {
             if (transform.rotation.y == 0)
                 _flipChar = true;
@@ -131,37 +159,25 @@ public class RunAwayBehavior : EnemyBehavior
             {
                 _rigidbody.velocity = _rigidbody.velocity + new Vector2(0, -1);
             }
-
         }
-        if (col.gameObject.tag == "Collision_T")
+        if (col.gameObject.tag == "Collision_T" && _running)
         {
 
             if (_rigidbody.velocity.x < 0.00f)
             {
                 _rigidbody.velocity = _rigidbody.velocity + new Vector2(-1, 0);
             }
-
-        }
-        if (col.gameObject.tag == "Collision_B")
-        {
-
-            if (_rigidbody.velocity.x < 0.00f)
-            {
-                _rigidbody.velocity = _rigidbody.velocity + new Vector2(1, 0);
-            }
-
         }
         if (col.gameObject.tag == "Player")
         {
-          if(col.otherCollider.tag != "Detection")
-          {
-            controller.Health -= controller.Health;
-            _runningAway = false;
-            _found = false;
-            _rigidbody.velocity = Vector2.zero;
-          }
+            if (col.otherCollider.tag == "Enemy" && _running)
+            {
+                controller.Health -= controller.Health;
+                _runningAway = false;
+                _found = false;
+                _rigidbody.velocity = Vector2.zero;
+            }
         }
-      }
     }
 
     public override void PerformBehavior()

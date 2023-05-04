@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public float Health;
     public float SensoryMeter;
     public float YippeeMeter;
-    public int DabloonCount;
+    public int Koiency;
     public List<Item> Inventory;
 
     [Header("Predefined Controls")]
@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     public float MaxYippeeMeter;
     public float MaxHealth;
     public float MaxSensoryMeter;
+    public float MaxShield;
 
     //Randomized / Internal Player Stats
     private float _tasteFactor;
@@ -35,6 +36,8 @@ public class PlayerController : MonoBehaviour
     private float _hearingFactor;
     private float _touchFactor;
     private bool _sensoryOverload;
+    private int _soakerLevel;
+
     
     //Private members
     private Vector2 _movement;
@@ -94,6 +97,59 @@ public class PlayerController : MonoBehaviour
 
 	 if(_tasteFactor < -1.0f)
 		_tasteFactor = -1.0f;
+    }
+
+    public void SetPlayerStats(PlayerData data)
+    {
+        MaxHealth = data.MaxHealth;
+        MaxSensoryMeter = data.MaxSensory;
+        MaxShield = data.MaxShield;
+        SensoryMeter = data.CurrentSensory;
+        Health = data.CurrentHealth;
+
+        _tasteFactor = data.Taste;
+        _smellFactor = data.Smell;
+        _sightFactor = data.Sight;
+        _hearingFactor = data.Hearing;
+        _touchFactor = data.Touch;
+        _soakerLevel = data.SoakerLevel;
+    }
+
+    public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)
+    {
+        PlayerData newData = reference;
+
+        newData.MaxHealth = MaxHealth;
+        newData.MaxSensory = MaxSensoryMeter;
+        newData.MaxShield = MaxShield;
+        newData.CurrentHealth = Health;
+        newData.SoakerLevel = _soakerLevel;
+        newData.Koiency = Koiency;
+        newData.CurrentSensory = SensoryMeter;
+
+        if (level != -1 && level != reference.Level)
+        {
+            newData.Level = level;
+        }
+
+        return newData;
+    }
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.LogFormat("Player collision - {0} and {1}", collision.collider.tag, this.tag);
+        if (collision.gameObject.CompareTag("Untagged"))
+            Debug.Log(collision.gameObject.name);
+        //if (collision.gameObject.CompareTag("RoomDetection"))
+        //{
+        //    //Debug.Log("ITSSSSSSSSSSSS SHOWTIME :^)");
+        //    var room = collision.gameObject.GetComponentInParent<Room>();
+        //    room.SignalPlayerInside();
+        //}
+        //if (collision.gameObject.CompareTag("Travel"))
+        //{
+        //    var tp = collision.gameObject.GetComponent<Travelpoint>();
+        //    tp.InvokeDelegate();
+        //}
     }
 
 }

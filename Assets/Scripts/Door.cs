@@ -5,6 +5,9 @@ public class Door : MonoBehaviour
     public bool DoorOpened;
     public bool DoorEnabled;
 
+    public Travelpoint DoorPoint;
+    public GameObject SnapPoint;
+
     [SerializeField]
     private SpriteRenderer DoorFrame;
     [SerializeField]
@@ -37,9 +40,14 @@ public class Door : MonoBehaviour
     {
         if (DoorEnabled)
         {
-			DoorOpen.SetActive(DoorOpened);
-			DoorClosed.SetActive(!DoorOpened);
-		}
+            DoorOpen.SetActive(DoorOpened);
+            DoorClosed.SetActive(!DoorOpened);
+        }
+        else
+        {
+            DoorOpen.SetActive(DoorOpened);
+            DoorClosed.SetActive(!DoorOpened);
+        }
 		
 	}
 }

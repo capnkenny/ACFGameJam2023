@@ -6,5 +6,6 @@
 	MENU = 4,
 	SHOP = 5,
 	CUTSCENE = 6,
-	EXITING = 10
+	EXITING = 10,
+	INITIALLOAD = 11,
 }
