@@ -10,15 +10,22 @@ public static class Save
     public static PlayerData SaveNewPlayer()
     {
         PlayerData data = new PlayerData();
-        string json = JsonUtility.ToJson(data);
-        string b64 = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
-		string path = Application.persistentDataPath + "/player.koi";
-		using (var stream = File.Open(path, FileMode.Create))
+        try
 		{
-			using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
+			string json = JsonUtility.ToJson(data);
+			string b64 = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
+			string path = Application.persistentDataPath + "/player.koi";
+			using (var stream = File.Open(path, FileMode.Create))
 			{
-                writer.Write(b64);
+				using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
+				{
+					writer.Write(b64);
+				}
 			}
+		}
+		catch (Exception e)
+		{
+			Debug.LogFormat("Error when saving new player data - {0}", e.Message);
 		}
 		
         return data;
