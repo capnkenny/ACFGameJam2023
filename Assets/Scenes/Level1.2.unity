@@ -216,15 +216,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: _xDistanceForCam
-      value: 135.32
+      value: 85.32
       objectReference: {fileID: 0}
     - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: _yDistanceForCam
-      value: 114.1
+      value: 64.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
+      propertyPath: _xDistanceForPrefab
+      value: 85.41
       objectReference: {fileID: 0}
     - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: _yDistanceForPrefab
-      value: 113.68
+      value: 63.68
       objectReference: {fileID: 0}
     - target: {fileID: 5814426524858241212, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: m_Name

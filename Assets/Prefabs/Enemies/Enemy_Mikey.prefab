@@ -159,6 +159,7 @@ MonoBehaviour:
   _secondaryAnimator: {fileID: 1124889701594228502}
   _found: 0
   _runningAnimName: Base Layer.MikeyRunning
+  spotlight: {fileID: 1711677123342351361}
 --- !u!95 &7095606302902038128
 Animator:
   serializedVersion: 5

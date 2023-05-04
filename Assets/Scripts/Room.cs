@@ -45,25 +45,25 @@ public class Room : MonoBehaviour
             var ed = EastDoor.GetComponent<Door>();
             var wd = WestDoor.GetComponent<Door>();
 
-            if (nd != null && nd.DoorEnabled && nd.DoorOpened != locked)
+            if (nd != null && nd.DoorEnabled && nd.DoorOpened != !locked)
             {
                 //Debug.Log($"Call to check room {RoomNumber} - north door");
-                nd.DoorOpened = locked;
+                nd.DoorOpened = !locked;
             }
-            if (sd != null && sd.DoorEnabled && sd.DoorOpened != locked)
+            if (sd != null && sd.DoorEnabled && sd.DoorOpened != !locked)
             {
                 //Debug.Log($"Call to check room {RoomNumber} - soutch door");
-                sd.DoorOpened = locked;
+                sd.DoorOpened = !locked;
             }
-            if (ed != null && ed.DoorEnabled && ed.DoorOpened != locked)
+            if (ed != null && ed.DoorEnabled && ed.DoorOpened != !locked)
             {
                 //Debug.Log($"Call to check room {RoomNumber} - east door");
-                ed.DoorOpened = locked;
+                ed.DoorOpened = !locked;
             }
-            if (wd != null && wd.DoorEnabled && wd.DoorOpened != locked)
+            if (wd != null && wd.DoorEnabled && wd.DoorOpened != !locked)
             {
                 //Debug.Log($"Call to check room {RoomNumber} - west door");
-                wd.DoorOpened = locked;
+                wd.DoorOpened = !locked;
             }
         }
     }

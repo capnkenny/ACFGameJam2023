@@ -212,15 +212,19 @@ PrefabInstance:
       objectReference: {fileID: 481254965}
     - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: _xDistanceForCam
-      value: 135.32
+      value: 85.32
       objectReference: {fileID: 0}
     - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: _yDistanceForCam
-      value: 114.1
+      value: 64.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
+      propertyPath: _xDistanceForPrefab
+      value: 85.41
       objectReference: {fileID: 0}
     - target: {fileID: 5814426524858241210, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: _yDistanceForPrefab
-      value: 113.68
+      value: 63.68
       objectReference: {fileID: 0}
     - target: {fileID: 5814426524858241212, guid: aae1bf4954e658648a3c05b581885841, type: 3}
       propertyPath: m_Name
@@ -451,7 +455,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 0.60784316, g: 0.45882353, b: 1, a: 1}
-  m_Intensity: 0.77
+  m_Intensity: 0.55
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -591,7 +595,7 @@ Transform:
   m_GameObject: {fileID: 2116256455}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 572.6, y: 412.59, z: 100}
-  m_LocalScale: {x: 2947.53, y: 2412.49, z: 1}
+  m_LocalScale: {x: 10000, y: 10000, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

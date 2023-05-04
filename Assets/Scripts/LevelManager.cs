@@ -30,6 +30,7 @@ public class LevelManager : MonoBehaviour
     public int PreviousRoomNumber;
 
     private int _currentEnemyCount;
+    private int _currentRoomEnemiesDead = 0;
     private bool _endRoomSetup = false;
 
     private void Awake()
@@ -63,95 +64,102 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        // Make sure GameManager is loaded too
-        if (_mgr.Loaded && !loaded)
+        if (_mgr.state == GameState.PLAYING)
         {
-            Debug.Log("Game Manager loaded for level!");
-
-
-            SpawnPlayer();
-            
-            
-            loaded = true;
-
-            if (instantiatedGM)
-                _levelLoader.transition.SetTrigger("DoneLoad");
-        }
-
-        // We switched rooms so spawn enemies here
-        // and lock the doors
-        if (CurrentRoomNumber != PreviousRoomNumber)
-        {
-            PreviousRoomNumber = CurrentRoomNumber;
-            var room = GameObject.Find($"Room{CurrentRoomNumber}");
-            if (room != null)
+            // Make sure GameManager is loaded too
+            if (_mgr.Loaded && !loaded)
             {
-                var roomObject = room.GetComponent<Room>();
-                Debug.Log($"Switched to room {CurrentRoomNumber} - {roomObject.EnemyCount} enemies");
-                if (roomObject.EndRoom && !_endRoomSetup)
-                {
-                    List<Door> disabledDoors = new List<Door>();
-                    //find the exit door
-                    if (!roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorEnabled)
-                        disabledDoors.Add(roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>());
-                    if (!roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorEnabled)
-                        disabledDoors.Add(roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>());
-                    if (!roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorEnabled)
-                        disabledDoors.Add(roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>());
-                    if (!roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorEnabled)
-                        disabledDoors.Add(roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>());
+                Debug.Log("Game Manager loaded for level!");
 
-                    int doorIdx = UnityEngine.Random.Range(0, disabledDoors.Count);
-                    var p = GameObject.FindGameObjectWithTag("Player");
-                    if (p != null)
-                    {
-                        var pl = p.GetComponent<PlayerData>();
-                        disabledDoors[doorIdx].DoorEnabled = true;
-                        disabledDoors[doorIdx].DoorOpened = true;
-                        disabledDoors[doorIdx].DoorPoint.SetDelegate(_levelGen.CompleteLevel, pl);
-                    }
-                    _endRoomSetup = true;
-                }
 
-                if (roomObject.EnemyCount > 0 && roomObject.PlayerInside)
-                {
-                    Debug.Log($"Enemy Count is {roomObject.EnemyCount} - locking room {CurrentRoomNumber}'s doors");
-                    _currentEnemyCount = roomObject.EnemyCount;
-                    roomObject.LockAllDoors(true);
-                    SpawnEnemies(roomObject);
-                }
+                SpawnPlayer();
+
+
+                loaded = true;
+
+                if (instantiatedGM)
+                    _levelLoader.transition.SetTrigger("DoneLoad");
             }
 
-        }
-        else
-        {
-            var roomObject = GameObject.Find($"Room{CurrentRoomNumber}");
-            Room room = null;
-            if (roomObject != null) room = roomObject.GetComponent<Room>();
-            if (room != null && (_currentEnemyCount == 0 || room.EnemyCount == 0) && room.SpawnRoom)
+            // We switched rooms so spawn enemies here
+            // and lock the doors
+            if (CurrentRoomNumber != PreviousRoomNumber)
             {
-                    room.LockAllDoors(false);
+                PreviousRoomNumber = CurrentRoomNumber;
+                _currentRoomEnemiesDead = 0;
+                var room = GameObject.Find($"Room{CurrentRoomNumber}");
+                if (room != null)
+                {
+                    var roomObject = room.GetComponent<Room>();
+                    Debug.Log($"Switched to room {CurrentRoomNumber} - {roomObject.EnemyCount} enemies");
+                    if (roomObject.EndRoom && !_endRoomSetup)
+                    {
+                        List<Door> disabledDoors = new List<Door>();
+                        //find the exit door
+                        if (!roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorEnabled)
+                            disabledDoors.Add(roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>());
+                        if (!roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorEnabled)
+                            disabledDoors.Add(roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>());
+                        if (!roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorEnabled)
+                            disabledDoors.Add(roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>());
+                        if (!roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorEnabled)
+                            disabledDoors.Add(roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>());
+
+                        int doorIdx = UnityEngine.Random.Range(0, disabledDoors.Count);
+                        var p = GameObject.FindGameObjectWithTag("Player");
+                        if (p != null)
+                        {
+                            var pl = p.GetComponent<PlayerData>();
+                            disabledDoors[doorIdx].DoorEnabled = true;
+                            disabledDoors[doorIdx].DoorOpened = true;
+                            disabledDoors[doorIdx].DoorPoint.SetDelegate(_levelGen.CompleteLevel, pl);
+                        }
+                        _endRoomSetup = true;
+                    }
+
+                    if (roomObject.EnemyCount > 0 && roomObject.PlayerInside)
+                    {
+                        Debug.Log($"Enemy Count is {roomObject.EnemyCount} - locking room {CurrentRoomNumber}'s doors");
+                        _currentEnemyCount = roomObject.EnemyCount;
+                        roomObject.LockAllDoors(true);
+                        SpawnEnemies(roomObject);
+                    }
+                }
+
             }
             else
             {
-                if (room != null)
+                var roomObject = GameObject.Find($"Room{CurrentRoomNumber}");
+                Room room = null;
+                if (roomObject != null) room = roomObject.GetComponent<Room>();
+                if (room != null && (_currentEnemyCount == 0 || room.EnemyCount == 0) && room.SpawnRoom)
                 {
-                    var rc = room.GetComponent<Room>();
-                    if (room.SpawnRoom)
+                    room.LockAllDoors(false);
+                }
+                else
+                {
+                    if (room != null)
                     {
-                        room.LockAllDoors(false);
-                    }
-                    if (rc.EnemyCount > 0 && rc.PlayerInside)
-                    {
-                        //Debug.Log($"Enemy Count is {rc.EnemyCount} - locking room {CurrentRoomNumber}'s doors");
-                        _currentEnemyCount = rc.EnemyCount;
-                        rc.LockAllDoors(true);
-                        SpawnEnemies(rc);
+                        var rc = room.GetComponent<Room>();
+                        if (room.SpawnRoom)
+                        {
+                            room.LockAllDoors(false);
+                        }
+                        if (rc.EnemyCount > 0 && rc.PlayerInside)
+                        {
+                            //Debug.Log($"Enemy Count is {rc.EnemyCount} - locking room {CurrentRoomNumber}'s doors");
+                            _currentEnemyCount = rc.EnemyCount;
+                            rc.LockAllDoors(true);
+                            SpawnEnemies(rc);
+                        }
+                        if (_currentRoomEnemiesDead == _currentEnemyCount)
+                        {
+                            rc.LockAllDoors(false);
+                        }
                     }
                 }
             }
         }
-
     }
 
     private void SpawnPlayer()
@@ -234,5 +242,5 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    public void SignalEnemyDied() => _currentEnemyCount--;
+    public void SignalEnemyDied() => _currentRoomEnemiesDead++;
 }

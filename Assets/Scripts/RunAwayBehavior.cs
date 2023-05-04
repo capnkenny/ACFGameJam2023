@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class RunAwayBehavior : EnemyBehavior
 {
@@ -21,6 +22,8 @@ public class RunAwayBehavior : EnemyBehavior
     private bool _found;
     [SerializeField]
     private string _runningAnimName;
+    [SerializeField]
+    private Light2D spotlight;
 
     private int _runningAnimHash;
     private bool _runningAway;
@@ -44,6 +47,7 @@ public class RunAwayBehavior : EnemyBehavior
     private void Start()
     {
         _rigidbody.bodyType = RigidbodyType2D.Static;
+        spotlight.enabled = false;
     }
 
     void Update()
@@ -83,6 +87,7 @@ public class RunAwayBehavior : EnemyBehavior
                 _rigidbody.velocity = Vector2.zero;
                 _rigidbody.bodyType = RigidbodyType2D.Dynamic;
                 _collider.enabled = false;
+                spotlight.enabled = true;
                 return;
             }
         }
