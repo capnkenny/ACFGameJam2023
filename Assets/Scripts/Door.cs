@@ -40,9 +40,14 @@ public class Door : MonoBehaviour
     {
         if (DoorEnabled)
         {
-			DoorOpen.SetActive(DoorOpened);
-			DoorClosed.SetActive(!DoorOpened);
-		}
+            DoorOpen.SetActive(DoorOpened);
+            DoorClosed.SetActive(!DoorOpened);
+        }
+        else
+        {
+            DoorOpen.SetActive(DoorOpened);
+            DoorClosed.SetActive(!DoorOpened);
+        }
 		
 	}
 }

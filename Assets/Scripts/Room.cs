@@ -22,20 +22,17 @@ public class Room : MonoBehaviour
     public EnemySpawnRow EnemyRow2;
     public EnemySpawnRow EnemyRow3;
     public EnemySpawnRow EnemyRow4;
-    public EnemySpawnRow EnemyRow5;
-    public EnemySpawnRow EnemyRow6;
-    public EnemySpawnRow EnemyRow7;
 
+    public Collider2D RoomDetectionCollider;
 
     public int EnemyCount;
+    public int CurrentlySpawnedEnemies = 0;
     public bool SpawnRoom;
     public bool EndRoom;
 
     private bool _allEnemiesDefeated = false;
-
-    private bool _playerInsideRoom = false;
     
-    public bool PlayerInside { get { return _playerInsideRoom; } }
+    public bool PlayerInside { get { return RoomDetectionCollider.bounds.Contains(GameObject.FindGameObjectWithTag("Player").transform.position); } }
 
     public GameObject RoomPrefab;
 
@@ -74,13 +71,5 @@ public class Room : MonoBehaviour
     public bool EnemiesDefeated() => _allEnemiesDefeated;
 
     public void SignalEnemiesDefeated() => _allEnemiesDefeated = true;
-
-    public void OnTriggerStay2D(Collider2D collision)
-    {
-        if(collision.tag.Contains("Player") && this.tag.Contains("RoomDetection"))
-        {
-            _playerInsideRoom = true;
-        }
-    }
 
 }

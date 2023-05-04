@@ -186,7 +186,7 @@ MonoBehaviour:
   Health: 100
   SensoryMeter: 0
   YippeeMeter: 0
-  DabloonCount: 0
+  Koiency: 0
   Inventory: []
   Visible: 1
   MovementSpeed: 5
@@ -194,6 +194,7 @@ MonoBehaviour:
   MaxYippeeMeter: 50
   MaxHealth: 100
   MaxSensoryMeter: 50
+  MaxShield: 0
 --- !u!61 &4226875623385688732
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Travelpoint : MonoBehaviour
 {
+    public Collider2D collider;
     public delegate void TravelDelegate(int lvl);
     public delegate void TravelDelegateRoom(RoomData r, bool booleanResult, Direction dir);
     public delegate void CompleteRoomDelegate(PlayerData data);
@@ -20,6 +21,13 @@ public class Travelpoint : MonoBehaviour
     private Direction directionParameter;
     private PlayerData dataParameter = null;
 
+    private void Update()
+    {
+        var p = GameObject.FindGameObjectWithTag("Player");
+        if (collider.bounds.Contains(p.transform.position))
+            InvokeDelegate();
+    }
+
     public void SetDelegate(TravelDelegate function, int param)
     {
         del = (p) => function(p);
@@ -31,7 +39,6 @@ public class Travelpoint : MonoBehaviour
         completeDel = (p) => function(p);
         dataParameter = param;
         isLevelSwitcher = false;
-        //levelComplete = true;
     }
 
     public void SetDelegate(TravelDelegateRoom function, RoomData param, bool result, Direction d)
@@ -43,18 +50,14 @@ public class Travelpoint : MonoBehaviour
         isLevelSwitcher = false;
     }
 
-
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void InvokeDelegate()
     {
-        if (collision.tag.Contains("Player") && this.tag.Contains("Travel"))
-        {
-            Debug.Log("YOLO time to go");
-            if (isLevelSwitcher && del != null)
-                del(parameter);
-            else if (!isLevelSwitcher && roomDel != null)
-                roomDel(roomParameter, booleanParameter, directionParameter);
-            else if (!isLevelSwitcher && completeDel != null)
-                completeDel(dataParameter);
-        }
+        //Debug.Log("YOLO time to go");
+        if (isLevelSwitcher && del != null)
+            del(parameter);
+        else if (!isLevelSwitcher && roomDel != null)
+            roomDel(roomParameter, booleanParameter, directionParameter);
+        else if (!isLevelSwitcher && completeDel != null)
+            completeDel(dataParameter);
     }
 }

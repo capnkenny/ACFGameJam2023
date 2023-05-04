@@ -54,11 +54,11 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        foreach (var r in _levelGen.ValidPath)
-        {
-            var room = GameObject.Find($"Room{r.RoomNumber}");
-            room.GetComponent<Room>().LockAllDoors(false);
-        }
+        //foreach (var r in _levelGen.ValidPath)
+        //{
+        //    var room = GameObject.Find($"Room{r.RoomNumber}");
+        //    room.GetComponent<Room>().LockAllDoors(false);
+        //}
     }
 
     private void Update()
@@ -82,12 +82,12 @@ public class LevelManager : MonoBehaviour
         // and lock the doors
         if (CurrentRoomNumber != PreviousRoomNumber)
         {
-            Debug.Log($"Switched to room {CurrentRoomNumber} - ");
             PreviousRoomNumber = CurrentRoomNumber;
             var room = GameObject.Find($"Room{CurrentRoomNumber}");
             if (room != null)
             {
                 var roomObject = room.GetComponent<Room>();
+                Debug.Log($"Switched to room {CurrentRoomNumber} - {roomObject.EnemyCount} enemies");
                 if (roomObject.EndRoom && !_endRoomSetup)
                 {
                     List<Door> disabledDoors = new List<Door>();
@@ -136,9 +136,17 @@ public class LevelManager : MonoBehaviour
             {
                 if (room != null)
                 {
+                    var rc = room.GetComponent<Room>();
                     if (room.SpawnRoom)
                     {
                         room.LockAllDoors(false);
+                    }
+                    if (rc.EnemyCount > 0 && rc.PlayerInside)
+                    {
+                        //Debug.Log($"Enemy Count is {rc.EnemyCount} - locking room {CurrentRoomNumber}'s doors");
+                        _currentEnemyCount = rc.EnemyCount;
+                        rc.LockAllDoors(true);
+                        SpawnEnemies(rc);
                     }
                 }
             }
@@ -157,93 +165,71 @@ public class LevelManager : MonoBehaviour
 
     private void SpawnEnemies(Room room)
     {
-        for (int i = 0; i < room.EnemyCount; i++)
+        if (room.CurrentlySpawnedEnemies == 0)
         {
-            bool spawned = false;
-            int y = Random.Range(1, 8);
-            int x = Random.Range(1, 6);
-            while (!spawned)
+            for (int i = 0; i < room.EnemyCount; i++)
             {
-                EnemySpawnRow esr = null;
-                switch (y)
-                {
-                    case 1:
-                        {
-                            esr = room.EnemyRow1;
-                            break;
-                        }
-                    case 2:
-                        {
-                            esr = room.EnemyRow2;
-                            break;
-                        }
-                    case 3:
-                        {
-                            esr = room.EnemyRow3;
-                            break;
-                        }
-                    case 4:
-                        {
-                            esr = room.EnemyRow4;
-                            break;
-                        }
-                    case 5:
-                        {
-                            esr = room.EnemyRow5;
-                            break;
-                        }
-                    case 6:
-                        {
-                            esr = room.EnemyRow6;
-                            break;
-                        }
-                    case 7:
-                        {
-                            esr = room.EnemyRow7;
-                            break;
-                        }
-                }
-
-                EnemySpawner es = null;
-
-                if (esr != null)
-                {
-                    switch (x)
+                //bool spawned = false;
+                int y = Random.Range(1, 5);
+                int x = Random.Range(1, 4);
+                //while (!spawned)
+                //{
+                    EnemySpawnRow esr = null;
+                    switch (y)
                     {
                         case 1:
                             {
-                                es = esr.SpawnPoint1;
+                                esr = room.EnemyRow1;
                                 break;
                             }
                         case 2:
                             {
-                                es = esr.SpawnPoint2;
+                                esr = room.EnemyRow2;
                                 break;
                             }
                         case 3:
                             {
-                                es = esr.SpawnPoint3;
+                                esr = room.EnemyRow3;
                                 break;
                             }
                         case 4:
                             {
-                                es = esr.SpawnPoint4;
-                                break;
-                            }
-                        case 5:
-                            {
-                                es = esr.SpawnPoint5;
+                                esr = room.EnemyRow4;
                                 break;
                             }
                     }
 
-                    if (es != null && !es.EnemySpawned)
+                    EnemySpawner es = null;
+
+                    if (esr != null)
                     {
-                        int e = Random.Range(0, AllowedEnemies.Count);
-                        es.SpawnEnemy(EnemyPrefabs[e]);
-                        spawned = true;
+                        switch (x)
+                        {
+                            case 1:
+                                {
+                                    es = esr.SpawnPoint1;
+                                    break;
+                                }
+                            case 2:
+                                {
+                                    es = esr.SpawnPoint2;
+                                    break;
+                                }
+                            case 3:
+                                {
+                                    es = esr.SpawnPoint3;
+                                    break;
+                                }
+                        }
+
+                        if (es != null && !es.EnemySpawned)
+                        {
+                            int e = Random.Range(0, AllowedEnemies.Count);
+                            es.SpawnEnemy(room, EnemyPrefabs[e]);
+                            //spawned = true;
+                        }
                     }
-                }
+                //}
             }
         }
     }

@@ -134,5 +134,22 @@ public class PlayerController : MonoBehaviour
 
         return newData;
     }
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.LogFormat("Player collision - {0} and {1}", collision.collider.tag, this.tag);
+        if (collision.gameObject.CompareTag("Untagged"))
+            Debug.Log(collision.gameObject.name);
+        //if (collision.gameObject.CompareTag("RoomDetection"))
+        //{
+        //    //Debug.Log("ITSSSSSSSSSSSS SHOWTIME :^)");
+        //    var room = collision.gameObject.GetComponentInParent<Room>();
+        //    room.SignalPlayerInside();
+        //}
+        //if (collision.gameObject.CompareTag("Travel"))
+        //{
+        //    var tp = collision.gameObject.GetComponent<Travelpoint>();
+        //    tp.InvokeDelegate();
+        //}
+    }
 
 }

@@ -136,7 +136,7 @@ public class LevelGenerator : MonoBehaviour
 
         _gridHeight = _gridWidth = m;
         _numberOfRooms = (m - 2);
-        _numberOfEnemies = (int)(_numberOfRooms * 1.5);
+        
 		//Debug Output
         
 		sb.AppendFormat("Number of Rooms: {0}", _numberOfRooms).AppendLine();
@@ -776,34 +776,40 @@ public class LevelGenerator : MonoBehaviour
 
     private void AssignEnemyCounts()
     {
+        _numberOfEnemies = (int)(ValidPath.Count * 1.75);
         int counter = _numberOfEnemies;
+        bool firstPass = true;
         while (counter > 0)
         {
-            foreach (var room in ValidPath)
+            int r = 0;
+            if (firstPass)
             {
-                if (counter <= 0)
+                for (int i = r; i < ValidPath.Count; i++)
                 {
-                    return;
-                }
-                var rc = GameObject.Find($"Room{room.RoomNumber}").GetComponent<Room>();
-                if (room.Spawn)
-                    continue;
-
-                if (rc.EnemyCount == 0)
-                {
+                    var room = ValidPath[i];
+                    var rc = GameObject.Find($"Room{room.RoomNumber}").GetComponent<Room>();
+                    if (room.Spawn)
+                        continue;
                     rc.EnemyCount++;
                     counter--;
                 }
-                else
+            }
+            else
+            {
+                r = UnityEngine.Random.Range(0, 3);
+                int endSub = UnityEngine.Random.Range((int)(ValidPath.Count / 2), ValidPath.Count);
+                for (int i = r; i <= endSub; i++)
                 {
-                    int r = UnityEngine.Random.Range(1, 6);
-                    if (r % 2 == 0)
-                    {
-                        rc.EnemyCount++;
-                        counter--;
-                    }
+                    var room = ValidPath[i];
+                    var rc = GameObject.Find($"Room{room.RoomNumber}").GetComponent<Room>();
+                    if (room.Spawn)
+                        continue;
+                    rc.EnemyCount++;
+                    counter--;
                 }
             }
+            if (counter <= 0)
+                return;
         }
     }
 
