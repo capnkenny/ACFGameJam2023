@@ -447,6 +447,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: state
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: Loader
       value: 
       objectReference: {fileID: 491739273}
