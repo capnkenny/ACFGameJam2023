@@ -19,6 +19,8 @@ public class RunAwayBehavior : EnemyBehavior
     [SerializeField]
     private Animator _secondaryAnimator;
     [SerializeField]
+    private Collider2D _secondaryCollider;
+    [SerializeField]
     private bool _found;
     [SerializeField]
     private string _runningAnimName;
@@ -48,6 +50,7 @@ public class RunAwayBehavior : EnemyBehavior
     {
         _rigidbody.bodyType = RigidbodyType2D.Static;
         spotlight.enabled = false;
+        _secondaryCollider.enabled = false;
     }
 
     void Update()
@@ -60,6 +63,7 @@ public class RunAwayBehavior : EnemyBehavior
       _animator.SetBool("RunningAway", _runningAway);
       _animator.SetBool("IsDead", _isDead);
       _secondaryAnimator.SetBool("IsRunning", _runningAway);
+
 
         if (_flipChar)
         {
@@ -104,11 +108,19 @@ public class RunAwayBehavior : EnemyBehavior
 
         if (_runningAway && !_running)
         {
-          Debug.Log("Running away!");
+            //Debug.Log("Running away!");
             _rigidbody.velocity = (Vector2)((-direction) * controller.MovementSpeed);
-
             _running = true;
+            _secondaryCollider.enabled = true;
+
             return;
+        }
+        else if (_runningAway && _running)
+        {
+            if (_secondaryCollider.enabled && _secondaryCollider.bounds.Contains(_player.transform.position))
+            {
+                _player.GetComponent<PlayerController>().HurtPlayer(0, true);
+            }
         }
 
         if(_isDead)

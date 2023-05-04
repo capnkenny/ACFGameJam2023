@@ -14,6 +14,9 @@ public class HubManager : MonoBehaviour
     [SerializeField]
     private GameObject _gameManagerPrefab;
 
+    [SerializeField]
+    private MusicPlayer _music;
+
     private GameManager _mgr;
 
     private bool loaded = false;
@@ -46,6 +49,12 @@ public class HubManager : MonoBehaviour
 
             loaded = true;
             _levelLoader.transition.SetTrigger("DoneLoad");
+        }
+
+        if (loaded && !_music.IsPlaying)
+        {
+            if(_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.5f)
+                _music.PlayMusic();
         }
 
     }

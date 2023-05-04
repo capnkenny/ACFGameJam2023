@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour
     private bool _sensoryOverload;
     private int _soakerLevel;
 
+    public bool Hurt = false;
+    private float hurtTimer = 3.0f;
     
     //Private members
     private Vector2 _movement;
@@ -70,6 +72,19 @@ public class PlayerController : MonoBehaviour
         if(Visible)
         {
                 rb2d.velocity = _movement;
+
+            if (Hurt)
+            {
+                hurtTimer -= Time.deltaTime;
+
+                if (hurtTimer <= 0)
+                {
+                    hurtTimer = 3.0f;
+                    Hurt = false;
+                }
+            }
+
+            Debug.LogFormat("player health: {0}", Health);
         }
     }
 
@@ -113,6 +128,19 @@ public class PlayerController : MonoBehaviour
         _hearingFactor = data.Hearing;
         _touchFactor = data.Touch;
         _soakerLevel = data.SoakerLevel;
+    }
+
+    public void HurtPlayer(int dmg, bool sensoryModifier)
+    {
+        if (!Hurt)
+        {
+            int damage = dmg;
+            if (sensoryModifier)
+            {
+                damage = (int)(dmg + _tasteFactor + _smellFactor + _sightFactor + _hearingFactor + _touchFactor);
+            }
+            Health -= damage;
+        }
     }
 
     public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)

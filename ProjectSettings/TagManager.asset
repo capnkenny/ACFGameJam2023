@@ -18,6 +18,7 @@ TagManager:
   - EnemySpawnLocations
   - LvlMgr
   - RoomDetection
+  - MikeySound
   layers:
   - Default
   - TransparentFX
