@@ -8,4 +8,5 @@
 	CUTSCENE = 6,
 	EXITING = 10,
 	INITIALLOAD = 11,
+	HUB = 12
 }

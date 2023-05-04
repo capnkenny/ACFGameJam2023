@@ -66,6 +66,7 @@ public class LevelManager : MonoBehaviour
     {
         if (_mgr.state == GameState.PLAYING)
         {
+            Debug.Log("Playing State");
             // Make sure GameManager is loaded too
             if (_mgr.Loaded && !loaded)
             {
@@ -77,10 +78,8 @@ public class LevelManager : MonoBehaviour
 
                 loaded = true;
 
-                if (instantiatedGM)
-                    _levelLoader.transition.SetTrigger("DoneLoad");
+                _levelLoader.transition.SetTrigger("DoneLoad");
             }
-
             // We switched rooms so spawn enemies here
             // and lock the doors
             if (CurrentRoomNumber != PreviousRoomNumber)
@@ -159,6 +158,10 @@ public class LevelManager : MonoBehaviour
                     }
                 }
             }
+        }
+        else
+        {
+            _mgr = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         }
     }
 

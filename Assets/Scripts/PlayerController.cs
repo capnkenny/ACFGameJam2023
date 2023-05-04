@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public Item RangedWeapon;
     public Item MeleeWeapon;
     public Sprite PlayerSprite;
+    public Animator animator;
     public SpriteRenderer renderer;
     public Rigidbody2D rb2d;
 
@@ -40,9 +41,11 @@ public class PlayerController : MonoBehaviour
 
     public bool Hurt = false;
     private float hurtTimer = 3.0f;
+    private Direction dir;
     
     //Private members
     private Vector2 _movement;
+    private GameManager mgr;
 
     void Awake()
     {
@@ -64,16 +67,24 @@ public class PlayerController : MonoBehaviour
         _sightFactor = Random.Range(0.0f, 1.5f);
         _hearingFactor = Random.Range(0.0f, 1.5f);
 	    _touchFactor = Random.Range(0.0f, 1.5f);
+
+        mgr = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Visible)
+        if(mgr.state == GameState.PLAYING || mgr.state == GameState.HUB)
         {
-                rb2d.velocity = _movement;
+            Debug.Log($"velocity {_movement}");
+            Debug.Log($"Direction: {dir}");
+            animator.SetInteger("VelocityX", (int)_movement.x);
+            animator.SetInteger("VelocityY", (int)_movement.y);
+            animator.SetInteger("Direction", ((int)dir));
 
-            if (Hurt)
+            rb2d.velocity = _movement;
+
+            if (Hurt && mgr.state == GameState.PLAYING)
             {
                 hurtTimer -= Time.deltaTime;
 
@@ -84,13 +95,22 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            Debug.LogFormat("player health: {0}", Health);
+            if (mgr.state == GameState.PLAYING)
+                Debug.LogFormat("player health: {0}", Health);
         }
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
         _movement = context.ReadValue<Vector2>() * MovementSpeed;
+        if (_movement.x > 0) // right
+            dir = Direction.EAST;
+        else if (_movement.x < 0)
+            dir = Direction.WEST;
+        else if (_movement.y > 0)
+            dir = Direction.NORTH;
+        else if (_movement.y < 0)
+            dir = Direction.SOUTH;
     }
 
     public void AddSensoryInput(float taste, float smell, float sight, float hearing, float touch)

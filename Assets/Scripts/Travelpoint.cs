@@ -24,7 +24,7 @@ public class Travelpoint : MonoBehaviour
     private void Update()
     {
         var p = GameObject.FindGameObjectWithTag("Player");
-        if (collider.bounds.Contains(p.transform.position))
+        if (collider != null && p != null && collider.bounds.Contains(p.transform.position))
             InvokeDelegate();
     }
 
