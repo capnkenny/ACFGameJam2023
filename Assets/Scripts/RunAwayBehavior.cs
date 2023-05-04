@@ -94,7 +94,13 @@ public class RunAwayBehavior : EnemyBehavior
           var state = _animator.GetCurrentAnimatorStateInfo(0);
           if(state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
           {
-            GameObject.Destroy(this.gameObject);
+                var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
+                var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
+                if (levelManager != null)
+                {
+                    levelManager.SignalEnemyDied();
+                }
+                GameObject.Destroy(this.gameObject);
           }
         }
     }

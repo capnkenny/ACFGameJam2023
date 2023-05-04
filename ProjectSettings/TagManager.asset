@@ -14,6 +14,10 @@ TagManager:
   - GameManager
   - NPC
   - Travel
+  - Spawner
+  - EnemySpawnLocations
+  - LvlMgr
+  - RoomDetection
   layers:
   - Default
   - TransparentFX

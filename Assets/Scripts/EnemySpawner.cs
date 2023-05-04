@@ -1,18 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public bool EnemySpawned = false;
+
+    public void SpawnEnemy(GameObject enemy)
     {
-        
+        if (enemy != null)
+        {
+            Instantiate(enemy, transform);
+            EnemySpawned = true;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

@@ -76,6 +76,8 @@ public class LevelGenerator : MonoBehaviour
 
     private bool disabledDebug = false;
 
+    private int _numberOfEnemies;
+
     #endregion Private members
 
     public GameObject Camera;
@@ -102,7 +104,7 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
             
-            DrawLine();
+            //DrawLine();
         }
             
 	}
@@ -134,8 +136,8 @@ public class LevelGenerator : MonoBehaviour
 
         _gridHeight = _gridWidth = m;
         _numberOfRooms = (m - 2);
+        _numberOfEnemies = (int)(_numberOfRooms * 1.5);
 		//Debug Output
-		
         
 		sb.AppendFormat("Number of Rooms: {0}", _numberOfRooms).AppendLine();
 		sb.AppendFormat("Grid Size: {0}, {1}", _gridWidth, _gridHeight).AppendLine();
@@ -453,6 +455,7 @@ public class LevelGenerator : MonoBehaviour
         }
         
         SetDoors();
+        AssignEnemyCounts();
         SnapCamera(_grid[StartingRoom.y][StartingRoom.x]);
     }
 
@@ -475,7 +478,7 @@ public class LevelGenerator : MonoBehaviour
     {
         List<RoomData> neighbors = new List<RoomData>();
         var center = _grid[room.Y][room.X];
-        Debug.Log($"Checking neighbors for room {center.RoomNumber} at {center.X}, {center.Y}");
+        //Debug.Log($"Checking neighbors for room {center.RoomNumber} at {center.X}, {center.Y}");
         if (room.Y == 0)
         {
             //Check north
@@ -572,9 +575,7 @@ public class LevelGenerator : MonoBehaviour
         {
             var room = ValidPath[i];
             room.Neighbors = DetermineNeighborsWithoutPathfinding(room);
-            //Debug.Log($"Room {room.RoomNumber} has {room.Neighbors.Count} neighbors");
             var roomObject = GameObject.Find($"Room{room.RoomNumber}");
-            bool spawn = room.Spawn;
             foreach (var neighbor in room.Neighbors)
             {
                 int x = room.X - neighbor.X;
@@ -583,12 +584,14 @@ public class LevelGenerator : MonoBehaviour
                 {
                     if (x > 0)
                     {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - west door");
                         roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorOpened = true;
                         roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.WEST);
                     }
                     else
                     {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - east door");
                         roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorOpened = true;
 						roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.EAST);
@@ -598,12 +601,14 @@ public class LevelGenerator : MonoBehaviour
                 {
                     if (y < 0)
                     {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - north door");
                         roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorOpened = true;
 						roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.NORTH);
 					}
                     else
                     {
+                        //Debug.Log($"Unlocking room {room.RoomNumber} - south door");
                         roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorOpened = true;
 						roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.SOUTH);
@@ -612,7 +617,14 @@ public class LevelGenerator : MonoBehaviour
 
             }
 
+            if (room.Spawn)
+            {
+                roomObject.GetComponent<Room>().EnemyCount = 0;
+                roomObject.GetComponent<Room>().SpawnRoom = true;
+            }
 
+            if (room.End)
+                roomObject.GetComponent<Room>().EndRoom = true;
         }
         
     }
@@ -709,11 +721,10 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 	}
-    
 
     private void SnapCamera(RoomData room, bool moveCharacter = false, Direction dir = Direction.NORTH)
     {
-        Debug.Log($"Snapping to room {room.RoomNumber}");
+        //Debug.Log($"Snapping to room {room.RoomNumber}");
         Camera.transform.position = new Vector3(room.X * _xDistanceForCam, room.Y * _yDistanceForCam, Camera.transform.position.z);
 
         if (moveCharacter)
@@ -748,7 +759,7 @@ public class LevelGenerator : MonoBehaviour
 						}
 				}
                
-                Debug.Log($"Door position: {pos}");
+                //Debug.Log($"Door position: {pos}");
                 var player = GameObject.FindGameObjectWithTag("Player");
                 if (player != null)
                 {
@@ -756,5 +767,64 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
 		}
+        var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
+        if (mgr != null)
+        {
+            mgr.GetComponent<LevelManager>().CurrentRoomNumber = room.RoomNumber;
+        }
+    }
+
+    private void AssignEnemyCounts()
+    {
+        int counter = _numberOfEnemies;
+        while (counter > 0)
+        {
+            foreach (var room in ValidPath)
+            {
+                if (counter <= 0)
+                {
+                    return;
+                }
+                var rc = GameObject.Find($"Room{room.RoomNumber}").GetComponent<Room>();
+                if (room.Spawn)
+                    continue;
+
+                if (rc.EnemyCount == 0)
+                {
+                    rc.EnemyCount++;
+                    counter--;
+                }
+                else
+                {
+                    int r = UnityEngine.Random.Range(1, 6);
+                    if (r % 2 == 0)
+                    {
+                        rc.EnemyCount++;
+                        counter--;
+                    }
+                }
+            }
+        }
+    }
+
+    public void CompleteLevel(PlayerData data)
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        var gmo = GameObject.FindGameObjectWithTag("GameManager");
+        if (gmo != null)
+        {
+            var gm = gmo.GetComponent<GameManager>();
+            var pc = player.GetComponent<PlayerController>();
+            gm.playerData = pc.UpdatePlayerData(data);
+        }
+
+        LoadToLevel(4); //fix later maybe ¯\_(ツ)_/¯
+    }
+
+    private void LoadToLevel(int level)
+    {
+        var lvlload = GameObject.Find("LevelLoader").GetComponent<LevelLoad>();
+        lvlload.transition.SetTrigger("Loading");
+        lvlload.LoadLevel(level); 
     }
 }
