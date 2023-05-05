@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Preload : MonoBehaviour
 {
@@ -9,10 +8,12 @@ public class Preload : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        foreach (var scene in SceneManager.GetAllScenes())
-        {
-            Debug.Log(scene.name);
-        }
+        //int sceneCount = SceneManager.sceneCount;
+        //for(int i = 0; i < sceneCount; i++)
+        //{
+        //    var scene = SceneManager.GetSceneAt(i);
+        //    Debug.Log(scene.name);
+        //}
 
 
         StartCoroutine(loader.LoadLevel(1));

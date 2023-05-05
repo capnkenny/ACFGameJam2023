@@ -16,7 +16,7 @@ public class Heart : MonoBehaviour
     public const int HEARTHALF = 2;
     public const int HEART34S = 3;
     public const int HEARTFULL = 4;
-    public const int HEARTSHIELD = 4;
+    public const int HEARTSHIELD = 5;
 
     public bool Shielded;
     public int Value;
@@ -40,7 +40,7 @@ public class Heart : MonoBehaviour
             case 4: renderer.texture = Full; break;
             case 5: renderer.texture = Shield; break;
         }
-        Debug.Log($"{this.gameObject.name} - {Value}");
+        
     }
 }
 

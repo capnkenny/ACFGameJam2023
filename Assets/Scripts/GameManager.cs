@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log("Setting to not destroy on transition");
+        //Debug.Log("Setting to not destroy on transition");
         DontDestroyOnLoad(this.gameObject);
         Loaded = false;
     }
@@ -49,12 +49,12 @@ public class GameManager : MonoBehaviour
             case GameState.LOADING:
                 {
                     HandleLoading();
-                    if (InitialLoad)
-                        state = GameState.INITIALLOAD;
-                    else
+                    if (!InitialLoad)
+
                         state = GameState.PLAYING;
                     break;
                 }
+            case GameState.INTRO:
             case GameState.HUB:
             case GameState.PLAYING:
                 {
@@ -77,12 +77,14 @@ public class GameManager : MonoBehaviour
             case GameState.LOADING:
                 {
                     HandleLoading();
-                    if (InitialLoad)
-                        state = GameState.INITIALLOAD;
-                    else
+                    //if (InitialLoad)
+                    //    state = GameState.INITIALLOAD;
+                    //else
+                    if(!InitialLoad)
                         state = GameState.PLAYING;
                     break;
                 }
+            case GameState.INTRO:
             case GameState.HUB:
             case GameState.PLAYING:
                 {
@@ -119,14 +121,17 @@ public class GameManager : MonoBehaviour
 
         if (state == GameState.INITIALLOAD)
         {
+            InitialLoad = true;
             Debug.Log("Initial load detected");
             if (playerData.ViewedIntro)
             {
+
                 Debug.Log("Skipping intro");
                 TransitionToLevel(-1);
             }
             else
             {
+                state = GameState.INTRO;
                 Debug.Log("Going to intro");
                 TransitionToLevel(-2);
             }
@@ -144,7 +149,8 @@ public class GameManager : MonoBehaviour
 
     public void TransitionToLevel(int level)
     {
-        state = GameState.LOADING;
+        if(state != GameState.INTRO)
+            state = GameState.LOADING;
         int index = 0;
 
         switch (level)

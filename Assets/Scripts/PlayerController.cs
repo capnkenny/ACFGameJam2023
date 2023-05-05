@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public Item MeleeWeapon;
     public Sprite PlayerSprite;
     public Animator animator;
-    public SpriteRenderer renderer;
+    public new SpriteRenderer renderer;
     public Rigidbody2D rb2d;
 
     [Header("Base Player Stats")]
@@ -117,8 +117,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (mgr.state == GameState.PLAYING)
-                Debug.LogFormat("player health: {0}", Health);
+            
         }
     }
 
@@ -177,7 +176,7 @@ public class PlayerController : MonoBehaviour
         float sensoryMod = 0;
         if (!Hurt)
         {
-            Debug.Log("Player was hurt!");
+            
             int damage = dmg;
             
             if (sensoryModifier)
@@ -226,9 +225,17 @@ public class PlayerController : MonoBehaviour
     }
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.LogFormat("Player collision - {0} and {1}", collision.collider.tag, this.tag);
-        if (collision.gameObject.CompareTag("Untagged"))
-            Debug.Log(collision.gameObject.name);
+        if (collision.collider.CompareTag("Projectile"))
+        {
+            var force = -collision.rigidbody.velocity;
+            rb2d.AddForce(force);
+        }
+        if (collision.collider.CompareTag("Enemy"))
+        {
+            var force = -movement * 2;
+            rb2d.AddForce(force);
+        }
+
         //if (collision.gameObject.CompareTag("RoomDetection"))
         //{
         //    //Debug.Log("ITSSSSSSSSSSSS SHOWTIME :^)");

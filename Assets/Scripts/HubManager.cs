@@ -21,6 +21,7 @@ public class HubManager : MonoBehaviour
 
     private bool loaded = false;
     private bool sceneRequested = false;
+    private bool musicRequested = false;
 
     private void Awake()
     {
@@ -54,10 +55,14 @@ public class HubManager : MonoBehaviour
             _mgr.state = GameState.HUB;
         }
 
-        if (loaded && !_music.IsPlaying)
+        if (loaded && !_music.IsPlaying && !musicRequested)
         {
-            if(_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.5f)
+            if (_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.5f)
+            {
+                musicRequested = true;
                 _music.PlayMusic();
+            }
+
         }
 
     }

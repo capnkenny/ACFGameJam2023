@@ -36,7 +36,7 @@ public class HeartBar : MonoBehaviour
         int div = (int)math.trunc(HealthValue / divisor);
         int per = (int)math.trunc(((HealthValue / divisor) - div) * 100);
         int ind = 1;
-        Debug.LogFormat("Test: {0}, {1}", div, per);
+       
         switch (div)
         {
             case 0: break;
@@ -83,14 +83,15 @@ public class HeartBar : MonoBehaviour
         }
 
         //Tell heart index to apply percentage value
-        if (ind < 6 && per >= 1)
+        if (ind < 6)
         {
-            
             int value = Heart.HEART34S;
             if (per <= 50 && per > 25)
                 value = Heart.HEARTHALF;
-            else if (per <= 25 && per >= 1)
+            else if (per <= 25 && per >= 0)
                 value = Heart.HEARTQUARTER;
+            else
+                value = Heart.HEARTEMPTY;
             
             switch (ind)
             {
@@ -132,6 +133,7 @@ public class HeartBar : MonoBehaviour
                 default: break;
             }
         }
+
 
         
     }

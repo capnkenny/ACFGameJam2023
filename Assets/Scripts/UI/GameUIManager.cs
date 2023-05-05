@@ -9,6 +9,8 @@ public class GameUIManager : MonoBehaviour
 
     private PlayerController pc;
 
+    public void SetPlayer(PlayerController p) => pc = p;
+
     private void Update()
     {
         if (pc == null)

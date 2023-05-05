@@ -7,40 +7,38 @@ public class Projectile : MonoBehaviour
     public float ImpactForce;
     public bool SensoryEffect;
 
-	private bool disposable = false;
-    private float timer = 0.0f;
+	private bool disposable = true;
+    private bool destroy = false;
+    //private float timer = 0.0f;
 
 
-    private void Awake()
+    private void Start()
     {
-        if (TimeToLive > 0)
-        {
-            disposable = true;
-        }
+        //GameObject.Destroy(this, TimeToLive);
     }
 
     private void Update()
     {
-        if (disposable)
-        {
-            timer += Time.deltaTime;
-            if (timer > TimeToLive)
-            {
-                DestroyImmediate(this);
-            }
-        }
+        if(destroy)
+            GameObject.DestroyImmediate(this.gameObject);
+        //if (disposable)
+        //{
+        //    TimeToLive -= Time.deltaTime;
+        //    if (TimeToLive <= 0)
+        //    {
+        //        Debug.LogWarning("Destroying projectile");
+        //        DestroyImmediate(this);
+        //    }
+        //}
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.collider.CompareTag("Player"))
         {
             var pc = collision.gameObject.GetComponent<PlayerController>();
-            var v = collision.otherRigidbody.velocity;
-            var force = v * new Vector2(ImpactForce, ImpactForce);
-            collision.rigidbody.AddForce(force);
             pc.HurtPlayer(Damage, SensoryEffect);
-            Destroy(this);
+            destroy = true;
         }
     }
 

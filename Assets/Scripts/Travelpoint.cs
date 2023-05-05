@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Travelpoint : MonoBehaviour
 {
-    public Collider2D collider;
+    public new Collider2D collider;
     public delegate void TravelDelegate(int lvl);
     public delegate void TravelDelegateRoom(RoomData r, bool booleanResult, Direction dir);
     public delegate void CompleteRoomDelegate(PlayerData data);

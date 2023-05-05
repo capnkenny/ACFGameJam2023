@@ -122,7 +122,7 @@ public class RunAwayBehavior : EnemyBehavior
             {
                 _player.GetComponent<PlayerController>().HurtPlayer(5, true, 0,0,0,2,0);
             }
-            sensoryTimer += Time.fixedDeltaTime;
+            sensoryTimer += Time.deltaTime;
             if (sensoryTimer >= 3.0f)
             {
                 sensoryTimer = 0;
@@ -132,10 +132,10 @@ public class RunAwayBehavior : EnemyBehavior
 
         if(_isDead)
         {
-          Debug.Log("dying :(");
           var state = _animator.GetCurrentAnimatorStateInfo(0);
           if(state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
           {
+                Debug.LogWarning("Mikey is going away");
                 var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
                 var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
                 if (levelManager != null)
@@ -143,7 +143,7 @@ public class RunAwayBehavior : EnemyBehavior
                     levelManager.SignalEnemyDied();
                 }
                 _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 25.0f, 0);
-                GameObject.Destroy(this.gameObject);
+                DestroyImmediate(this.gameObject);
           }
         }
     }
@@ -191,17 +191,19 @@ public class RunAwayBehavior : EnemyBehavior
         }
         if (col.gameObject.tag == "Player")
         {
+            Debug.LogFormat("Mikey collision - {0} and {1}", col.collider.tag, this.tag);
             if (col.otherCollider.tag == "Enemy" && _running)
             {
                 col.gameObject.GetComponent<PlayerController>().HurtPlayer((int)controller.AttackDamage, false);
                 controller.Health -= controller.Health;
+                _isDead = true;
                 _runningAway = false;
                 _found = false;
                 var v = col.otherRigidbody.velocity;
-                var force = v * new Vector2(10, 10);
-                col.rigidbody.AddForce(force);
+                var force = v * new Vector2(100, 100);
+                col.rigidbody.AddForce(-force);
                 _rigidbody.velocity = Vector2.zero;
-                Destroy(this);
+                //Destroy(this);
             }
         }
     }
