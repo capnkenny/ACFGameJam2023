@@ -4,9 +4,6 @@ using UnityEngine.InputSystem;
 
 public class EnemyController : MonoBehaviour
 {
-    //HitSoundEffect
-    //DeadSoundEffect
-    //AttackSoundEffect
 
     [Header("GameObjects")]
     public SpriteRenderer SpriteRenderer;
