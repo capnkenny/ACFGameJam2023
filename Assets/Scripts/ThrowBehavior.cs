@@ -46,9 +46,9 @@ public class ThrowBehavior : EnemyBehavior
                 var position = transform.position;
                 position.y += YPosition;
                 var item = Instantiate(AllowedItemPrefabsToThrow[i], position, Quaternion.identity);
+                Destroy(item, 6.0f);
                 int x = Random.Range(1, 3) % 2 == 0 ? -3 : 3;
                 Vector2 force = (new Vector2(x, 10).normalized * Magnitude);
-                Debug.Log(force);
                 item.GetComponent<Rigidbody2D>().AddForce(force);
                 if (x < 0)
                     item.GetComponent<Rigidbody2D>().AddTorque(Torque);

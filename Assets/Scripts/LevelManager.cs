@@ -23,7 +23,7 @@ public class LevelManager : MonoBehaviour
 
     private GameManager _mgr;
 
-    private bool instantiatedGM = false;
+
     private bool loaded = false;
 
     public int CurrentRoomNumber;
@@ -43,7 +43,7 @@ public class LevelManager : MonoBehaviour
         {
             _mgr = Instantiate(_gameManagerPrefab).GetComponent<GameManager>();
             _mgr.Loader = _levelLoader;
-            instantiatedGM = true;
+
 
         }
         else
@@ -54,14 +54,14 @@ public class LevelManager : MonoBehaviour
         PreviousRoomNumber = 0;
     }
 
-    private void Start()
-    {
-        //foreach (var r in _levelGen.ValidPath)
-        //{
-        //    var room = GameObject.Find($"Room{r.RoomNumber}");
-        //    room.GetComponent<Room>().LockAllDoors(false);
-        //}
-    }
+    //private void Start()
+    //{
+    //    //foreach (var r in _levelGen.ValidPath)
+    //    //{
+    //    //    var room = GameObject.Find($"Room{r.RoomNumber}");
+    //    //    room.GetComponent<Room>().LockAllDoors(false);
+    //    //}
+    //}
 
     private void Update()
     {
@@ -90,7 +90,8 @@ public class LevelManager : MonoBehaviour
 
             if (levelstart && !_mgr.GameUI.activeSelf)
             {
-                _mgr.EnableGameUI();
+                if(_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+                    _mgr.EnableGameUI();
             }
 
             
@@ -107,7 +108,7 @@ public class LevelManager : MonoBehaviour
                     Debug.Log($"Switched to room {CurrentRoomNumber} - {roomObject.EnemyCount} enemies");
                     if (roomObject.EndRoom && !_endRoomSetup)
                     {
-                        List<Door> disabledDoors = new List<Door>();
+                        List<Door> disabledDoors = new();
                         //find the exit door
                         if (!roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorEnabled)
                             disabledDoors.Add(roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>());
@@ -119,10 +120,11 @@ public class LevelManager : MonoBehaviour
                             disabledDoors.Add(roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>());
 
                         int doorIdx = UnityEngine.Random.Range(0, disabledDoors.Count);
-                        var p = GameObject.FindGameObjectWithTag("Player");
+                        var p = GameObject.FindGameObjectWithTag("GameManager");
                         if (p != null)
                         {
-                            var pl = p.GetComponent<PlayerData>();
+                            var pl = p.GetComponent<GameManager>().playerData;
+                            //var pl = p.GetComponent<PlayerData>();
                             disabledDoors[doorIdx].DoorEnabled = true;
                             disabledDoors[doorIdx].DoorOpened = true;
                             disabledDoors[doorIdx].DoorPoint.SetDelegate(_levelGen.CompleteLevel, pl);

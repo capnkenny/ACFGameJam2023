@@ -146,4 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98435643fa0bd7b45808d369250bc691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: 15
+  Damage: 25
+  TimeToLive: 3
+  ImpactForce: 10
+  SensoryEffect: 0

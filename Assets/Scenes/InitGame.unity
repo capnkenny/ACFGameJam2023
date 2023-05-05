@@ -402,6 +402,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5968389336136176762, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5968389336136176762, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5968389336136176762, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 3.5450287
+      objectReference: {fileID: 0}
     - target: {fileID: 6032117589248991545, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -461,6 +473,10 @@ PrefabInstance:
     - target: {fileID: 6032117589248991547, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_Name
       value: GameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7804031527174104059, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8460583979298025000, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_Camera

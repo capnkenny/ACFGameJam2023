@@ -142,13 +142,13 @@ public class LevelGenerator : MonoBehaviour
 		sb.AppendFormat("Number of Rooms: {0}", _numberOfRooms).AppendLine();
 		sb.AppendFormat("Grid Size: {0}, {1}", _gridWidth, _gridHeight).AppendLine();
 
-		Debug.Log(sb.ToString());
+		//Debug.Log(sb.ToString());
 		sb.Clear();
 		InitializeGrid();
 
 		sb.AppendFormat("Start Room: {0}, {1}", StartingRoom.x, StartingRoom.y).AppendLine();
 		sb.AppendFormat("End Room: {0}, {1}", EndRoom.x, EndRoom.y).AppendLine();
-		Debug.Log(sb.ToString());
+		//Debug.Log(sb.ToString());
         sb.Clear();
 
 		
@@ -170,7 +170,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void InitializeGrid()
     {
-        Debug.Log("Initializing Grid");
+        //Debug.Log("Initializing Grid");
         ValidPath = new List<RoomData>();
         _grid = new List<List<RoomData>>();
         int roomNumber = 1;
@@ -244,13 +244,13 @@ public class LevelGenerator : MonoBehaviour
             }
 
             _grid[dY][dX].Enabled = false;
-            Debug.LogFormat("Disabled Room {0}", _grid[dY][dX].RoomNumber);
+            //Debug.LogFormat("Disabled Room {0}", _grid[dY][dX].RoomNumber);
         }
     }
 
     private bool Search()
     {
-        Debug.Log("Searching...");
+        //Debug.Log("Searching...");
         //Create an open list to check, and a closed list of rooms
         // we don't need to check anymore.
         var openList = new List<RoomData>();
@@ -265,7 +265,7 @@ public class LevelGenerator : MonoBehaviour
             UpdateDebugLayers();
             //Get lowest F cost
             var room = openList.OrderBy(r => r.FullCost).First();
-            //Debug.LogFormat("Room {0}, Cost: {1}", room.RoomNumber, room.FullCost);
+            ////Debug.LogFormat("Room {0}, Cost: {1}", room.RoomNumber, room.FullCost);
             
             //Remove lowest cost and move to closed list
             openList.Remove(room);
@@ -276,7 +276,7 @@ public class LevelGenerator : MonoBehaviour
             
             if(closedList.Any(r => r.RoomNumber == _grid[EndRoom.y][EndRoom.x].RoomNumber))
             {
-                Debug.Log("Completed search!");
+                //Debug.Log("Completed search!");
                 return true;
             }
         }
@@ -430,7 +430,7 @@ public class LevelGenerator : MonoBehaviour
 
     private List<RoomData> FindPathToEnd()
     {
-        Debug.Log("Finding valid path...");
+        //Debug.Log("Finding valid path...");
         List<RoomData> path = new List<RoomData>();
         RoomData currentRoom = _grid[EndRoom.y][EndRoom.x];
         while(currentRoom != null)
@@ -464,8 +464,8 @@ public class LevelGenerator : MonoBehaviour
 
     private void CreateRoomPrefab(RoomData data)
     {
-        foreach (var n in data.Neighbors)
-            Debug.Log($"{data.RoomNumber} neighbor: {n.RoomNumber}");
+        //foreach (var n in data.Neighbors)
+            //Debug.Log($"{data.RoomNumber} neighbor: {n.RoomNumber}");
 
         var gameObject = Instantiate(_roomPrefab, new Vector2(data.X * _xDistanceForPrefab, data.Y * _yDistanceForPrefab), Quaternion.identity, RoomParent.transform);
         gameObject.name = $"Room{data.RoomNumber}";
@@ -481,7 +481,7 @@ public class LevelGenerator : MonoBehaviour
     {
         List<RoomData> neighbors = new List<RoomData>();
         var center = _grid[room.Y][room.X];
-        //Debug.Log($"Checking neighbors for room {center.RoomNumber} at {center.X}, {center.Y}");
+        ////Debug.Log($"Checking neighbors for room {center.RoomNumber} at {center.X}, {center.Y}");
         if (room.Y == 0)
         {
             //Check north
@@ -587,14 +587,14 @@ public class LevelGenerator : MonoBehaviour
                 {
                     if (x > 0)
                     {
-                        //Debug.Log($"Unlocking room {room.RoomNumber} - west door");
+                        ////Debug.Log($"Unlocking room {room.RoomNumber} - west door");
                         roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorOpened = true;
                         roomObject.GetComponent<Room>().WestDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.WEST);
                     }
                     else
                     {
-                        //Debug.Log($"Unlocking room {room.RoomNumber} - east door");
+                        ////Debug.Log($"Unlocking room {room.RoomNumber} - east door");
                         roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorOpened = true;
 						roomObject.GetComponent<Room>().EastDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.EAST);
@@ -604,14 +604,14 @@ public class LevelGenerator : MonoBehaviour
                 {
                     if (y < 0)
                     {
-                        //Debug.Log($"Unlocking room {room.RoomNumber} - north door");
+                        ////Debug.Log($"Unlocking room {room.RoomNumber} - north door");
                         roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorOpened = true;
 						roomObject.GetComponent<Room>().NorthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.NORTH);
 					}
                     else
                     {
-                        //Debug.Log($"Unlocking room {room.RoomNumber} - south door");
+                        ////Debug.Log($"Unlocking room {room.RoomNumber} - south door");
                         roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorEnabled = true;
                         roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorOpened = true;
 						roomObject.GetComponent<Room>().SouthDoor.GetComponent<Door>().DoorPoint.SetDelegate(SnapCamera, neighbor, true, Direction.SOUTH);
@@ -727,7 +727,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void SnapCamera(RoomData room, bool moveCharacter = false, Direction dir = Direction.NORTH)
     {
-        //Debug.Log($"Snapping to room {room.RoomNumber}");
+        ////Debug.Log($"Snapping to room {room.RoomNumber}");
         Camera.transform.position = new Vector3(room.X * _xDistanceForCam, room.Y * _yDistanceForCam, Camera.transform.position.z);
 
         if (moveCharacter)
@@ -762,7 +762,7 @@ public class LevelGenerator : MonoBehaviour
 						}
 				}
                
-                //Debug.Log($"Door position: {pos}");
+                ////Debug.Log($"Door position: {pos}");
                 var player = GameObject.FindGameObjectWithTag("Player");
                 if (player != null)
                 {

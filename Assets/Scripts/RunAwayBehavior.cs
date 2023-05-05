@@ -35,6 +35,7 @@ public class RunAwayBehavior : EnemyBehavior
     private bool _flipChar;
 
     private bool _isDead;
+    private float sensoryTimer;
 
     void Awake()
     {
@@ -119,31 +120,39 @@ public class RunAwayBehavior : EnemyBehavior
         {
             if (_secondaryCollider.enabled && _secondaryCollider.bounds.Contains(_player.transform.position))
             {
-                _player.GetComponent<PlayerController>().HurtPlayer(0, true);
+                _player.GetComponent<PlayerController>().HurtPlayer(5, true, 0,0,0,2,0);
+            }
+            sensoryTimer += Time.deltaTime;
+            if (sensoryTimer >= 3.0f)
+            {
+                sensoryTimer = 0;
+                _player.GetComponent<PlayerController>().ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
             }
         }
 
         if(_isDead)
         {
-          Debug.Log("dying :(");
           var state = _animator.GetCurrentAnimatorStateInfo(0);
           if(state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
           {
+                Debug.LogWarning("Mikey is going away");
                 var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
                 var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
                 if (levelManager != null)
                 {
                     levelManager.SignalEnemyDied();
                 }
-                GameObject.Destroy(this.gameObject);
+                _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 25.0f, 0);
+                DestroyImmediate(this.gameObject);
           }
         }
     }
 
+
     void OnCollisionEnter2D(Collision2D col)
     {
-        if(col.otherCollider.tag.Contains("Detection"))
-            Debug.LogFormat("MIKEY - Collided with {0}", col.gameObject.tag);
+        //if(col.otherCollider.tag.Contains("Detection"))
+        //    Debug.LogFormat("MIKEY - Collided with {0}", col.gameObject.tag);
 
         if (col.gameObject.tag == "Collision_B" && _running)
         {
@@ -182,12 +191,19 @@ public class RunAwayBehavior : EnemyBehavior
         }
         if (col.gameObject.tag == "Player")
         {
+            Debug.LogFormat("Mikey collision - {0} and {1}", col.collider.tag, this.tag);
             if (col.otherCollider.tag == "Enemy" && _running)
             {
+                col.gameObject.GetComponent<PlayerController>().HurtPlayer((int)controller.AttackDamage, false);
                 controller.Health -= controller.Health;
+                _isDead = true;
                 _runningAway = false;
                 _found = false;
+                var v = col.otherRigidbody.velocity;
+                var force = v * new Vector2(100, 100);
+                col.rigidbody.AddForce(-force);
                 _rigidbody.velocity = Vector2.zero;
+                //Destroy(this);
             }
         }
     }

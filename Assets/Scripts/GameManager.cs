@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -29,9 +30,12 @@ public class GameManager : MonoBehaviour
     public bool Loaded;
     public bool InitialLoad = false;
 
+    private float intensityOrig;
+    private PlayerController playerController;
+
     void Awake()
     {
-        Debug.Log("Setting to not destroy on transition");
+        //Debug.Log("Setting to not destroy on transition");
         DontDestroyOnLoad(this.gameObject);
         Loaded = false;
     }
@@ -45,12 +49,12 @@ public class GameManager : MonoBehaviour
             case GameState.LOADING:
                 {
                     HandleLoading();
-                    if (InitialLoad)
-                        state = GameState.INITIALLOAD;
-                    else
+                    if (!InitialLoad)
+
                         state = GameState.PLAYING;
                     break;
                 }
+            case GameState.INTRO:
             case GameState.HUB:
             case GameState.PLAYING:
                 {
@@ -73,12 +77,14 @@ public class GameManager : MonoBehaviour
             case GameState.LOADING:
                 {
                     HandleLoading();
-                    if (InitialLoad)
-                        state = GameState.INITIALLOAD;
-                    else
+                    //if (InitialLoad)
+                    //    state = GameState.INITIALLOAD;
+                    //else
+                    if(!InitialLoad)
                         state = GameState.PLAYING;
                     break;
                 }
+            case GameState.INTRO:
             case GameState.HUB:
             case GameState.PLAYING:
                 {
@@ -115,14 +121,17 @@ public class GameManager : MonoBehaviour
 
         if (state == GameState.INITIALLOAD)
         {
+            InitialLoad = true;
             Debug.Log("Initial load detected");
             if (playerData.ViewedIntro)
             {
+
                 Debug.Log("Skipping intro");
                 TransitionToLevel(-1);
             }
             else
             {
+                state = GameState.INTRO;
                 Debug.Log("Going to intro");
                 TransitionToLevel(-2);
             }
@@ -140,7 +149,8 @@ public class GameManager : MonoBehaviour
 
     public void TransitionToLevel(int level)
     {
-        state = GameState.LOADING;
+        if(state != GameState.INTRO)
+            state = GameState.LOADING;
         int index = 0;
 
         switch (level)
@@ -148,8 +158,10 @@ public class GameManager : MonoBehaviour
             case -2: index = IntroIndex; break;
             case 1: index = Level1dot1Index; break;
             case 2: index = Level1dot2Index; break;
-            case 3: index = Level1dot3Index; break;
-            case 4: index = Level1dot4Index; break;
+            //case 3: index = Level1dot3Index; break;
+            //case 4: index = Level1dot4Index; break;
+            case 3:
+            case 4:
             case 5: index = AJIndex; break;
             case -1:
             default: index = HomeHubIndex; break;
@@ -168,12 +180,14 @@ public class GameManager : MonoBehaviour
             playerObject = Instantiate(playerPrefab);
             var player = playerObject.GetComponent<PlayerController>();
             player.SetPlayerStats(playerData);
+            playerController = player;
             return player;
         }
         else
         {
             var player = playerObject.GetComponent<PlayerController>();
             player.SetPlayerStats(playerData);
+            playerController = player;
             return player;
         }
     }
@@ -193,5 +207,46 @@ public class GameManager : MonoBehaviour
     public void DisableGameUI()
     {
         GameUI.SetActive(false);
+    }
+
+    public PlayerController? GetPlayer()
+    {
+        if (playerController != null)
+            return playerController;
+        else
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject == null) { return null; }
+            PlayerController pc = playerObject.GetComponent<PlayerController>();
+            if (pc == null) return null;
+            else
+            {
+                playerController = pc;
+                return playerController;
+            }
+        }
+    }
+
+    public void SensoryOverload(bool activated = false)
+    {
+        var l2d = Camera.main.GetComponentInChildren<Light2D>();
+        if (activated)
+        {
+            if (l2d != null)
+            {
+                intensityOrig = l2d.intensity;
+                l2d.intensity = 0.2f;
+                //l2d.color = new Color()
+            }
+        }
+        else
+        {
+            //deactivated
+            if (l2d != null)
+            {
+                l2d.intensity = intensityOrig;
+                //l2d.color = new Color()
+            }
+        }
     }
 }
