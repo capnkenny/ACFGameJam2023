@@ -45,6 +45,7 @@ public class HubManager : MonoBehaviour
             Debug.Log("GameManager loaded!");
 
             int level = _mgr.playerData.Level;
+            //Debug.LogFormat("Player Level: {0}", level);
             _levelDoor.SetDelegate(LoadToLevel, level);
 
 

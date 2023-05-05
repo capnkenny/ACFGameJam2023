@@ -44,13 +44,13 @@ public class PlayerController : MonoBehaviour
     private Direction dir;
     
     //Private members
-    private Vector2 _movement;
+    public Vector2 movement;
     private GameManager mgr;
 
     void Awake()
     {
         renderer.sprite = PlayerSprite;
-        _movement = new Vector2(0,0);
+        movement = new Vector2(0,0);
         _sensoryOverload = false;
     }
 
@@ -76,13 +76,13 @@ public class PlayerController : MonoBehaviour
     {
         if(mgr.state == GameState.PLAYING || mgr.state == GameState.HUB)
         {
-            Debug.Log($"velocity {_movement}");
-            Debug.Log($"Direction: {dir}");
-            animator.SetInteger("VelocityX", (int)_movement.x);
-            animator.SetInteger("VelocityY", (int)_movement.y);
+            //Debug.Log($"velocity {movement}");
+            //Debug.Log($"Direction: {dir}");
+            animator.SetInteger("VelocityX", (int)movement.x);
+            animator.SetInteger("VelocityY", (int)movement.y);
             animator.SetInteger("Direction", ((int)dir));
 
-            rb2d.velocity = _movement;
+            rb2d.velocity = movement;
 
             if (Hurt && mgr.state == GameState.PLAYING)
             {
@@ -102,14 +102,14 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        _movement = context.ReadValue<Vector2>() * MovementSpeed;
-        if (_movement.x > 0) // right
+        movement = context.ReadValue<Vector2>() * MovementSpeed;
+        if (movement.x > 0) // right
             dir = Direction.EAST;
-        else if (_movement.x < 0)
+        else if (movement.x < 0)
             dir = Direction.WEST;
-        else if (_movement.y > 0)
+        else if (movement.y > 0)
             dir = Direction.NORTH;
-        else if (_movement.y < 0)
+        else if (movement.y < 0)
             dir = Direction.SOUTH;
     }
 
