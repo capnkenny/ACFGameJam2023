@@ -19,6 +19,7 @@ TagManager:
   - LvlMgr
   - RoomDetection
   - MikeySound
+  - Projectile
   layers:
   - Default
   - TransparentFX

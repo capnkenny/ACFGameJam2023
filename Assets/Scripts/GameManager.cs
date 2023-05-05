@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
 
     public PlayerData playerData;
     public GameObject playerPrefab;
+    public GameObject GameUI;
+    public Canvas UICanvas;
 
     public GameState state;
 
@@ -181,5 +183,15 @@ public class GameManager : MonoBehaviour
         Save.SavePlayer(playerData);
         Application.Quit();
     }
-	
+
+    public void EnableGameUI()
+    {
+        UICanvas.worldCamera = Camera.main;
+        GameUI.SetActive(true);
+    }
+
+    public void DisableGameUI()
+    {
+        GameUI.SetActive(false);
+    }
 }

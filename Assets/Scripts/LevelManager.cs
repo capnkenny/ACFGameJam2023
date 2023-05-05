@@ -32,6 +32,7 @@ public class LevelManager : MonoBehaviour
     private int _currentEnemyCount;
     private int _currentRoomEnemiesDead = 0;
     private bool _endRoomSetup = false;
+    private bool levelstart = false;
 
     private void Awake()
     {
@@ -79,7 +80,20 @@ public class LevelManager : MonoBehaviour
                 loaded = true;
 
                 _levelLoader.transition.SetTrigger("DoneLoad");
+                return;
             }
+            else if(!levelstart && _mgr.Loaded && loaded)
+            {
+                levelstart = true;
+                return;
+            }
+
+            if (levelstart && !_mgr.GameUI.activeSelf)
+            {
+                _mgr.EnableGameUI();
+            }
+
+            
             // We switched rooms so spawn enemies here
             // and lock the doors
             if (CurrentRoomNumber != PreviousRoomNumber)
