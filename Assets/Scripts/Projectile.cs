@@ -5,6 +5,7 @@ public class Projectile : MonoBehaviour
 	public int Damage;
 	public float TimeToLive;
     public float ImpactForce;
+    public bool SensoryEffect;
 
 	private bool disposable = false;
     private float timer = 0.0f;
@@ -34,20 +35,12 @@ public class Projectile : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            var p = collision.rigidbody.velocity;
+            var pc = collision.gameObject.GetComponent<PlayerController>();
             var v = collision.otherRigidbody.velocity;
-            if (p == null)
-            {
-                Debug.LogError("Didn't get velocity!");
-            }
-            else
-            {
-                //Knockback
-                var force = v * new Vector2(ImpactForce, ImpactForce);
-                collision.rigidbody.AddForce(force);
-                collision.otherRigidbody.velocity = -v;
-            }
-            
+            var force = v * new Vector2(ImpactForce, ImpactForce);
+            collision.rigidbody.AddForce(force);
+            pc.HurtPlayer(Damage, SensoryEffect);
+            Destroy(this);
         }
     }
 

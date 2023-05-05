@@ -82,7 +82,29 @@ public class PlayerController : MonoBehaviour
             animator.SetInteger("VelocityY", (int)movement.y);
             animator.SetInteger("Direction", ((int)dir));
 
-            rb2d.velocity = movement;
+            if (!_sensoryOverload)
+            {
+                if (SensoryMeter >= MaxSensoryMeter)
+                {
+                    SensoryMeter = MaxSensoryMeter;
+                    _sensoryOverload = true;
+                }
+            }
+
+            if (_sensoryOverload)
+            {
+                rb2d.velocity = (movement / 2);
+                if (SensoryMeter <= 0)
+                {
+                    _sensoryOverload = false;
+                    SensoryMeter = 0;
+                }
+            }
+            else
+                rb2d.velocity = movement;
+
+
+
 
             if (Hurt && mgr.state == GameState.PLAYING)
             {
@@ -150,17 +172,37 @@ public class PlayerController : MonoBehaviour
         _soakerLevel = data.SoakerLevel;
     }
 
-    public void HurtPlayer(int dmg, bool sensoryModifier)
+    public void HurtPlayer(int dmg, bool sensoryModifier, float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)
     {
+        float sensoryMod = 0;
         if (!Hurt)
         {
+            Debug.Log("Player was hurt!");
             int damage = dmg;
+            
             if (sensoryModifier)
             {
-                damage = (int)(dmg + _tasteFactor + _smellFactor + _sightFactor + _hearingFactor + _touchFactor);
+                sensoryMod = ProvideSensoryEffect(tf, smf, sif, hf, tof);
+                damage = (int)(dmg * 1.25) + (int)(sensoryMod);
             }
             Health -= damage;
+            Hurt = true;
         }
+
+    }
+
+    public float ProvideSensoryEffect(float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)
+    {
+        float effect = (_tasteFactor * tf) + (_smellFactor * smf) + (_sightFactor * sif) + (_hearingFactor * hf) + (_touchFactor * tof);
+        if(SensoryMeter < MaxSensoryMeter && !_sensoryOverload)
+            SensoryMeter += effect;
+        return effect;
+    }
+
+    public void ReduceDirectSensoryEffect(float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)
+    {
+        float effect = (_tasteFactor * tf) + (_smellFactor * smf) + (_sightFactor * sif) + (_hearingFactor * hf) + (_touchFactor * tof);
+        SensoryMeter -= effect;
     }
 
     public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)

@@ -90,7 +90,8 @@ public class LevelManager : MonoBehaviour
 
             if (levelstart && !_mgr.GameUI.activeSelf)
             {
-                _mgr.EnableGameUI();
+                if(_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+                    _mgr.EnableGameUI();
             }
 
             
