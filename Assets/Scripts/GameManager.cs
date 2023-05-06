@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public PlayerData playerData;
     public GameObject playerPrefab;
     public GameObject GameUI;
+    public GameObject GameOverUI;
     public Canvas UICanvas;
 
     public GameState state;
@@ -29,6 +30,8 @@ public class GameManager : MonoBehaviour
 
     public bool Loaded;
     public bool InitialLoad = false;
+    public bool GoToHub = false;
+    public bool Quit = false;
 
     private float intensityOrig;
     private PlayerController playerController;
@@ -88,6 +91,12 @@ public class GameManager : MonoBehaviour
             case GameState.HUB:
             case GameState.PLAYING:
                 {
+                    break;
+                }
+            case GameState.GAMEOVER:
+                {
+                    if (!GoToHub && !Quit)
+                        break;
                     break;
                 }
             case GameState.EXITING:
@@ -248,5 +257,17 @@ public class GameManager : MonoBehaviour
                 //l2d.color = new Color()
             }
         }
+    }
+
+    public void EnableGameOverMenu(bool active = true)
+    {
+        GameOverUI.SetActive(active);
+    }
+
+    public void SignalPlayerDeath()
+    {
+        state = GameState.GAMEOVER;
+        DisableGameUI();
+        EnableGameOverMenu();
     }
 }

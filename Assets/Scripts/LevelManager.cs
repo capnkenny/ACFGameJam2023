@@ -67,7 +67,7 @@ public class LevelManager : MonoBehaviour
     {
         if (_mgr.state == GameState.PLAYING)
         {
-            Debug.Log("Playing State");
+            //Debug.Log("Playing State");
             // Make sure GameManager is loaded too
             if (_mgr.Loaded && !loaded)
             {

@@ -148,5 +148,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Damage: 25
   TimeToLive: 3
-  ImpactForce: 10
+  ImpactForce: 5
   SensoryEffect: 0

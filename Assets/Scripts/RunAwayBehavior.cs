@@ -132,7 +132,8 @@ public class RunAwayBehavior : EnemyBehavior
 
         if(_isDead)
         {
-          var state = _animator.GetCurrentAnimatorStateInfo(0);
+            _rigidbody.velocity = Vector2.zero;
+            var state = _animator.GetCurrentAnimatorStateInfo(0);
           if(state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
           {
                 Debug.LogWarning("Mikey is going away");
@@ -199,10 +200,7 @@ public class RunAwayBehavior : EnemyBehavior
                 _isDead = true;
                 _runningAway = false;
                 _found = false;
-                var v = col.otherRigidbody.velocity;
-                var force = v * new Vector2(100, 100);
-                col.rigidbody.AddForce(-force);
-                _rigidbody.velocity = Vector2.zero;
+                
                 //Destroy(this);
             }
         }
