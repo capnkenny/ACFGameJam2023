@@ -22,6 +22,7 @@ TagManager:
   - Projectile
   - UI
   - Music
+  - LvlLoader
   layers:
   - Default
   - TransparentFX

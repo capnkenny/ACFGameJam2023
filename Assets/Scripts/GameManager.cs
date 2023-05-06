@@ -1,6 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using static System.TimeZoneInfo;
 
 public class GameManager : MonoBehaviour
 {
@@ -84,7 +86,15 @@ public class GameManager : MonoBehaviour
                     //    state = GameState.INITIALLOAD;
                     //else
                     if(!InitialLoad)
-                        state = GameState.PLAYING;
+                        if (SceneManager.GetActiveScene().buildIndex == HomeHubIndex)
+                            state = GameState.HUB;
+                        else
+                            state = GameState.PLAYING;
+                    var ll = GameObject.FindGameObjectWithTag("LvlLoader");
+                    if (ll != null)
+                        Loader = ll.GetComponent<LevelLoad>();
+
+
                     break;
                 }
             case GameState.INTRO:
@@ -184,7 +194,23 @@ public class GameManager : MonoBehaviour
 
         Debug.LogFormat("Transition called - navigating to scene {0}", index);
 
-        StartCoroutine(Loader.LoadLevel(index));
+        StartCoroutine(LoadLevel(index));
+    }
+
+    private IEnumerator LoadLevel(int index)
+    {
+        Debug.LogFormat("GM - Scene requested - {0}", index);
+        var llo = GameObject.FindGameObjectWithTag("LvlLoader");
+        if (llo != null)
+        {
+            var ll = llo.GetComponent<LevelLoad>();
+            ll.transition.SetTrigger("Loading");
+        }
+        
+
+        yield return new WaitForSeconds(3);
+
+        SceneManager.LoadScene(index);
     }
 
     public PlayerController SpawnPlayer()
@@ -251,6 +277,7 @@ public class GameManager : MonoBehaviour
         else
         {
             playerController = pc;
+            pc.Health = 100;
             return playerController;
         }
     }

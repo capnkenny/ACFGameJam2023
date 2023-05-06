@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 3225425955107588598}
   m_Layer: 0
   m_Name: LevelLoader
-  m_TagString: Untagged
+  m_TagString: LvlLoader
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -189,6 +189,7 @@ MonoBehaviour:
   Koi3: {fileID: 21300000, guid: f4e8a5a4a74d9514381bc65b4ca5d1a9, type: 3}
   Koi4: {fileID: 21300000, guid: e311826d535484141a0ee089d9fdab6c, type: 3}
   transitionTime: 3
+  callAction: 0
 --- !u!1 &3225425955201963092
 GameObject:
   m_ObjectHideFlags: 0
