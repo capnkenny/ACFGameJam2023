@@ -21,6 +21,7 @@ TagManager:
   - MikeySound
   - Projectile
   - UI
+  - Music
   layers:
   - Default
   - TransparentFX

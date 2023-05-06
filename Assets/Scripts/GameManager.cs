@@ -22,8 +22,8 @@ public class GameManager : MonoBehaviour
     public int ShopIndex;
     public int Level1dot1Index;
     public int Level1dot2Index;
-    public int Level1dot3Index;
-    public int Level1dot4Index;
+    //public int Level1dot3Index;
+    //public int Level1dot4Index;
     //public int Level2Index;
     public int AJIndex;
     public int TFPIndex;
@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
             case GameState.INITIALLOAD:
             case GameState.LOADING:
                 {
-                    HandleLoading();
+                    //HandleLoading();
                     //if (InitialLoad)
                     //    state = GameState.INITIALLOAD;
                     //else
@@ -119,12 +119,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleLoading()
     {
-        Debug.Log("Loading player data...");
-		playerData = Save.LoadPlayer();
-		if (playerData == null)
-		{
-			playerData = Save.SaveNewPlayer();
-		}
+        LoadPlayerData();
 
 		Loaded = true;
 
@@ -156,6 +151,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void LoadPlayerData()
+    {
+        Debug.Log("Loading player data...");
+        playerData = Save.LoadPlayer();
+        if (playerData == null)
+        {
+            playerData = Save.SaveNewPlayer();
+        }
+    }
+
     public void TransitionToLevel(int level)
     {
         if(state != GameState.INTRO)
@@ -164,6 +169,7 @@ public class GameManager : MonoBehaviour
 
         switch (level)
         {
+            case -10: index = TFPIndex; break;
             case -2: index = IntroIndex; break;
             case 1: index = Level1dot1Index; break;
             case 2: index = Level1dot2Index; break;
@@ -234,6 +240,28 @@ public class GameManager : MonoBehaviour
                 return playerController;
             }
         }
+    }
+
+    public PlayerController? GetRefreshedPlayer()
+    {
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject == null) { return null; }
+        PlayerController pc = playerObject.GetComponent<PlayerController>();
+        if (pc == null) return null;
+        else
+        {
+            playerController = pc;
+            return playerController;
+        }
+    }
+
+    public void SaveCurrentPlayerData()
+    {
+        var pl = GetPlayer();
+        if (pl == null)
+            Debug.LogError("Player was null, could not save data!");
+        else
+            Save.SavePlayer(pl.GetPlayerData());
     }
 
     public void SensoryOverload(bool activated = false)

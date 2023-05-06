@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private int _soakerLevel;
     private Color originalColor;
     private float originalIntensity;
+    private int currentLevel = 1;
 
     public bool Hurt = false;
     public bool Dead = false;
@@ -185,6 +186,7 @@ public class PlayerController : MonoBehaviour
         _hearingFactor = data.Hearing;
         _touchFactor = data.Touch;
         _soakerLevel = data.SoakerLevel;
+        currentLevel = data.Level;
     }
 
     public void HurtPlayer(int dmg, bool sensoryModifier, float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)
@@ -225,6 +227,26 @@ public class PlayerController : MonoBehaviour
         SensoryMeter -= effect;
     }
 
+    public PlayerData GetPlayerData()
+    {
+        PlayerData p = new PlayerData
+        {
+            Taste = _tasteFactor,
+            Touch = _touchFactor,
+            Smell = _smellFactor,
+            Sight = _sightFactor,
+            Hearing = _hearingFactor,
+            MaxHealth = MaxHealth,
+            MaxSensory = MaxSensoryMeter,
+            MaxShield = MaxShield,
+            CurrentHealth = Health,
+            Koiency = Koiency,
+            CurrentSensory = SensoryMeter,
+            Level = currentLevel
+        };
+        return p;
+    }
+
     public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)
     {
         PlayerData newData = reference;
@@ -240,6 +262,7 @@ public class PlayerController : MonoBehaviour
         if (level != -1 && level != reference.Level)
         {
             newData.Level = level;
+            currentLevel = level;
         }
 
         return newData;

@@ -28,6 +28,7 @@ public class LevelManager : MonoBehaviour
 
     public int CurrentRoomNumber;
     public int PreviousRoomNumber;
+    public MusicPlayer music;
 
     private int _currentEnemyCount;
     private int _currentRoomEnemiesDead = 0;
@@ -90,8 +91,11 @@ public class LevelManager : MonoBehaviour
 
             if (levelstart && !_mgr.GameUI.activeSelf)
             {
-                if(_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+                if (_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.5f)
+                {
                     _mgr.EnableGameUI();
+                    music.PlayMusic();
+                }
             }
 
             
@@ -184,6 +188,9 @@ public class LevelManager : MonoBehaviour
     private void SpawnPlayer()
     {
         var player = Instantiate(_playerPrefab);
+        var pc = _mgr.GetRefreshedPlayer();
+        if (pc != null)
+            pc.SetPlayerStats(_mgr.playerData);
         var pos = GameObject.FindGameObjectWithTag("MainCamera").transform.position;
         pos.z = 0;
         pos.y -= 2.5f;

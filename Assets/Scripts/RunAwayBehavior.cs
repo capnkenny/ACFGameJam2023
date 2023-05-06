@@ -36,6 +36,7 @@ public class RunAwayBehavior : EnemyBehavior
 
     private bool _isDead;
     private float sensoryTimer;
+    private bool playerDead = false;
 
     void Awake()
     {
@@ -56,96 +57,104 @@ public class RunAwayBehavior : EnemyBehavior
 
     void Update()
     {
-      // Check if dead
-      _isDead = controller.Health == 0;
-      //Debug.Log($"Health: {controller.Health}, Found: {_found}, Running Away: {_runningAway}, Dead: {_isDead}");
-        //Set animation stuff
-      _animator.SetBool("WasFound", _found);
-      _animator.SetBool("RunningAway", _runningAway);
-      _animator.SetBool("IsDead", _isDead);
-      _secondaryAnimator.SetBool("IsRunning", _runningAway);
-
-
-        if (_flipChar)
+        if (_player != null)
         {
-            //Debug.Log($"Transform: {transform.rotation.y}");
-            float yAxis = 180;
-            _flipChar = false;
-            if (transform.rotation.y >= 180)
-            {
-                yAxis = -yAxis;
-            }
-            transform.Rotate(0, yAxis, 0);
+            playerDead = _player.GetComponent<PlayerController>().Dead;
         }
 
-        //Handle movement and reaction
-
-        float distance = Vector2.Distance((Vector2)_enemyTransform.position, (Vector2)_player.transform.position);
-        var direction = _player.transform.position - _enemyTransform.position;
-
-        if (!_found)
+        if (!playerDead)
         {
-            var p = GameObject.FindGameObjectWithTag("Player");
-            if (_collider.bounds.Contains(p.transform.position))
+            // Check if dead
+            _isDead = controller.Health == 0;
+            //Debug.Log($"Health: {controller.Health}, Found: {_found}, Running Away: {_runningAway}, Dead: {_isDead}");
+            //Set animation stuff
+            _animator.SetBool("WasFound", _found);
+            _animator.SetBool("RunningAway", _runningAway);
+            _animator.SetBool("IsDead", _isDead);
+            _secondaryAnimator.SetBool("IsRunning", _runningAway);
+
+
+            if (_flipChar)
             {
-                _found = true;
-                _rigidbody.bodyType = RigidbodyType2D.Dynamic;
-                _rigidbody.velocity = Vector2.zero;
-                _collider.enabled = false;
-                spotlight.enabled = true;
-                return;
-            }
-        }
-
-        if (_found && !_runningAway)
-        {
-          Debug.LogFormat("distance - {0}, radius: {1}", distance, _collider.radius);
-            if (distance <= _collider.radius)
-            {
-                _runningAway = true;
-                return;
-            }
-        }
-
-        if (_runningAway && !_running)
-        {
-            //Debug.Log("Running away!");
-            _rigidbody.velocity = (Vector2)((-direction) * controller.MovementSpeed);
-            _running = true;
-            _secondaryCollider.enabled = true;
-
-            return;
-        }
-        else if (_runningAway && _running)
-        {
-            if (_secondaryCollider.enabled && _secondaryCollider.bounds.Contains(_player.transform.position))
-            {
-                _player.GetComponent<PlayerController>().HurtPlayer(5, true, 0,0,0,2,0);
-            }
-            sensoryTimer += Time.deltaTime;
-            if (sensoryTimer >= 3.0f)
-            {
-                sensoryTimer = 0;
-                _player.GetComponent<PlayerController>().ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
-            }
-        }
-
-        if(_isDead)
-        {
-            _rigidbody.velocity = Vector2.zero;
-            var state = _animator.GetCurrentAnimatorStateInfo(0);
-          if(state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
-          {
-                Debug.LogWarning("Mikey is going away");
-                var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
-                var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
-                if (levelManager != null)
+                //Debug.Log($"Transform: {transform.rotation.y}");
+                float yAxis = 180;
+                _flipChar = false;
+                if (transform.rotation.y >= 180)
                 {
-                    levelManager.SignalEnemyDied();
+                    yAxis = -yAxis;
                 }
-                _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 25.0f, 0);
-                DestroyImmediate(this.gameObject);
-          }
+                transform.Rotate(0, yAxis, 0);
+            }
+
+            //Handle movement and reaction
+
+            float distance = Vector2.Distance((Vector2)_enemyTransform.position, (Vector2)_player.transform.position);
+            var direction = _player.transform.position - _enemyTransform.position;
+
+            if (!_found)
+            {
+                var p = GameObject.FindGameObjectWithTag("Player");
+                if (_collider.bounds.Contains(p.transform.position))
+                {
+                    _found = true;
+                    _rigidbody.bodyType = RigidbodyType2D.Dynamic;
+                    _rigidbody.velocity = Vector2.zero;
+                    _collider.enabled = false;
+                    spotlight.enabled = true;
+                    return;
+                }
+            }
+
+            if (_found && !_runningAway)
+            {
+                Debug.LogFormat("distance - {0}, radius: {1}", distance, _collider.radius);
+                if (distance <= _collider.radius)
+                {
+                    _runningAway = true;
+                    return;
+                }
+            }
+
+            if (_runningAway && !_running)
+            {
+                //Debug.Log("Running away!");
+                _rigidbody.velocity = (Vector2)((-direction) * controller.MovementSpeed);
+                _running = true;
+                _secondaryCollider.enabled = true;
+
+                return;
+            }
+            else if (_runningAway && _running)
+            {
+                if (_secondaryCollider.enabled && _secondaryCollider.bounds.Contains(_player.transform.position))
+                {
+                    _player.GetComponent<PlayerController>().HurtPlayer(5, true, 0, 0, 0, 2, 0);
+                }
+                sensoryTimer += Time.deltaTime;
+                if (sensoryTimer >= 3.0f)
+                {
+                    sensoryTimer = 0;
+                    _player.GetComponent<PlayerController>().ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
+                }
+            }
+
+            if (_isDead)
+            {
+                _rigidbody.velocity = Vector2.zero;
+                var state = _animator.GetCurrentAnimatorStateInfo(0);
+                if (state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
+                {
+                    Debug.LogWarning("Mikey is going away");
+                    var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
+                    var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
+                    if (levelManager != null)
+                    {
+                        levelManager.SignalEnemyDied();
+                    }
+                    _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 25.0f, 0);
+                    DestroyImmediate(this.gameObject);
+                }
+            }
         }
     }
 
