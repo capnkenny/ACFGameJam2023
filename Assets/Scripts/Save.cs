@@ -11,23 +11,7 @@ public static class Save
     {
 		Debug.Log("Creating new player data");
         PlayerData data = new PlayerData();
-        try
-		{
-			string json = JsonUtility.ToJson(data);
-			string b64 = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
-			string path = Application.persistentDataPath + "/player.koi";
-			using (var stream = File.Open(path, FileMode.Create))
-			{
-				using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
-				{
-					writer.Write(b64);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			Debug.LogWarningFormat("Error when saving new player data - {0}", e.Message);
-		}
+		SavePlayer(data);
 		
         return data;
     }
@@ -39,7 +23,7 @@ public static class Save
 		string path = Application.persistentDataPath + "/player.koi";
 		using (var stream = File.Open(path, FileMode.Create))
 		{
-			using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
+			using (var writer = new StreamWriter(stream, Encoding.UTF8))
 			{
 				writer.Write(b64);
 			}
@@ -55,15 +39,22 @@ public static class Save
         {
 			try
 			{
-				using (var stream = File.Open(path, FileMode.Create))
+				using (var stream = File.Open(path, FileMode.Open))
 				{
-					using (var writer = new BinaryReader(stream, Encoding.UTF8, false))
+					using (var reader = new StreamReader(stream, Encoding.UTF8))
 					{
-						var b64bytes = Convert.FromBase64String(writer.ReadString());
-						var json = System.Text.Encoding.UTF8.GetString(b64bytes);
-						data = JsonUtility.FromJson<PlayerData>(json);
-					}
-				}
+						string str = reader.ReadToEnd();
+						var b64bytes = Convert.FromBase64String(str);
+                        var json = Encoding.UTF8.GetString(b64bytes);
+                        data = JsonUtility.FromJson<PlayerData>(json);
+                    }
+                    //using (var writer = new BinaryReader(stream, Encoding.UTF8, false))
+                    //{
+                    //	var b64bytes = Convert.FromBase64String(writer.ReadString());
+                    //	var json = System.Text.Encoding.UTF8.GetString(b64bytes);
+                    //	data = JsonUtility.FromJson<PlayerData>(json);
+                    //}
+                }
 			}
 			catch (Exception e)
 			{

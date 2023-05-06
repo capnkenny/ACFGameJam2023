@@ -9,5 +9,6 @@
 	EXITING = 10,
 	INITIALLOAD = 11,
 	INTRO = 14,
-	HUB = 12
+	HUB = 12,
+	GAMEOVER = 15
 }

@@ -101,7 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Damage: 15
   TimeToLive: 3
-  ImpactForce: 5
+  ImpactForce: 3
   SensoryEffect: 0
 --- !u!58 &6812958580674821501
 CircleCollider2D:

@@ -32,9 +32,9 @@ public class HeartBar : MonoBehaviour
             Heart5.gameObject.SetActive(false);
         }
 
-
+        int percent = (int)math.trunc((HealthValue / MaxHealthValue) * 100);
         int div = (int)math.trunc(HealthValue / divisor);
-        int per = (int)math.trunc(((HealthValue / divisor) - div) * 100);
+        int per = (int)(percent - (div * 25));
         int ind = 1;
        
         switch (div)
@@ -88,7 +88,7 @@ public class HeartBar : MonoBehaviour
             int value = Heart.HEART34S;
             if (per <= 50 && per > 25)
                 value = Heart.HEARTHALF;
-            else if (per <= 25 && per >= 0)
+            else if (per <= 25 && per > 0)
                 value = Heart.HEARTQUARTER;
             else
                 value = Heart.HEARTEMPTY;

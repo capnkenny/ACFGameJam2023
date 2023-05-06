@@ -28,6 +28,7 @@ public class LevelManager : MonoBehaviour
 
     public int CurrentRoomNumber;
     public int PreviousRoomNumber;
+    public MusicPlayer music;
 
     private int _currentEnemyCount;
     private int _currentRoomEnemiesDead = 0;
@@ -67,7 +68,7 @@ public class LevelManager : MonoBehaviour
     {
         if (_mgr.state == GameState.PLAYING)
         {
-            Debug.Log("Playing State");
+            //Debug.Log("Playing State");
             // Make sure GameManager is loaded too
             if (_mgr.Loaded && !loaded)
             {
@@ -90,8 +91,14 @@ public class LevelManager : MonoBehaviour
 
             if (levelstart && !_mgr.GameUI.activeSelf)
             {
-                if(_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+                if (_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.5f)
+                {
+                    var p = _mgr.GetPlayer();
+                    if (p != null)
+                        p.Health = p.MaxHealth;
                     _mgr.EnableGameUI();
+                    music.PlayMusic();
+                }
             }
 
             
@@ -184,6 +191,9 @@ public class LevelManager : MonoBehaviour
     private void SpawnPlayer()
     {
         var player = Instantiate(_playerPrefab);
+        var pc = _mgr.GetRefreshedPlayer();
+        if (pc != null)
+            pc.SetPlayerStats(_mgr.playerData);
         var pos = GameObject.FindGameObjectWithTag("MainCamera").transform.position;
         pos.z = 0;
         pos.y -= 2.5f;
@@ -196,66 +206,70 @@ public class LevelManager : MonoBehaviour
         {
             for (int i = 0; i < room.EnemyCount; i++)
             {
-                //bool spawned = false;
+
                 int y = Random.Range(1, 5);
                 int x = Random.Range(1, 4);
                 //while (!spawned)
                 //{
-                    EnemySpawnRow esr = null;
-                    switch (y)
+                EnemySpawnRow esr = null;
+                switch (y)
+                {
+                    case 1:
+                        {
+                            esr = room.EnemyRow1;
+                            break;
+                        }
+                    case 2:
+                        {
+                            esr = room.EnemyRow2;
+                            break;
+                        }
+                    case 3:
+                        {
+                            esr = room.EnemyRow3;
+                            break;
+                        }
+                    case 4:
+                        {
+                            esr = room.EnemyRow4;
+                            break;
+                        }
+                }
+
+                EnemySpawner es = null;
+
+                if (esr != null)
+                {
+                    switch (x)
                     {
                         case 1:
                             {
-                                esr = room.EnemyRow1;
+                                es = esr.SpawnPoint1;
                                 break;
                             }
                         case 2:
                             {
-                                esr = room.EnemyRow2;
+                                es = esr.SpawnPoint2;
                                 break;
                             }
                         case 3:
                             {
-                                esr = room.EnemyRow3;
-                                break;
-                            }
-                        case 4:
-                            {
-                                esr = room.EnemyRow4;
+                                es = esr.SpawnPoint3;
                                 break;
                             }
                     }
 
-                    EnemySpawner es = null;
-
-                    if (esr != null)
+                    if (es != null && !es.EnemySpawned)
                     {
-                        switch (x)
-                        {
-                            case 1:
-                                {
-                                    es = esr.SpawnPoint1;
-                                    break;
-                                }
-                            case 2:
-                                {
-                                    es = esr.SpawnPoint2;
-                                    break;
-                                }
-                            case 3:
-                                {
-                                    es = esr.SpawnPoint3;
-                                    break;
-                                }
-                        }
-
-                        if (es != null && !es.EnemySpawned)
-                        {
-                            int e = Random.Range(0, AllowedEnemies.Count);
-                            es.SpawnEnemy(room, EnemyPrefabs[e]);
-                            //spawned = true;
-                        }
+                        int e = Random.Range(0, AllowedEnemies.Count);
+                        es.SpawnEnemy(room, EnemyPrefabs[e]);
+                        //spawned = true;
                     }
+                    else
+                    {
+                        i--;
+                    }
+                }
                 //}
             }
         }

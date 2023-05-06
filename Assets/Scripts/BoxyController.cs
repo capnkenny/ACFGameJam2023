@@ -13,9 +13,17 @@ public class BoxyController : EnemyController
     private float coolDown = 0;
     private bool cooldownMode = false;
 
+    private GameManager mgr;
+    
+    private void Awake()
+    {
+        var mg = GameObject.FindGameObjectWithTag("GameManager");
+        if (mg != null) mgr = mg.GetComponent<GameManager>();
+    }
+
     private void Update()
     {        
-        if (!Dead)
+        if (!Dead && mgr != null && !mgr.GetPlayer().Dead)
         {
             animator.SetBool("Spraying", ((ThrowBehavior)AttackBehavior).throwing);
 
@@ -67,7 +75,7 @@ public class BoxyController : EnemyController
                 {
                     levelManager.SignalEnemyDied();
                 }
-                GameObject.Destroy(this.gameObject);
+                GameObject.DestroyImmediate(this.gameObject);
             }
         }
 

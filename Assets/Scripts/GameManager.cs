@@ -1,6 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using static System.TimeZoneInfo;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class GameManager : MonoBehaviour
     public PlayerData playerData;
     public GameObject playerPrefab;
     public GameObject GameUI;
+    public GameObject GameOverUI;
     public Canvas UICanvas;
 
     public GameState state;
@@ -21,14 +24,16 @@ public class GameManager : MonoBehaviour
     public int ShopIndex;
     public int Level1dot1Index;
     public int Level1dot2Index;
-    public int Level1dot3Index;
-    public int Level1dot4Index;
+    //public int Level1dot3Index;
+    //public int Level1dot4Index;
     //public int Level2Index;
     public int AJIndex;
     public int TFPIndex;
 
     public bool Loaded;
     public bool InitialLoad = false;
+    public bool GoToHub = false;
+    public bool Quit = false;
 
     private float intensityOrig;
     private PlayerController playerController;
@@ -76,18 +81,32 @@ public class GameManager : MonoBehaviour
             case GameState.INITIALLOAD:
             case GameState.LOADING:
                 {
-                    HandleLoading();
+                    //HandleLoading();
                     //if (InitialLoad)
                     //    state = GameState.INITIALLOAD;
                     //else
                     if(!InitialLoad)
-                        state = GameState.PLAYING;
+                        if (SceneManager.GetActiveScene().buildIndex == HomeHubIndex)
+                            state = GameState.HUB;
+                        else
+                            state = GameState.PLAYING;
+                    var ll = GameObject.FindGameObjectWithTag("LvlLoader");
+                    if (ll != null)
+                        Loader = ll.GetComponent<LevelLoad>();
+
+
                     break;
                 }
             case GameState.INTRO:
             case GameState.HUB:
             case GameState.PLAYING:
                 {
+                    break;
+                }
+            case GameState.GAMEOVER:
+                {
+                    if (!GoToHub && !Quit)
+                        break;
                     break;
                 }
             case GameState.EXITING:
@@ -110,12 +129,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleLoading()
     {
-        Debug.Log("Loading player data...");
-		playerData = Save.LoadPlayer();
-		if (playerData == null)
-		{
-			playerData = Save.SaveNewPlayer();
-		}
+        LoadPlayerData();
 
 		Loaded = true;
 
@@ -147,6 +161,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void LoadPlayerData()
+    {
+        Debug.Log("Loading player data...");
+        playerData = Save.LoadPlayer();
+        if (playerData == null)
+        {
+            playerData = Save.SaveNewPlayer();
+        }
+    }
+
     public void TransitionToLevel(int level)
     {
         if(state != GameState.INTRO)
@@ -155,6 +179,7 @@ public class GameManager : MonoBehaviour
 
         switch (level)
         {
+            case -10: index = TFPIndex; break;
             case -2: index = IntroIndex; break;
             case 1: index = Level1dot1Index; break;
             case 2: index = Level1dot2Index; break;
@@ -169,7 +194,23 @@ public class GameManager : MonoBehaviour
 
         Debug.LogFormat("Transition called - navigating to scene {0}", index);
 
-        StartCoroutine(Loader.LoadLevel(index));
+        StartCoroutine(LoadLevel(index));
+    }
+
+    private IEnumerator LoadLevel(int index)
+    {
+        Debug.LogFormat("GM - Scene requested - {0}", index);
+        var llo = GameObject.FindGameObjectWithTag("LvlLoader");
+        if (llo != null)
+        {
+            var ll = llo.GetComponent<LevelLoad>();
+            ll.transition.SetTrigger("Loading");
+        }
+        
+
+        yield return new WaitForSeconds(3);
+
+        SceneManager.LoadScene(index);
     }
 
     public PlayerController SpawnPlayer()
@@ -227,6 +268,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public PlayerController? GetRefreshedPlayer()
+    {
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject == null) { return null; }
+        PlayerController pc = playerObject.GetComponent<PlayerController>();
+        if (pc == null) return null;
+        else
+        {
+            playerController = pc;
+            pc.Health = 100;
+            return playerController;
+        }
+    }
+
+    public void SaveCurrentPlayerData()
+    {
+        var pl = GetPlayer();
+        if (pl == null)
+            Debug.LogError("Player was null, could not save data!");
+        else
+            Save.SavePlayer(pl.GetPlayerData());
+    }
+
     public void SensoryOverload(bool activated = false)
     {
         var l2d = Camera.main.GetComponentInChildren<Light2D>();
@@ -248,5 +312,17 @@ public class GameManager : MonoBehaviour
                 //l2d.color = new Color()
             }
         }
+    }
+
+    public void EnableGameOverMenu(bool active = true)
+    {
+        GameOverUI.SetActive(active);
+    }
+
+    public void SignalPlayerDeath()
+    {
+        state = GameState.GAMEOVER;
+        DisableGameUI();
+        EnableGameOverMenu();
     }
 }

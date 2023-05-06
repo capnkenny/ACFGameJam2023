@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class HubManager : MonoBehaviour
@@ -18,6 +19,8 @@ public class HubManager : MonoBehaviour
     private MusicPlayer _music;
 
     private GameManager _mgr;
+
+    public TextPanel levelText;
 
     private bool loaded = false;
     private bool sceneRequested = false;
@@ -46,6 +49,7 @@ public class HubManager : MonoBehaviour
             Debug.Log("GameManager loaded!");
 
             int level = _mgr.playerData.Level;
+            
             //Debug.LogFormat("Player Level: {0}", level);
             _levelDoor.SetDelegate(LoadToLevel, level);
 
@@ -62,8 +66,24 @@ public class HubManager : MonoBehaviour
                 musicRequested = true;
                 _music.PlayMusic();
             }
-
         }
+
+        var pos = _mgr.GetPlayer().transform.position;
+        if(pos != null) 
+        {
+            pos.z = levelText.collider.transform.position.z;
+            if (levelText.collider.bounds.Contains(pos))
+            {
+                levelText.text.SetText($"Proceed to Level {_mgr.playerData.Level} ->");
+                levelText.text.gameObject.SetActive(true);
+            }
+            else if (levelText.text.gameObject.activeSelf)
+            {
+                levelText.text.gameObject.SetActive(false);
+            }
+        }
+
+        
 
     }
 

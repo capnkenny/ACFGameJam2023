@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     public new SpriteRenderer renderer;
     public Rigidbody2D rb2d;
+    private Light2D l2d;
 
     [Header("Base Player Stats")]
     public float Health;
@@ -31,15 +33,19 @@ public class PlayerController : MonoBehaviour
     public float MaxShield;
 
     //Randomized / Internal Player Stats
-    private float _tasteFactor;
-    private float _smellFactor;
-    private float _sightFactor;
-    private float _hearingFactor;
-    private float _touchFactor;
+    public float _tasteFactor;
+    public float _smellFactor;
+    public float _sightFactor;
+    public float _hearingFactor;
+    public float _touchFactor;
     private bool _sensoryOverload;
     private int _soakerLevel;
+    private Color originalColor;
+    private float originalIntensity;
+    private int currentLevel = 1;
 
     public bool Hurt = false;
+    public bool Dead = false;
     private float hurtTimer = 3.0f;
     private Direction dir;
     
@@ -49,7 +55,10 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        renderer.sprite = PlayerSprite;
+        //renderer.sprite = PlayerSprite;
+        originalColor = renderer.color;
+        l2d = GetComponentInChildren<Light2D>();
+        originalIntensity = l2d.intensity;
         movement = new Vector2(0,0);
         _sensoryOverload = false;
     }
@@ -76,11 +85,13 @@ public class PlayerController : MonoBehaviour
     {
         if(mgr.state == GameState.PLAYING || mgr.state == GameState.HUB)
         {
-            //Debug.Log($"velocity {movement}");
-            //Debug.Log($"Direction: {dir}");
+            //animator.SetBool("Hurt", Hurt);
+            animator.SetBool("Dead", Dead);
             animator.SetInteger("VelocityX", (int)movement.x);
             animator.SetInteger("VelocityY", (int)movement.y);
             animator.SetInteger("Direction", ((int)dir));
+            
+
 
             if (!_sensoryOverload)
             {
@@ -91,47 +102,53 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (_sensoryOverload)
+            if (!Dead)
             {
-                rb2d.velocity = (movement / 2);
-                if (SensoryMeter <= 0)
+                if (_sensoryOverload)
                 {
-                    _sensoryOverload = false;
-                    SensoryMeter = 0;
+                    rb2d.velocity = (movement / 2);
+                    if (SensoryMeter <= 0)
+                    {
+                        _sensoryOverload = false;
+                        SensoryMeter = 0;
+                    }
                 }
+                else
+                    rb2d.velocity = movement;
             }
-            else
-                rb2d.velocity = movement;
 
-
-
-
-            if (Hurt && mgr.state == GameState.PLAYING)
+            if (Hurt && !Dead && mgr.state == GameState.PLAYING)
             {
+                renderer.color = new Color(Mathf.Cos(hurtTimer / 3.0f)+1, 0, 0);
+                l2d.intensity = 1 * (hurtTimer / 3.0f);
                 hurtTimer -= Time.deltaTime;
 
                 if (hurtTimer <= 0)
                 {
+                    l2d.intensity = originalIntensity;
+                    renderer.color = originalColor;
                     hurtTimer = 3.0f;
                     Hurt = false;
                 }
             }
-
             
         }
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        movement = context.ReadValue<Vector2>() * MovementSpeed;
-        if (movement.x > 0) // right
-            dir = Direction.EAST;
-        else if (movement.x < 0)
-            dir = Direction.WEST;
-        else if (movement.y > 0)
-            dir = Direction.NORTH;
-        else if (movement.y < 0)
-            dir = Direction.SOUTH;
+        if (!Dead)
+        {
+            movement = context.ReadValue<Vector2>() * MovementSpeed;
+            if (movement.x > 0) // right
+                dir = Direction.EAST;
+            else if (movement.x < 0)
+                dir = Direction.WEST;
+            else if (movement.y > 0)
+                dir = Direction.NORTH;
+            else if (movement.y < 0)
+                dir = Direction.SOUTH;
+        }
     }
 
     public void AddSensoryInput(float taste, float smell, float sight, float hearing, float touch)
@@ -169,6 +186,7 @@ public class PlayerController : MonoBehaviour
         _hearingFactor = data.Hearing;
         _touchFactor = data.Touch;
         _soakerLevel = data.SoakerLevel;
+        currentLevel = data.Level;
     }
 
     public void HurtPlayer(int dmg, bool sensoryModifier, float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)
@@ -176,7 +194,6 @@ public class PlayerController : MonoBehaviour
         float sensoryMod = 0;
         if (!Hurt)
         {
-            
             int damage = dmg;
             
             if (sensoryModifier)
@@ -186,6 +203,12 @@ public class PlayerController : MonoBehaviour
             }
             Health -= damage;
             Hurt = true;
+            if (Health <= 0)
+            {
+                Hurt = false;
+                Dead = true;
+                mgr.SignalPlayerDeath();
+            }
         }
 
     }
@@ -204,6 +227,26 @@ public class PlayerController : MonoBehaviour
         SensoryMeter -= effect;
     }
 
+    public PlayerData GetPlayerData()
+    {
+        PlayerData p = new PlayerData
+        {
+            Taste = _tasteFactor,
+            Touch = _touchFactor,
+            Smell = _smellFactor,
+            Sight = _sightFactor,
+            Hearing = _hearingFactor,
+            MaxHealth = MaxHealth,
+            MaxSensory = MaxSensoryMeter,
+            MaxShield = MaxShield,
+            CurrentHealth = Health,
+            Koiency = Koiency,
+            CurrentSensory = SensoryMeter,
+            Level = currentLevel
+        };
+        return p;
+    }
+
     public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)
     {
         PlayerData newData = reference;
@@ -219,34 +262,33 @@ public class PlayerController : MonoBehaviour
         if (level != -1 && level != reference.Level)
         {
             newData.Level = level;
+            currentLevel = level;
         }
 
         return newData;
     }
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Projectile"))
+        if (!Dead)
         {
-            var force = -collision.rigidbody.velocity;
-            rb2d.AddForce(force);
-        }
-        if (collision.collider.CompareTag("Enemy"))
-        {
-            var force = -movement * 2;
-            rb2d.AddForce(force);
+            if (collision.collider.CompareTag("Projectile"))
+            {
+                var force = (collision.rigidbody.velocity * 2).normalized;
+                rb2d.AddRelativeForce(force);
+            }
+            if (collision.collider.CompareTag("Enemy"))
+            {
+
+                Vector2 force;
+                if (movement == Vector2.zero)
+                    force = -(collision.rigidbody.velocity * 2);
+                else
+                    force = -(movement * 100).normalized;
+                Debug.LogFormat("Collided with {0} - Applied Force: {1}", collision.gameObject.name, force);
+                rb2d.AddRelativeForce(force);
+            }
         }
 
-        //if (collision.gameObject.CompareTag("RoomDetection"))
-        //{
-        //    //Debug.Log("ITSSSSSSSSSSSS SHOWTIME :^)");
-        //    var room = collision.gameObject.GetComponentInParent<Room>();
-        //    room.SignalPlayerInside();
-        //}
-        //if (collision.gameObject.CompareTag("Travel"))
-        //{
-        //    var tp = collision.gameObject.GetComponent<Travelpoint>();
-        //    tp.InvokeDelegate();
-        //}
     }
 
 }

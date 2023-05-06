@@ -614,15 +614,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 653325053149001595, guid: a142c4ca6d07d784c95f1679a4aac554, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 17.72027
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 653325053149001595, guid: a142c4ca6d07d784c95f1679a4aac554, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.2676691
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 653325053149001595, guid: a142c4ca6d07d784c95f1679a4aac554, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.6217482
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 653325053149001595, guid: a142c4ca6d07d784c95f1679a4aac554, type: 3}
       propertyPath: m_LocalRotation.w
@@ -688,5 +688,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelMgr
       objectReference: {fileID: 0}
+    - target: {fileID: 7821157216617478397, guid: a142c4ca6d07d784c95f1679a4aac554, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 41b962af64c81564a867eb56a3743587, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a142c4ca6d07d784c95f1679a4aac554, type: 3}

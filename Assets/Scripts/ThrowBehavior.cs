@@ -10,7 +10,8 @@ public class ThrowBehavior : EnemyBehavior
     public float Torque;
     public float YPosition;
     public bool throwing;
-    
+    public AudioSource source;
+    public List<AudioClip> ThrowSounds;
     
     private int numberToThrow;
     private float timer;
@@ -37,14 +38,18 @@ public class ThrowBehavior : EnemyBehavior
             {
                 timer = 0.0f;
                 int i = Random.Range(0, AllowedItemPrefabsToThrow.Count);
+                int a = Random.Range(0, ThrowSounds.Count - 1);
                 if (i == 3)
                 {
                     int r = Random.Range(1, 10);
                     if (r % 7 != 0)
                         i = Random.Range(0, 3);
+                    else
+                        a = ThrowSounds.Count - 1;
                 }
                 var position = transform.position;
                 position.y += YPosition;
+                source.PlayOneShot(ThrowSounds[a]);
                 var item = Instantiate(AllowedItemPrefabsToThrow[i], position, Quaternion.identity);
                 Destroy(item, 6.0f);
                 int x = Random.Range(1, 3) % 2 == 0 ? -3 : 3;
