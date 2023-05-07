@@ -37,15 +37,13 @@ public class LevelManager : MonoBehaviour
 
     private void Awake()
     {
-        _levelLoader.transition.SetTrigger("Loading");
+        _levelLoader.SetLoading();
         //Get the game manager
         var mg = GameObject.FindGameObjectWithTag("GameManager");
         if (mg == null)
         {
             _mgr = Instantiate(_gameManagerPrefab).GetComponent<GameManager>();
             _mgr.Loader = _levelLoader;
-
-
         }
         else
         {
@@ -80,13 +78,14 @@ public class LevelManager : MonoBehaviour
 
                 loaded = true;
 
-                _levelLoader.transition.SetTrigger("DoneLoad");
+                _levelLoader.SetDoneLoadingIfNot();
                 return;
             }
             else if(!levelstart && _mgr.Loaded && loaded)
             {
                 levelstart = true;
-                return;
+                _levelLoader.SetDoneLoadingIfNot();
+				return;
             }
 
             if (levelstart && !_mgr.GameUI.activeSelf)
@@ -185,19 +184,21 @@ public class LevelManager : MonoBehaviour
         else
         {
             _mgr = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+            _mgr.state = GameState.PLAYING;
         }
     }
 
     private void SpawnPlayer()
     {
-        var player = Instantiate(_playerPrefab);
-        var pc = _mgr.GetRefreshedPlayer();
-        if (pc != null)
-            pc.SetPlayerStats(_mgr.playerData);
+        //var player = Instantiate(_playerPrefab);
+        //var pc = _mgr.GetRefreshedPlayer();
+        //if (pc != null)
+        //    pc.SetPlayerStats(_mgr.playerData);
+        var player = _mgr.SpawnPlayer();
         var pos = GameObject.FindGameObjectWithTag("MainCamera").transform.position;
         pos.z = 0;
         pos.y -= 2.5f;
-        player.transform.position = pos;
+        player.gameObject.transform.position = pos;
     }
 
     private void SpawnEnemies(Room room)

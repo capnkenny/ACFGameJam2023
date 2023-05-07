@@ -53,9 +53,8 @@ public class HubManager : MonoBehaviour
             //Debug.LogFormat("Player Level: {0}", level);
             _levelDoor.SetDelegate(LoadToLevel, level);
 
-
             loaded = true;
-            _levelLoader.transition.SetTrigger("DoneLoad");
+            _levelLoader.SetDoneLoading();
             _mgr.state = GameState.HUB;
         }
 
@@ -91,7 +90,20 @@ public class HubManager : MonoBehaviour
     {
         if (!sceneRequested)
         {
-            _levelLoader.transition.SetTrigger("Loading");
+			if (_levelLoader == null)
+			{
+				var ll = GameObject.FindGameObjectWithTag("LvlLoader");
+				if (ll != null)
+				{
+					_levelLoader = ll.GetComponent<LevelLoad>();
+				}
+			}
+
+			if (_levelLoader != null)
+			{
+				_levelLoader.SetLoadingIfNot();
+			}
+            //_levelLoader.SetLoading();
             _mgr.TransitionToLevel(level);
             sceneRequested = true;
         }

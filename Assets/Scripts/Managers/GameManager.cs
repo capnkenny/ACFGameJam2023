@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
-using static System.TimeZoneInfo;
 
 public class GameManager : MonoBehaviour
 {
@@ -47,7 +46,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        Loader.transition.SetTrigger("Loading");
+        Loader.SetLoading();
         switch (state)
         {
             case GameState.INITIALLOAD:
@@ -81,25 +80,28 @@ public class GameManager : MonoBehaviour
             case GameState.INITIALLOAD:
             case GameState.LOADING:
                 {
-                    //HandleLoading();
-                    //if (InitialLoad)
-                    //    state = GameState.INITIALLOAD;
-                    //else
                     if(!InitialLoad)
+                    { 
                         if (SceneManager.GetActiveScene().buildIndex == HomeHubIndex)
                             state = GameState.HUB;
                         else
                             state = GameState.PLAYING;
-                    var ll = GameObject.FindGameObjectWithTag("LvlLoader");
-                    if (ll != null)
-                        Loader = ll.GetComponent<LevelLoad>();
+                    }
+					var ll = GameObject.FindGameObjectWithTag("LvlLoader");
+					if (ll != null)
+						Loader = ll.GetComponent<LevelLoad>();
+                    if (InitialLoad && state == GameState.LOADING) InitialLoad = false;
 
-
+					break;
+                }
+            
+            case GameState.HUB:
+                {
+                    DisableGameUI();
                     break;
                 }
-            case GameState.INTRO:
-            case GameState.HUB:
-            case GameState.PLAYING:
+			case GameState.INTRO:
+			case GameState.PLAYING:
                 {
                     break;
                 }
@@ -129,7 +131,8 @@ public class GameManager : MonoBehaviour
 
     private void HandleLoading()
     {
-        LoadPlayerData();
+        if(playerData == null)
+            LoadPlayerData();
 
 		Loaded = true;
 
@@ -137,6 +140,7 @@ public class GameManager : MonoBehaviour
         {
             InitialLoad = true;
             Debug.Log("Initial load detected");
+            LoadPlayerData();
             if (playerData.ViewedIntro)
             {
 
@@ -173,7 +177,21 @@ public class GameManager : MonoBehaviour
 
     public void TransitionToLevel(int level)
     {
-        if(state != GameState.INTRO)
+        if (Loader == null)
+        {
+			var ll = GameObject.FindGameObjectWithTag("LvlLoader");
+            if (ll != null)
+            {
+                Loader = ll.GetComponent<LevelLoad>();
+            }
+		}
+
+        if (Loader != null)
+        {
+            Loader.SetLoading();
+        }
+		
+		if (state != GameState.INTRO)
             state = GameState.LOADING;
         int index = 0;
 
@@ -193,20 +211,23 @@ public class GameManager : MonoBehaviour
         }
 
         Debug.LogFormat("Transition called - navigating to scene {0}", index);
-
-        StartCoroutine(LoadLevel(index));
-    }
+		if (index == HomeHubIndex)
+			state = GameState.HUB;
+		SceneManager.LoadScene(index);
+		//StartCoroutine(LoadLevel(index));
+	}
 
     private IEnumerator LoadLevel(int index)
     {
         Debug.LogFormat("GM - Scene requested - {0}", index);
-        var llo = GameObject.FindGameObjectWithTag("LvlLoader");
-        if (llo != null)
-        {
-            var ll = llo.GetComponent<LevelLoad>();
-            ll.transition.SetTrigger("Loading");
-        }
-        
+        //var llo = GameObject.FindGameObjectWithTag("LvlLoader");
+        //if (llo != null)
+        //{
+        //    var ll = llo.GetComponent<LevelLoad>();
+        //    ll.transition.SetTrigger("Loading");
+        //}
+        if (index == HomeHubIndex)
+            state = GameState.HUB;
 
         yield return new WaitForSeconds(3);
 
@@ -233,7 +254,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void HandleExit()
+    public void HandleExit()
     {
         Save.SavePlayer(playerData);
         Application.Quit();
@@ -241,13 +262,16 @@ public class GameManager : MonoBehaviour
 
     public void EnableGameUI()
     {
-        UICanvas.worldCamera = Camera.main;
+		Debug.LogWarning("Enabling in-game ui");
+		UICanvas.worldCamera = Camera.main;
         GameUI.SetActive(true);
     }
 
     public void DisableGameUI()
     {
-        GameUI.SetActive(false);
+        Debug.LogWarning("Disabling in-game ui");
+        if (GameUI.activeSelf)
+            GameUI.SetActive(false);
     }
 
     public PlayerController? GetPlayer()
@@ -282,14 +306,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SaveCurrentPlayerData()
-    {
-        var pl = GetPlayer();
-        if (pl == null)
-            Debug.LogError("Player was null, could not save data!");
-        else
-            Save.SavePlayer(pl.GetPlayerData());
-    }
+    //public void SaveCurrentPlayerData()
+    //{
+    //    var pl = GetPlayer();
+    //    if (pl == null)
+    //        Debug.LogError("Player was null, could not save data!");
+    //    else
+    //        Save.SavePlayer(pl.GetPlayerData());
+    //}
 
     public void SensoryOverload(bool activated = false)
     {

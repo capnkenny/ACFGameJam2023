@@ -63,6 +63,30 @@ public class LevelLoad : MonoBehaviour
         }
 	}
 
+    public void SetLoading()
+    {
+        transition.SetTrigger("Loading");
+        Debug.LogWarning("Setting loading anim");
+    }
+
+    public void SetLoadingIfNot()
+    {
+        if (transition.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.LoadEnd"))
+            SetLoading();
+    }
+
+	public void SetDoneLoadingIfNot()
+	{
+		if (transition.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.LoadLevel"))
+			SetDoneLoading();
+	}
+
+	public void SetDoneLoading()
+    {
+		transition.SetTrigger("DoneLoad");
+		Debug.LogWarning("Setting loading anim to finish");
+    }
+
 	public bool GetAnimationFinished()
     {
         return transition.GetCurrentAnimatorStateInfo(0).length > 1;

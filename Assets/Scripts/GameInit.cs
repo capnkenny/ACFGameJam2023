@@ -1,6 +1,4 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameInit : MonoBehaviour
 {
@@ -9,7 +7,7 @@ public class GameInit : MonoBehaviour
 
 	private void Awake()
 	{
-		_loader.transition.SetTrigger("Loading");
+		_loader.SetLoading();
 	}
 
 	void Start()

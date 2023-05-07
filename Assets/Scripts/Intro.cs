@@ -20,6 +20,7 @@ public class Intro : MonoBehaviour
             if(level != null) 
             {
                 var gm = level.GetComponent<GameManager>();
+                gm.playerData.ViewedIntro = true;
 				StartCoroutine(loader.LoadLevel(gm.HomeHubIndex));
 			}
             
