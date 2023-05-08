@@ -839,10 +839,8 @@ public class LevelGenerator : MonoBehaviour
         {
             var gm = gmo.GetComponent<GameManager>();
             var pc = player.GetComponent<PlayerController>();
-            var pd = pc.UpdatePlayerData(data);
-            pd.Level++;
+            var pd = pc.UpdatePlayerData(gm.playerData, gm.playerData.Level + 1);
             gm.playerData = pd;
-            gm.SaveCurrentPlayerData();
 
             gm.DisableGameUI();
         }

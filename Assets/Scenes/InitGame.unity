@@ -392,6 +392,10 @@ PrefabInstance:
       propertyPath: loader
       value: 
       objectReference: {fileID: 491739273}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: playerPrefab
+      value: 
+      objectReference: {fileID: 6762940431723730722, guid: f09ac91929e5ccb4290b26c6ff710d82, type: 3}
     - target: {fileID: 6032117589248991547, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_Name
       value: GameManager
