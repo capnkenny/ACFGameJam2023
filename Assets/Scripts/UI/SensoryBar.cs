@@ -8,12 +8,22 @@ public class SensoryBar : MonoBehaviour
 
     public Slider slider;
 
+    private void Start()
+    {
+        slider.minValue = 0;
+        slider.maxValue = 100;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (MaxSensoryValue > 0)
-            slider.value = (SensoryValue / MaxSensoryValue);
-        else
-            slider.value = 0;
+    }
+
+    public void UpdateSlider(float value, float maxValue = 0.0f)
+    {
+        if (maxValue != 0.0f)
+            MaxSensoryValue = maxValue;
+
+        slider.value = value;
     }
 }

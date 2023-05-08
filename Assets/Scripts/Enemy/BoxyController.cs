@@ -57,11 +57,16 @@ public class BoxyController : EnemyController
 
             if (Hurt)
             {
-                if (hurtTimer == 0.0f)
-                    animator.SetTrigger("Hurt");
+                hurtTimer = 0.0f;
+                animator.SetTrigger("Hurt");
+                
                 if (((ThrowBehavior)AttackBehavior).throwing)
                     ((ThrowBehavior)AttackBehavior).EndEarly();
                 Throw = false;
+                Hurt = false;
+            }
+            else if (hurtTimer > 0.0f)
+            {
                 hurtTimer += Time.deltaTime;
                 if (hurtTimer >= HurtCoolDownTime)
                 {
@@ -69,6 +74,9 @@ public class BoxyController : EnemyController
                     hurtTimer = 0.0f;
                 }
             }
+
+
+
             if (Health <= 0)
             {
                 Dead = true;
@@ -79,7 +87,7 @@ public class BoxyController : EnemyController
         else
         {
             var state = animator.GetCurrentAnimatorStateInfo(0);
-            if (state.IsName("Base Layer.Dead") && state.normalizedTime > 1.0f)
+            if (state.IsName("Base Layer.Dead") && state.normalizedTime >= 1.0f)
             {
                 var mg = GameObject.FindGameObjectWithTag("LvlMgr");
                 var levelManager = mg == null ? null : mg.GetComponent<LevelManager>();
@@ -92,7 +100,7 @@ public class BoxyController : EnemyController
                 {
                     p.ReduceDirectStimulation(25.0f);
                 }
-                GameObject.DestroyImmediate(this.gameObject);
+                DestroyImmediate(this.gameObject);
             }
         }
 

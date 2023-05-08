@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
@@ -189,7 +188,17 @@ public class PlayerController : MonoBehaviour
     {
         if (!Dead)
         {
-            movement = context.ReadValue<Vector2>() * MovementSpeed;
+            var vec = context.ReadValue<Vector2>();
+            if (vec.x > 0 || vec.x < 0)
+            {
+                vec.y = 0;
+            }
+            else if (vec.y > 0 || vec.y < 0)
+            {
+                vec.x = 0;
+            }
+
+            movement = vec * MovementSpeed;
             if (movement.x > 0) // right
                 dir = Direction.EAST;
             else if (movement.x < 0)
@@ -295,25 +304,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public PlayerData GetPlayerData()
-    {
-        PlayerData p = new PlayerData
-        {
-            Taste = _tasteFactor,
-            Touch = _touchFactor,
-            Smell = _smellFactor,
-            Sight = _sightFactor,
-            Hearing = _hearingFactor,
-            MaxHealth = MaxHealth,
-            MaxSensory = MaxSensoryMeter,
-            MaxShield = MaxShield,
-            CurrentHealth = Health,
-            Koiency = Koiency,
-            CurrentSensory = SensoryMeter,
-            Level = currentLevel
-        };
-        return p;
-    }
 
     public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)
     {
@@ -344,17 +334,6 @@ public class PlayerController : MonoBehaviour
                 var force = (collision.rigidbody.velocity * 2).normalized;
                 rb2d.AddRelativeForce(force);
             }
-            //if (collision.collider.CompareTag("Enemy"))
-            //{
-
-            //    Vector2 force;
-            //    if (movement == Vector2.zero)
-            //        force = -(collision.rigidbody.velocity * 2);
-            //    else
-            //        force = -(movement * 100).normalized;
-            //    Debug.LogFormat("Collided with {0} - Applied Force: {1}", collision.gameObject.name, force);
-            //    rb2d.AddRelativeForce(force);
-            //}
         }
 
     }

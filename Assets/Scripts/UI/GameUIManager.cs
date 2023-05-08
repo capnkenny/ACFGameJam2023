@@ -7,20 +7,11 @@ public class GameUIManager : MonoBehaviour
     public HeartBar healthbar;
     public SensoryBar sensory;
 
-    private PlayerController pc;
-
-    public void SetPlayer(PlayerController p) => pc = p;
 
     private void Update()
     {
-        pc = parentManager.GetPlayer();
-        if (pc != null)
-        {
-            healthbar.HealthValue = pc.Health;
-            healthbar.MaxHealthValue = pc.MaxHealth;
-            sensory.MaxSensoryValue = pc.MaxSensoryMeter;
-            sensory.SensoryValue = pc.SensoryMeter;
-        }
-
+        healthbar.HealthValue = parentManager.GetPlayerHealth();
+        healthbar.MaxHealthValue = parentManager.playerData.MaxHealth;
+        sensory.UpdateSlider(parentManager.GetPlayerSensoryMeter());
     }
 }

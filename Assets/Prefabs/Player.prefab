@@ -355,6 +355,12 @@ MonoBehaviour:
   animator: {fileID: 2840388374591599619}
   renderer: {fileID: 8512238780587643872}
   rb2d: {fileID: 6762940431723730721}
+  actions:
+    m_Name: Actions
+    m_Id: 6ebb4524-a2ba-4905-88f7-a09fc9f24c0d
+    m_Asset: {fileID: 0}
+    m_Actions: []
+    m_Bindings: []
   Health: 100
   SensoryMeter: 0
   YippeeMeter: 0
@@ -374,6 +380,8 @@ MonoBehaviour:
   _touchFactor: 0
   Hurt: 0
   Dead: 0
+  Attacking: 0
+  AtkTrigger: 0
   movement: {x: 0, y: 0}
 --- !u!61 &4226875623385688732
 BoxCollider2D:

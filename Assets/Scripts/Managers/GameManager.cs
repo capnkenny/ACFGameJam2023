@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public GameObject GameUI;
     public GameObject GameOverUI;
     public Canvas UICanvas;
+    public GameUIManager gameUiManager;
 
     public GameState state;
 
@@ -101,8 +102,15 @@ public class GameManager : MonoBehaviour
                     break;
                 }
 			case GameState.INTRO:
+                {
+                    break;
+                }
 			case GameState.PLAYING:
                 {
+                    //if (gameUiManager.gameObject.activeSelf)
+                    //{
+                    //    gameUiManager.Set
+                    //}
                     break;
                 }
             case GameState.GAMEOVER:
@@ -272,6 +280,46 @@ public class GameManager : MonoBehaviour
         Debug.LogWarning("Disabling in-game ui");
         if (GameUI.activeSelf)
             GameUI.SetActive(false);
+    }
+
+    public float GetPlayerHealth()
+    {
+        if (playerController != null)
+        {
+            return playerController.Health;
+        }
+        else
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject == null) { return 0; }
+            PlayerController pc = playerObject.GetComponent<PlayerController>();
+            if (pc == null) return 0;
+            else
+            {
+                playerController = pc;
+                return pc.Health;
+            }
+        }
+    }
+
+    public float GetPlayerSensoryMeter()
+    {
+        if (playerController != null)
+        {
+            return playerController.SensoryMeter;
+        }
+        else
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject == null) { return 0; }
+            PlayerController pc = playerObject.GetComponent<PlayerController>();
+            if (pc == null) return 0;
+            else
+            {
+                playerController = pc;
+                return pc.SensoryMeter;
+            }
+        }
     }
 
     public PlayerController? GetPlayer()

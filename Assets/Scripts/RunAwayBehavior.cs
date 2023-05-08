@@ -157,7 +157,7 @@ public class RunAwayBehavior : EnemyBehavior
                     {
                         levelManager.SignalEnemyDied();
                     }
-                    _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 10.0f, 0);
+                    _player.GetComponent<PlayerController>().ReduceDirectStimulation(25.0f);
                     DestroyImmediate(this.gameObject);
                 }
             }
