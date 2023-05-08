@@ -27,6 +27,9 @@ public class RunAwayBehavior : EnemyBehavior
     [SerializeField]
     private Light2D spotlight;
 
+    [SerializeField]
+    private AudioSource mic;
+
     private int _runningAnimHash;
     private bool _runningAway;
     private float _runAwayDistance;
@@ -121,6 +124,7 @@ public class RunAwayBehavior : EnemyBehavior
                 _rigidbody.velocity = (Vector2)((-direction) * controller.MovementSpeed);
                 _running = true;
                 _secondaryCollider.enabled = true;
+                mic.Play();
 
                 return;
             }
@@ -141,6 +145,7 @@ public class RunAwayBehavior : EnemyBehavior
 
             if (_isDead)
             {
+                mic.Stop();
                 _rigidbody.velocity = Vector2.zero;
                 var state = _animator.GetCurrentAnimatorStateInfo(0);
                 if (state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
