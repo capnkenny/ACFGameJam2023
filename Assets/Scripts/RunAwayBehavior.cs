@@ -126,6 +126,7 @@ public class RunAwayBehavior : EnemyBehavior
             }
             else if (_runningAway && _running)
             {
+                Debug.LogFormat("Velocity: {0}", _rigidbody.velocity);
                 if (_secondaryCollider.enabled && _secondaryCollider.bounds.Contains(_player.transform.position))
                 {
                     _player.GetComponent<PlayerController>().HurtPlayer(5, true, 0, 0, 0, 2, 0);
@@ -151,7 +152,7 @@ public class RunAwayBehavior : EnemyBehavior
                     {
                         levelManager.SignalEnemyDied();
                     }
-                    _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 25.0f, 0);
+                    _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 10.0f, 0);
                     DestroyImmediate(this.gameObject);
                 }
             }
@@ -202,9 +203,9 @@ public class RunAwayBehavior : EnemyBehavior
         if (col.gameObject.tag == "Player")
         {
             Debug.LogFormat("Mikey collision - {0} and {1}", col.collider.tag, this.tag);
-            if (col.otherCollider.tag == "Enemy" && _running)
+            if (_running)
             {
-                col.gameObject.GetComponent<PlayerController>().HurtPlayer((int)controller.AttackDamage, false);
+                col.gameObject.GetComponent<PlayerController>().HurtPlayer((int)controller.AttackDamage, true, controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
                 controller.Health -= controller.Health;
                 _isDead = true;
                 _runningAway = false;

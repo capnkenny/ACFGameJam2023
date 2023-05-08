@@ -13,10 +13,7 @@ public class GameUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (pc == null)
-        {
-            pc = parentManager.GetPlayer();
-        }
+        pc = parentManager.GetPlayer();
         if (pc != null)
         {
             healthbar.HealthValue = pc.Health;

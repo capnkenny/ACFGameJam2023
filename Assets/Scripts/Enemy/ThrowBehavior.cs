@@ -10,6 +10,7 @@ public class ThrowBehavior : EnemyBehavior
     public float Torque;
     public float YPosition;
     public bool throwing;
+    public bool hurt;
     public AudioSource source;
     public List<AudioClip> ThrowSounds;
     
@@ -26,6 +27,11 @@ public class ThrowBehavior : EnemyBehavior
     private void Start()
     {
      
+    }
+
+    public void EndEarly()
+    {
+        timer2 = SecondsToThrow;
     }
 
     void Update()
@@ -73,7 +79,7 @@ public class ThrowBehavior : EnemyBehavior
 
     public override void PerformBehavior()
     {
-        if (!throwing)
+        if (!throwing && !hurt)
         {
             numberToThrow = Random.Range(1, AllowedItemPrefabsToThrow.Count);
             throwing = true;

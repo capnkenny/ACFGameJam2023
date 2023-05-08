@@ -394,10 +394,10 @@ MonoBehaviour:
   TasteFactor: 0
   SmellFactor: 0
   SightFactor: 0
-  HearingFactor: 1.3
+  HearingFactor: 5.3
   TouchFactor: 0
   IsIncremental: 0
-  MovementSpeed: 3.5
+  MovementSpeed: 2.5
   AttackDamage: 25
   Health: 3
 --- !u!50 &730282772568127823

@@ -149,4 +149,5 @@ MonoBehaviour:
   Damage: 25
   TimeToLive: 3
   ImpactForce: 5
-  SensoryEffect: 0
+  SensoryEffect: 1
+  SensoryEffectValue: 10

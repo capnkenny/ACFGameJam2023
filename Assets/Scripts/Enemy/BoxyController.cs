@@ -8,8 +8,10 @@ public class BoxyController : EnemyController
     private bool Dead = false;
     public float SecondsToWait;
     public float CoolDownTime;
+    public float HurtCoolDownTime;
 
     private float timer = 0;
+    private float hurtTimer = 0;
     private float coolDown = 0;
     private bool cooldownMode = false;
 
@@ -55,7 +57,17 @@ public class BoxyController : EnemyController
 
             if (Hurt)
             {
-                animator.SetTrigger("Hurt");
+                if (hurtTimer == 0.0f)
+                    animator.SetTrigger("Hurt");
+                if (((ThrowBehavior)AttackBehavior).throwing)
+                    ((ThrowBehavior)AttackBehavior).EndEarly();
+                Throw = false;
+                hurtTimer += Time.deltaTime;
+                if (hurtTimer >= HurtCoolDownTime)
+                {
+                    Hurt = false;
+                    hurtTimer = 0.0f;
+                }
             }
             if (Health <= 0)
             {
@@ -69,11 +81,16 @@ public class BoxyController : EnemyController
             var state = animator.GetCurrentAnimatorStateInfo(0);
             if (state.IsName("Base Layer.Dead") && state.normalizedTime > 1.0f)
             {
-                var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
-                var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
+                var mg = GameObject.FindGameObjectWithTag("LvlMgr");
+                var levelManager = mg == null ? null : mg.GetComponent<LevelManager>();
                 if (levelManager != null)
                 {
                     levelManager.SignalEnemyDied();
+                }
+                var p = mgr.GetPlayer();
+                if (p != null)
+                {
+                    p.ReduceDirectStimulation(25.0f);
                 }
                 GameObject.DestroyImmediate(this.gameObject);
             }
@@ -85,6 +102,7 @@ public class BoxyController : EnemyController
     {
         if (collision.collider.CompareTag("Soaker"))
         {
+            Debug.Log("Collision");
             base.Health -= 5;
             Hurt = true;
         }

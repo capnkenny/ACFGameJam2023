@@ -102,7 +102,8 @@ MonoBehaviour:
   Damage: 50
   TimeToLive: 3
   ImpactForce: 5
-  SensoryEffect: 0
+  SensoryEffect: 1
+  SensoryEffectValue: 40
 --- !u!50 &7296571628758505984
 Rigidbody2D:
   serializedVersion: 4

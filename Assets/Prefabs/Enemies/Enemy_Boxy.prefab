@@ -177,7 +177,7 @@ MonoBehaviour:
   SmellFactor: 0
   SightFactor: 0
   HearingFactor: 0
-  TouchFactor: 0
+  TouchFactor: 5
   IsIncremental: 0
   MovementSpeed: 0
   AttackDamage: 25
@@ -187,6 +187,7 @@ MonoBehaviour:
   Hurt: 0
   SecondsToWait: 7
   CoolDownTime: 5
+  HurtCoolDownTime: 2.5
 --- !u!114 &3253255279447037718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,6 +213,7 @@ MonoBehaviour:
   Torque: 100
   YPosition: 2
   throwing: 0
+  hurt: 0
   source: {fileID: 2022617583234751164}
   ThrowSounds:
   - {fileID: 8300000, guid: c538f4f28aaffb34aacedcb84df5bc55, type: 3}

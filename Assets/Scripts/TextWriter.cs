@@ -8,6 +8,7 @@ public class TextWriter : MonoBehaviour
 	public float deltaBetweenLetters = 0.1f;
 
 	public TextMeshProUGUI textBox;
+	public GameObject HiddenObject;
 
 	public TextAsset textFile;
 
@@ -60,6 +61,10 @@ public class TextWriter : MonoBehaviour
 				else if (_currentChar == 'c')
 				{
 					textBox.SetText("");
+				}
+				else if (_currentChar == 'h')
+				{
+					HiddenObject.SetActive(true);
 				}
 				else
 				{

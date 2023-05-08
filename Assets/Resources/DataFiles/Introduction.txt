@@ -2,7 +2,7 @@ The Koi Caverns...
 
 A peaceful sanctuary... a strange, other-worldly labyrinth for everyone to relax in.
 Home to the thousands of Koi that flourish in the streams within.
-
+/h
 
 /w 2At least it was.
 
