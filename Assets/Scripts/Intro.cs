@@ -26,4 +26,10 @@ public class Intro : MonoBehaviour
             
         }
     }
+
+    public void OnButtonClick()
+    {
+        if(!writer.Done)
+            writer.Done = true;
+    }
 }

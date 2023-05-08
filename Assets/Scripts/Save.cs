@@ -10,7 +10,7 @@ public static class Save
     {
 		Debug.Log("Creating new player data");
         PlayerData data = new PlayerData();
-		SavePlayer(data);
+		//SavePlayer(data);
 		
         return data;
     }

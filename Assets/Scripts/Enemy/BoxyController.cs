@@ -81,5 +81,12 @@ public class BoxyController : EnemyController
 
     }
 
-
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Soaker"))
+        {
+            base.Health -= 5;
+            Hurt = true;
+        }
+    }
 }

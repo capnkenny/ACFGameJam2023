@@ -27,12 +27,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Level1.2.unity
     guid: ac4e72b54a9db3645a77740bfbcf4fca
   - enabled: 1
-    path: Assets/Scenes/Level1.3.unity
-    guid: 8c7af7db354686f40b6f6066058090ec
-  - enabled: 1
-    path: Assets/Scenes/Level1.4.unity
-    guid: b33554aa54b99c8489d44bb14bc41139
-  - enabled: 1
     path: Assets/Scenes/AirhornJimBattle.unity
     guid: 388d3eb6b87303444a78e48566037603
   - enabled: 1

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
@@ -15,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public new SpriteRenderer renderer;
     public Rigidbody2D rb2d;
     private Light2D l2d;
+    [SerializeField]
+    private InputActionMap actions;
 
     [Header("Base Player Stats")]
     public float Health;
@@ -46,7 +49,10 @@ public class PlayerController : MonoBehaviour
 
     public bool Hurt = false;
     public bool Dead = false;
+    public bool Attacking = false;
+    public bool AtkTrigger = false;
     private float hurtTimer = 3.0f;
+    private float AtkTimer = 0.5f;
     private Direction dir;
     
     //Private members
@@ -77,8 +83,32 @@ public class PlayerController : MonoBehaviour
         _hearingFactor = Random.Range(0.0f, 1.5f);
 	    _touchFactor = Random.Range(0.0f, 1.5f);
 
-        mgr = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+
+        var mgrO = GameObject.FindGameObjectWithTag("GameManager");
+        if (mgrO != null)
+        {
+            mgr = mgrO.GetComponent<GameManager>();
+        }
+
+        InputSystem.onActionChange += OnInput;
     }
+
+    private void OnInput(object arg1, InputActionChange arg2)
+    {
+        if (!Dead)
+        {
+            if (arg1 is InputAction)
+            {
+                var action = (InputAction)arg1;
+                //Debug.Log(action.name);
+                if (arg2 == InputActionChange.ActionStarted && action.name.Contains("attack"))
+                {
+                    Attacking = true;
+                }
+            }
+        }
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -115,6 +145,25 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                     rb2d.velocity = movement;
+
+                if (Attacking)
+                {
+                    if (!AtkTrigger)
+                    {
+                        AtkTrigger = true;
+                        animator.SetTrigger("Attacking");
+                    }
+                    else
+                    {
+                        AtkTimer -= Time.deltaTime;
+                        if (AtkTimer <= 0.0f)
+                        {
+                            Attacking = false;
+                            AtkTrigger = false;
+                            AtkTimer = 0.5f;
+                        }
+                    }
+                }
             }
 
             if (Hurt && !Dead && mgr.state == GameState.PLAYING)
@@ -135,6 +184,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     public void OnMove(InputAction.CallbackContext context)
     {
         if (!Dead)
@@ -150,6 +200,8 @@ public class PlayerController : MonoBehaviour
                 dir = Direction.SOUTH;
         }
     }
+
+    
 
     public void AddSensoryInput(float taste, float smell, float sight, float hearing, float touch)
     {

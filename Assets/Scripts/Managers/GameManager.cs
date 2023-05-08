@@ -131,8 +131,8 @@ public class GameManager : MonoBehaviour
 
     private void HandleLoading()
     {
-        if(playerData == null)
-            LoadPlayerData();
+        if (playerData == null)
+            playerData = new PlayerData();//LoadPlayerData();
 
 		Loaded = true;
 
@@ -140,19 +140,19 @@ public class GameManager : MonoBehaviour
         {
             InitialLoad = true;
             Debug.Log("Initial load detected");
-            LoadPlayerData();
-            if (playerData.ViewedIntro)
-            {
+            //LoadPlayerData();
+            //if (playerData.ViewedIntro)
+            //{
 
-                Debug.Log("Skipping intro");
-                TransitionToLevel(-1);
-            }
-            else
-            {
+            //    Debug.Log("Skipping intro");
+            //    TransitionToLevel(-1);
+            //}
+            //else
+            //{
                 state = GameState.INTRO;
                 Debug.Log("Going to intro");
                 TransitionToLevel(-2);
-            }
+            //}
         }
         else
         {
@@ -165,15 +165,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void LoadPlayerData()
-    {
-        Debug.Log("Loading player data...");
-        playerData = Save.LoadPlayer();
-        if (playerData == null)
-        {
-            playerData = Save.SaveNewPlayer();
-        }
-    }
+    //public void LoadPlayerData()
+    //{
+    //    Debug.Log("Loading player data...");
+    //    playerData = Save.LoadPlayer();
+    //    if (playerData == null)
+    //    {
+    //        playerData = Save.SaveNewPlayer();
+    //    }
+    //}
 
     public void TransitionToLevel(int level)
     {
@@ -256,7 +256,7 @@ public class GameManager : MonoBehaviour
 
     public void HandleExit()
     {
-        Save.SavePlayer(playerData);
+        //Save.SavePlayer(playerData);
         Application.Quit();
     }
 
