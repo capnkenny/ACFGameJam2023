@@ -495,7 +495,7 @@ MonoBehaviour:
   HearingFactor: 5.3
   TouchFactor: 0
   IsIncremental: 0
-  MovementSpeed: 2.5
+  MovementSpeed: 1.5
   AttackDamage: 25
   Health: 3
 --- !u!50 &730282772568127823
