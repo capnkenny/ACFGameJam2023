@@ -53,7 +53,25 @@ AnimationClip:
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
+        time: 0.016666668
+        value: {x: 0.10648, y: -0.20872, z: 0}
+        inSlope: {x: -1.4976, y: -2.0736, z: 0}
+        outSlope: {x: -1.4976, y: -2.0736, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
+      - serializedVersion: 3
         time: 0.083333336
+        value: {x: -0.01, y: -0.37, z: 0}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
+      - serializedVersion: 3
+        time: 0.33333334
         value: {x: -0.01, y: -0.37, z: 0}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
@@ -106,7 +124,7 @@ AnimationClip:
         outWeight: 0
       - serializedVersion: 3
         time: 0.33333334
-        value: 0
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -134,7 +152,7 @@ AnimationClip:
         outWeight: 0
       - serializedVersion: 3
         time: 0.016666668
-        value: 0
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -143,7 +161,7 @@ AnimationClip:
         outWeight: 0
       - serializedVersion: 3
         time: 0.33333334
-        value: -1
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -194,6 +212,34 @@ AnimationClip:
     path: Soaker
     classID: 50
     script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.33333334
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Simulated
+    path: 
+    classID: 50
+    script: {fileID: 0}
   m_PPtrCurves:
   - curve:
     - time: 0
@@ -241,6 +287,13 @@ AnimationClip:
       isPPtrCurve: 0
     - serializedVersion: 2
       path: 1092812851
+      attribute: 1406677095
+      script: {fileID: 0}
+      typeID: 50
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 0
       attribute: 1406677095
       script: {fileID: 0}
       typeID: 50
@@ -298,7 +351,7 @@ AnimationClip:
         outWeight: 0
       - serializedVersion: 3
         time: 0.33333334
-        value: 0
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -373,6 +426,24 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.016666668
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.33333334
         value: 0
         inSlope: 0
         outSlope: 0
@@ -542,7 +613,7 @@ AnimationClip:
         outWeight: 0
       - serializedVersion: 3
         time: 0.016666668
-        value: 0
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -551,7 +622,7 @@ AnimationClip:
         outWeight: 0
       - serializedVersion: 3
         time: 0.33333334
-        value: -1
+        value: 1
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -600,6 +671,34 @@ AnimationClip:
       m_RotationOrder: 4
     attribute: m_Simulated
     path: Soaker
+    classID: 50
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.33333334
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Simulated
+    path: 
     classID: 50
     script: {fileID: 0}
   m_EulerEditorCurves:

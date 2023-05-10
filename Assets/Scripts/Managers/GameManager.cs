@@ -208,9 +208,10 @@ public class GameManager : MonoBehaviour
             case -10: index = TFPIndex; break;
             case -2: index = IntroIndex; break;
             case 1: index = Level1dot1Index; break;
-            case 2: index = Level1dot2Index; break;
+            //case 2: index = Level1dot2Index; break;
             //case 3: index = Level1dot3Index; break;
             //case 4: index = Level1dot4Index; break;
+            case 2:
             case 3:
             case 4:
             case 5: index = AJIndex; break;
@@ -222,18 +223,12 @@ public class GameManager : MonoBehaviour
 		if (index == HomeHubIndex)
 			state = GameState.HUB;
 		SceneManager.LoadScene(index);
-		//StartCoroutine(LoadLevel(index));
 	}
 
     private IEnumerator LoadLevel(int index)
     {
         Debug.LogFormat("GM - Scene requested - {0}", index);
-        //var llo = GameObject.FindGameObjectWithTag("LvlLoader");
-        //if (llo != null)
-        //{
-        //    var ll = llo.GetComponent<LevelLoad>();
-        //    ll.transition.SetTrigger("Loading");
-        //}
+
         if (index == HomeHubIndex)
             state = GameState.HUB;
 
@@ -264,20 +259,19 @@ public class GameManager : MonoBehaviour
 
     public void HandleExit()
     {
-        //Save.SavePlayer(playerData);
         Application.Quit();
     }
 
     public void EnableGameUI()
     {
-		Debug.LogWarning("Enabling in-game ui");
+		//Debug.LogWarning("Enabling in-game ui");
 		UICanvas.worldCamera = Camera.main;
         GameUI.SetActive(true);
     }
 
     public void DisableGameUI()
     {
-        Debug.LogWarning("Disabling in-game ui");
+        //Debug.LogWarning("Disabling in-game ui");
         if (GameUI.activeSelf)
             GameUI.SetActive(false);
     }
