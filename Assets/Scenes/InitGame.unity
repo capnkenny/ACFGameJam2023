@@ -252,6 +252,17 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!114 &1182218911 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6559881084951352347, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+  m_PrefabInstance: {fileID: 6032117589301504139}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82851a9001394014e81e72955830613b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1324251580
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -266,6 +277,10 @@ PrefabInstance:
     - target: {fileID: 3225425955107588596, guid: 022968b623e9c614f8770516079dd79c, type: 3}
       propertyPath: m_Name
       value: LevelLoader
+      objectReference: {fileID: 0}
+    - target: {fileID: 3225425955107588596, guid: 022968b623e9c614f8770516079dd79c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3225425955107588598, guid: 022968b623e9c614f8770516079dd79c, type: 3}
       propertyPath: transitionTime
@@ -324,6 +339,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4078948101377295061, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259528176893882231, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 66.96
+      objectReference: {fileID: 0}
     - target: {fileID: 5968389336136176762, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -381,6 +404,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: A
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: R
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: state
       value: 11
       objectReference: {fileID: 0}
@@ -392,13 +423,59 @@ PrefabInstance:
       propertyPath: loader
       value: 
       objectReference: {fileID: 491739273}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: AJIndex
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: TFPIndex
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: playerPrefab
+      value: 
+      objectReference: {fileID: 6762940431723730722, guid: f09ac91929e5ccb4290b26c6ff710d82, type: 3}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: Level1Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: Level1Color.g
+      value: 0.45882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: Level1Color.r
+      value: 0.60784316
+      objectReference: {fileID: 0}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: gameUiManager
+      value: 
+      objectReference: {fileID: 1182218911}
+    - target: {fileID: 6032117589248991546, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: playerData.MaxSensory
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 6032117589248991547, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6429059385387907126, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 66.96
+      objectReference: {fileID: 0}
     - target: {fileID: 7804031527174104059, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7934064461994610508, guid: 6595254912926594fb89930f4f3097e5, type: 3}
+      propertyPath: m_text
+      value: 'You''re Hurt!
+
+        Head back to safety!
+
+
+
+'
       objectReference: {fileID: 0}
     - target: {fileID: 8460583979298025000, guid: 6595254912926594fb89930f4f3097e5, type: 3}
       propertyPath: m_Camera

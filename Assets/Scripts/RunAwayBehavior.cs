@@ -27,6 +27,9 @@ public class RunAwayBehavior : EnemyBehavior
     [SerializeField]
     private Light2D spotlight;
 
+    [SerializeField]
+    private AudioSource mic;
+
     private int _runningAnimHash;
     private bool _runningAway;
     private float _runAwayDistance;
@@ -121,37 +124,66 @@ public class RunAwayBehavior : EnemyBehavior
                 _rigidbody.velocity = (Vector2)((-direction) * controller.MovementSpeed);
                 _running = true;
                 _secondaryCollider.enabled = true;
+                mic.Play();
 
                 return;
             }
             else if (_runningAway && _running)
             {
+                float cap = 5.0f;
+                //player stuff
+                var pc = _player.GetComponent<PlayerController>();
+                if (pc._sensoryOverload)
+                {
+                    if (mic.pitch != 0.5f)
+                        mic.pitch = 0.5f;
+                    cap = 2.5f;
+                }
+                else
+                {
+                    if (mic.pitch != 1.0f)
+                        mic.pitch = 1.0f;
+                }
+
+                Debug.LogFormat("Velocity: {0}", _rigidbody.velocity);
+                var velocity = _rigidbody.velocity;
+                if (velocity.x > cap)
+                    velocity.x = cap;
+                else if (velocity.x < -cap) 
+                    velocity.x = -cap;
+                if (velocity.y > cap)
+                    velocity.y = cap;
+                else if (velocity.y < -cap)
+                    velocity.y = -cap;
+                _rigidbody.velocity = velocity;
+
                 if (_secondaryCollider.enabled && _secondaryCollider.bounds.Contains(_player.transform.position))
                 {
-                    _player.GetComponent<PlayerController>().HurtPlayer(5, true, 0, 0, 0, 2, 0);
+                    pc.ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor * 1.05f, controller.TouchFactor);
                 }
                 sensoryTimer += Time.deltaTime;
                 if (sensoryTimer >= 3.0f)
                 {
                     sensoryTimer = 0;
-                    _player.GetComponent<PlayerController>().ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
+                    pc.ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
                 }
             }
 
             if (_isDead)
             {
+                mic.Stop();
                 _rigidbody.velocity = Vector2.zero;
                 var state = _animator.GetCurrentAnimatorStateInfo(0);
                 if (state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
                 {
-                    Debug.LogWarning("Mikey is going away");
+                    //Debug.LogWarning("Mikey is going away");
                     var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
                     var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
                     if (levelManager != null)
                     {
                         levelManager.SignalEnemyDied();
                     }
-                    _player.GetComponent<PlayerController>().ReduceDirectSensoryEffect(0, 0, 0, 25.0f, 0);
+                    _player.GetComponent<PlayerController>().ReduceDirectStimulation(12.5f);
                     DestroyImmediate(this.gameObject);
                 }
             }
@@ -202,9 +234,9 @@ public class RunAwayBehavior : EnemyBehavior
         if (col.gameObject.tag == "Player")
         {
             Debug.LogFormat("Mikey collision - {0} and {1}", col.collider.tag, this.tag);
-            if (col.otherCollider.tag == "Enemy" && _running)
+            if (_running)
             {
-                col.gameObject.GetComponent<PlayerController>().HurtPlayer((int)controller.AttackDamage, false);
+                col.gameObject.GetComponent<PlayerController>().HurtPlayer((int)controller.AttackDamage, true, controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
                 controller.Health -= controller.Health;
                 _isDead = true;
                 _runningAway = false;

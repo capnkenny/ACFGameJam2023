@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     public new SpriteRenderer renderer;
     public Rigidbody2D rb2d;
     private Light2D l2d;
+    [SerializeField]
+    private InputActionMap actions;
 
     [Header("Base Player Stats")]
     public float Health;
@@ -38,7 +40,7 @@ public class PlayerController : MonoBehaviour
     public float _sightFactor;
     public float _hearingFactor;
     public float _touchFactor;
-    private bool _sensoryOverload;
+    public bool _sensoryOverload;
     private int _soakerLevel;
     private Color originalColor;
     private float originalIntensity;
@@ -46,7 +48,10 @@ public class PlayerController : MonoBehaviour
 
     public bool Hurt = false;
     public bool Dead = false;
+    public bool Attacking = false;
+    public bool AtkTrigger = false;
     private float hurtTimer = 3.0f;
+    private float AtkTimer = 0.5f;
     private Direction dir;
     
     //Private members
@@ -77,8 +82,32 @@ public class PlayerController : MonoBehaviour
         _hearingFactor = Random.Range(0.0f, 1.5f);
 	    _touchFactor = Random.Range(0.0f, 1.5f);
 
-        mgr = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+
+        var mgrO = GameObject.FindGameObjectWithTag("GameManager");
+        if (mgrO != null)
+        {
+            mgr = mgrO.GetComponent<GameManager>();
+        }
+
+        InputSystem.onActionChange += OnInput;
     }
+
+    private void OnInput(object arg1, InputActionChange arg2)
+    {
+        if (!Dead)
+        {
+            if (arg1 is InputAction)
+            {
+                var action = (InputAction)arg1;
+                //Debug.Log(action.name);
+                if (arg2 == InputActionChange.ActionStarted && action.name.Contains("attack"))
+                {
+                    Attacking = true;
+                }
+            }
+        }
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -106,7 +135,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (_sensoryOverload)
                 {
-                    rb2d.velocity = (movement / 2);
+                    rb2d.velocity = (movement * 0.75f);
                     if (SensoryMeter <= 0)
                     {
                         _sensoryOverload = false;
@@ -115,6 +144,25 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                     rb2d.velocity = movement;
+
+                if (Attacking)
+                {
+                    if (!AtkTrigger)
+                    {
+                        AtkTrigger = true;
+                        animator.SetTrigger("Attacking");
+                    }
+                    else
+                    {
+                        AtkTimer -= Time.deltaTime;
+                        if (AtkTimer <= 0.0f)
+                        {
+                            Attacking = false;
+                            AtkTrigger = false;
+                            AtkTimer = 0.5f;
+                        }
+                    }
+                }
             }
 
             if (Hurt && !Dead && mgr.state == GameState.PLAYING)
@@ -135,11 +183,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     public void OnMove(InputAction.CallbackContext context)
     {
         if (!Dead)
         {
-            movement = context.ReadValue<Vector2>() * MovementSpeed;
+            var vec = context.ReadValue<Vector2>();
+            //if (vec.x > 0 || vec.x < 0)
+            //{
+            //    vec.y = 0;
+            //}
+            //else if (vec.y > 0 || vec.y < 0)
+            //{
+            //    vec.x = 0;
+            //}
+
+            movement = vec * MovementSpeed;
             if (movement.x > 0) // right
                 dir = Direction.EAST;
             else if (movement.x < 0)
@@ -213,11 +272,18 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public void HealPlayer(int dmg, float sens)
+    {
+        Health += dmg;
+        ReduceDirectStimulation(sens);
+    }
+
     public float ProvideSensoryEffect(float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)
     {
         float effect = (_tasteFactor * tf) + (_smellFactor * smf) + (_sightFactor * sif) + (_hearingFactor * hf) + (_touchFactor * tof);
         if(SensoryMeter < MaxSensoryMeter && !_sensoryOverload)
             SensoryMeter += effect;
+        Debug.LogWarning($"Sensory Effect added - {effect}");
         return effect;
     }
 
@@ -225,27 +291,23 @@ public class PlayerController : MonoBehaviour
     {
         float effect = (_tasteFactor * tf) + (_smellFactor * smf) + (_sightFactor * sif) + (_hearingFactor * hf) + (_touchFactor * tof);
         SensoryMeter -= effect;
+        if (SensoryMeter < 0)
+        {
+            SensoryMeter = 0;
+            _sensoryOverload = false;
+        }
     }
 
-    public PlayerData GetPlayerData()
+    public void ReduceDirectStimulation(float value)
     {
-        PlayerData p = new PlayerData
+        SensoryMeter -= value;
+        if (SensoryMeter < 0)
         {
-            Taste = _tasteFactor,
-            Touch = _touchFactor,
-            Smell = _smellFactor,
-            Sight = _sightFactor,
-            Hearing = _hearingFactor,
-            MaxHealth = MaxHealth,
-            MaxSensory = MaxSensoryMeter,
-            MaxShield = MaxShield,
-            CurrentHealth = Health,
-            Koiency = Koiency,
-            CurrentSensory = SensoryMeter,
-            Level = currentLevel
-        };
-        return p;
+            SensoryMeter = 0;
+            _sensoryOverload = false;
+        }
     }
+
 
     public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)
     {
@@ -274,17 +336,6 @@ public class PlayerController : MonoBehaviour
             if (collision.collider.CompareTag("Projectile"))
             {
                 var force = (collision.rigidbody.velocity * 2).normalized;
-                rb2d.AddRelativeForce(force);
-            }
-            if (collision.collider.CompareTag("Enemy"))
-            {
-
-                Vector2 force;
-                if (movement == Vector2.zero)
-                    force = -(collision.rigidbody.velocity * 2);
-                else
-                    force = -(movement * 100).normalized;
-                Debug.LogFormat("Collided with {0} - Applied Force: {1}", collision.gameObject.name, force);
                 rb2d.AddRelativeForce(force);
             }
         }

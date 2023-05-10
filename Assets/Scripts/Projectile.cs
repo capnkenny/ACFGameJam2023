@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour
 	public float TimeToLive;
     public float ImpactForce;
     public bool SensoryEffect;
+    public float SensoryEffectValue;
 
 	private bool disposable = true;
     private bool destroy = false;
@@ -37,7 +38,10 @@ public class Projectile : MonoBehaviour
         if (collision.collider.CompareTag("Player"))
         {
             var pc = collision.gameObject.GetComponent<PlayerController>();
-            pc.HurtPlayer(Damage, SensoryEffect);
+            if (Damage <= 0)
+                pc.HealPlayer(Damage, SensoryEffectValue);
+            else
+                pc.HurtPlayer(Damage, SensoryEffect, 0, 0, 0, 0, SensoryEffectValue);
             destroy = true;
         }
     }

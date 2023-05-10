@@ -23,6 +23,7 @@ TagManager:
   - UI
   - Music
   - LvlLoader
+  - Soaker
   layers:
   - Default
   - TransparentFX
