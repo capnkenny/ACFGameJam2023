@@ -29,6 +29,7 @@ public class LevelManager : MonoBehaviour
     public int CurrentRoomNumber;
     public int PreviousRoomNumber;
     public MusicPlayer music;
+    public AudioSource secondarySource;
 
     private int _currentEnemyCount;
     private int _currentRoomEnemiesDead = 0;
@@ -93,13 +94,28 @@ public class LevelManager : MonoBehaviour
                 if (_levelLoader.transition.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.5f)
                 {
                     var p = _mgr.GetPlayer();
-                    if (p != null)
-                        p.Health = p.MaxHealth;
-                    _mgr.EnableGameUI();
-                    music.PlayMusic();
+                    if (p != null && p.Health == p.MaxHealth)
+                    {
+                        _mgr.EnableGameUI();
+                        music.PlayMusic();
+                    }
                 }
             }
 
+            if (_mgr.PlayerInSensoryOverload)
+            {
+                if (!secondarySource.isPlaying)
+                    secondarySource.Play();
+                music.source.pitch = 0.5f;
+                music.source.volume = 0.25f;
+            }
+            else
+            {
+                if (secondarySource.isPlaying)
+                    secondarySource.Stop();
+                music.source.pitch = 1.0f;
+                music.source.volume = 0.5f;
+            }
             
             // We switched rooms so spawn enemies here
             // and lock the doors

@@ -55,11 +55,32 @@ public class ThrowBehavior : EnemyBehavior
                 }
                 var position = transform.position;
                 position.y += YPosition;
+
+                int x = Random.Range(1, 3) % 2 == 0 ? -3 : 3;
+                Vector2 force = (new Vector2(x, 10).normalized * Magnitude);
+
+                //get player
+                var p = GameObject.FindGameObjectWithTag("Player");
+                if (p != null)
+                {
+                    var pc = p.GetComponent<PlayerController>();
+                    if (pc != null && pc._sensoryOverload)
+                    {
+                        source.pitch = 0.5f;
+                        source.volume = 0.25f;
+                        force = force / 2;
+                    }
+                    else if (pc != null)
+                    {
+                        source.pitch = 1.0f;
+                        source.volume = 0.5f;
+                    }
+                }
+
                 source.PlayOneShot(ThrowSounds[a]);
                 var item = Instantiate(AllowedItemPrefabsToThrow[i], position, Quaternion.identity);
                 Destroy(item, 6.0f);
-                int x = Random.Range(1, 3) % 2 == 0 ? -3 : 3;
-                Vector2 force = (new Vector2(x, 10).normalized * Magnitude);
+                
                 item.GetComponent<Rigidbody2D>().AddForce(force);
                 if (x < 0)
                     item.GetComponent<Rigidbody2D>().AddTorque(Torque);

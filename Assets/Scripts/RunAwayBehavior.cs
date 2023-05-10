@@ -130,16 +130,42 @@ public class RunAwayBehavior : EnemyBehavior
             }
             else if (_runningAway && _running)
             {
+                float cap = 5.0f;
+                //player stuff
+                var pc = _player.GetComponent<PlayerController>();
+                if (pc._sensoryOverload)
+                {
+                    if (mic.pitch != 0.5f)
+                        mic.pitch = 0.5f;
+                    cap = 2.5f;
+                }
+                else
+                {
+                    if (mic.pitch != 1.0f)
+                        mic.pitch = 1.0f;
+                }
+
                 Debug.LogFormat("Velocity: {0}", _rigidbody.velocity);
+                var velocity = _rigidbody.velocity;
+                if (velocity.x > cap)
+                    velocity.x = cap;
+                else if (velocity.x < -cap) 
+                    velocity.x = -cap;
+                if (velocity.y > cap)
+                    velocity.y = cap;
+                else if (velocity.y < -cap)
+                    velocity.y = -cap;
+                _rigidbody.velocity = velocity;
+
                 if (_secondaryCollider.enabled && _secondaryCollider.bounds.Contains(_player.transform.position))
                 {
-                    _player.GetComponent<PlayerController>().HurtPlayer(5, true, 0, 0, 0, 2, 0);
+                    pc.ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor * 1.05f, controller.TouchFactor);
                 }
                 sensoryTimer += Time.deltaTime;
                 if (sensoryTimer >= 3.0f)
                 {
                     sensoryTimer = 0;
-                    _player.GetComponent<PlayerController>().ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
+                    pc.ProvideSensoryEffect(controller.TasteFactor, controller.SmellFactor, controller.SightFactor, controller.HearingFactor, controller.TouchFactor);
                 }
             }
 
@@ -150,14 +176,14 @@ public class RunAwayBehavior : EnemyBehavior
                 var state = _animator.GetCurrentAnimatorStateInfo(0);
                 if (state.IsName("Base Layer.Death") && state.normalizedTime > 1.0f)
                 {
-                    Debug.LogWarning("Mikey is going away");
+                    //Debug.LogWarning("Mikey is going away");
                     var mgr = GameObject.FindGameObjectWithTag("LvlMgr");
                     var levelManager = mgr == null ? null : mgr.GetComponent<LevelManager>();
                     if (levelManager != null)
                     {
                         levelManager.SignalEnemyDied();
                     }
-                    _player.GetComponent<PlayerController>().ReduceDirectStimulation(25.0f);
+                    _player.GetComponent<PlayerController>().ReduceDirectStimulation(12.5f);
                     DestroyImmediate(this.gameObject);
                 }
             }

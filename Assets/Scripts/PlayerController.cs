@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     public float _sightFactor;
     public float _hearingFactor;
     public float _touchFactor;
-    private bool _sensoryOverload;
+    public bool _sensoryOverload;
     private int _soakerLevel;
     private Color originalColor;
     private float originalIntensity;
@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (_sensoryOverload)
                 {
-                    rb2d.velocity = (movement / 2);
+                    rb2d.velocity = (movement * 0.75f);
                     if (SensoryMeter <= 0)
                     {
                         _sensoryOverload = false;
@@ -189,14 +189,14 @@ public class PlayerController : MonoBehaviour
         if (!Dead)
         {
             var vec = context.ReadValue<Vector2>();
-            if (vec.x > 0 || vec.x < 0)
-            {
-                vec.y = 0;
-            }
-            else if (vec.y > 0 || vec.y < 0)
-            {
-                vec.x = 0;
-            }
+            //if (vec.x > 0 || vec.x < 0)
+            //{
+            //    vec.y = 0;
+            //}
+            //else if (vec.y > 0 || vec.y < 0)
+            //{
+            //    vec.x = 0;
+            //}
 
             movement = vec * MovementSpeed;
             if (movement.x > 0) // right
@@ -209,8 +209,6 @@ public class PlayerController : MonoBehaviour
                 dir = Direction.SOUTH;
         }
     }
-
-    
 
     public void AddSensoryInput(float taste, float smell, float sight, float hearing, float touch)
     {
@@ -272,6 +270,12 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+    }
+
+    public void HealPlayer(int dmg, float sens)
+    {
+        Health += dmg;
+        ReduceDirectStimulation(sens);
     }
 
     public float ProvideSensoryEffect(float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)

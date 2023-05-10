@@ -89,7 +89,7 @@ public class LevelLoad : MonoBehaviour
 
 	public bool GetAnimationFinished()
     {
-        return transition.GetCurrentAnimatorStateInfo(0).length > 1;
+        return transition.GetCurrentAnimatorStateInfo(0).length >= 1.0f;
     }
 
     public IEnumerator LoadLevel(int index)

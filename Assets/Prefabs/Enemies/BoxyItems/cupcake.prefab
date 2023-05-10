@@ -99,11 +99,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98435643fa0bd7b45808d369250bc691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: 10
+  Damage: -10
   TimeToLive: 3
-  ImpactForce: 2
+  ImpactForce: 0
   SensoryEffect: 1
-  SensoryEffectValue: 10
+  SensoryEffectValue: -12.5
 --- !u!58 &6812958580674821501
 CircleCollider2D:
   m_ObjectHideFlags: 0

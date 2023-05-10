@@ -35,8 +35,17 @@ public class GameManager : MonoBehaviour
     public bool GoToHub = false;
     public bool Quit = false;
 
+    [Header("Sensory Overload")]
+    public float R;
+    public float G;
+    public float B;
+    public float A;
+    public Color Level1Color;
+    public bool PlayerInSensoryOverload;
+
     private float intensityOrig;
     private PlayerController playerController;
+    private Light2D playerLight;
 
     void Awake()
     {
@@ -107,6 +116,12 @@ public class GameManager : MonoBehaviour
                 }
 			case GameState.PLAYING:
                 {
+                    if (playerController == null) playerController = GetPlayer();
+                    if (playerController != null)
+                    {
+                        PlayerInSensoryOverload = playerController._sensoryOverload;
+                    }
+                    SensoryOverload(PlayerInSensoryOverload);
                     //if (gameUiManager.gameObject.activeSelf)
                     //{
                     //    gameUiManager.Set
@@ -364,8 +379,9 @@ public class GameManager : MonoBehaviour
         {
             if (l2d != null)
             {
-                intensityOrig = l2d.intensity;
+                //intensityOrig = l2d.intensity;
                 l2d.intensity = 0.2f;
+                l2d.color = new Color(R, G, B, A);
                 //l2d.color = new Color()
             }
         }
@@ -374,7 +390,8 @@ public class GameManager : MonoBehaviour
             //deactivated
             if (l2d != null)
             {
-                l2d.intensity = intensityOrig;
+                l2d.intensity = 0.55f;
+                l2d.color = Level1Color;
                 //l2d.color = new Color()
             }
         }

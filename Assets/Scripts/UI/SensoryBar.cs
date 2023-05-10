@@ -11,7 +11,7 @@ public class SensoryBar : MonoBehaviour
     private void Start()
     {
         slider.minValue = 0;
-        slider.maxValue = 100;
+        slider.maxValue = 50;
     }
 
     // Update is called once per frame

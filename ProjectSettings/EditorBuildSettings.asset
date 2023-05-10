@@ -27,10 +27,13 @@ EditorBuildSettings:
     path: Assets/Scenes/Level1.2.unity
     guid: ac4e72b54a9db3645a77740bfbcf4fca
   - enabled: 1
-    path: Assets/Scenes/AirhornJimBattle.unity
-    guid: 388d3eb6b87303444a78e48566037603
+    path: Assets/Scenes/AirhornJimSpecial.unity
+    guid: bbd753c3e1334d34da0d30553b96c973
   - enabled: 1
     path: Assets/Scenes/ThanksForPlaying.unity
     guid: ccd43d189e65a0c408338388179e1be4
+  - enabled: 1
+    path: Assets/Scenes/AirhornJimBattle.unity
+    guid: 431801aa89e3d314bb7b50d01c9cd7a7
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: e9e98724c5fdfd64fa20dc7f827fb256, type: 2}

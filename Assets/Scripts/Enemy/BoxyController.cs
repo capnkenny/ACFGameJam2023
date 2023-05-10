@@ -98,7 +98,7 @@ public class BoxyController : EnemyController
                 var p = mgr.GetPlayer();
                 if (p != null)
                 {
-                    p.ReduceDirectStimulation(25.0f);
+                    p.ReduceDirectStimulation(12.5f);
                 }
                 DestroyImmediate(this.gameObject);
             }

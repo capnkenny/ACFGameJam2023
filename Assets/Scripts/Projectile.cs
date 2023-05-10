@@ -38,7 +38,10 @@ public class Projectile : MonoBehaviour
         if (collision.collider.CompareTag("Player"))
         {
             var pc = collision.gameObject.GetComponent<PlayerController>();
-            pc.HurtPlayer(Damage, SensoryEffect, 0, 0, 0, 0, SensoryEffectValue);
+            if (Damage <= 0)
+                pc.HealPlayer(Damage, SensoryEffectValue);
+            else
+                pc.HurtPlayer(Damage, SensoryEffect, 0, 0, 0, 0, SensoryEffectValue);
             destroy = true;
         }
     }
