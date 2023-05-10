@@ -7,7 +7,7 @@
   </head>
   <body style="text-align: center; padding: 0; border: 0; margin: 0;">
     <canvas id="unity-canvas" width=1360 height=768 style="width: 1360px; height: 768px; background: #231F20"></canvas>
-    <script src="Build/build.loader.js"></script>
+    <script src="Build/docs.loader.js"></script>
     <script>
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
@@ -25,9 +25,9 @@
       }
 
       createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "Build/build.data.unityweb",
-        frameworkUrl: "Build/build.framework.js.unityweb",
-        codeUrl: "Build/build.wasm.unityweb",
+        dataUrl: "Build/docs.data.unityweb",
+        frameworkUrl: "Build/docs.framework.js.unityweb",
+        codeUrl: "Build/docs.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "TeamKoi",
         productName: "KoiCaverns",
