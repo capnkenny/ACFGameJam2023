@@ -10,6 +10,9 @@ public class HubManager : MonoBehaviour
     private Door _shopKeepDoor;
 
     [SerializeField]
+    private Travelpoint _debugDoor;
+
+    [SerializeField]
     private LevelLoad _levelLoader;
 
     [SerializeField]
@@ -52,9 +55,10 @@ public class HubManager : MonoBehaviour
             
             //Debug.LogFormat("Player Level: {0}", level);
             _levelDoor.SetDelegate(LoadToLevel, level);
+            _debugDoor.SetDelegate(LoadToLevel, 2);
 
             loaded = true;
-            _levelLoader.SetDoneLoading();
+            //_levelLoader.SetDoneLoading();
             _mgr.state = GameState.HUB;
         }
 
