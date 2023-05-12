@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    [Header("Projectile Stats")]
 	public int Damage;
 	public float TimeToLive;
     public float ImpactForce;
@@ -9,7 +10,7 @@ public class Projectile : MonoBehaviour
     public float SensoryEffectValue;
 
 	private bool disposable = true;
-    private bool destroy = false;
+    public bool destroy = false;
     //private float timer = 0.0f;
 
 
