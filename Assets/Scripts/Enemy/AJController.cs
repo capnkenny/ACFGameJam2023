@@ -98,11 +98,11 @@ public class AJController : EnemyController
                         HandleIdle();
                         break;
                     }
-                case BossState.DEBUG:
-                    {
-                        DebugAttackOne();
-                        break;
-                    }
+                //case BossState.DEBUG:
+                //    {
+                //        DebugAttackOne();
+                //        break;
+                //    }
                 default:
                     {
                         _state = BossState.IDLE;
@@ -195,49 +195,51 @@ public class AJController : EnemyController
         mgr.TransitionToLevel(-10);
     }
 
-    private void DebugAttackOne()
-    {
-        if (_cooldown == 0.0f)
-        {
-            var pos = new Vector3(ShockwaveSpawnTransform.position.x, ShockwaveSpawnTransform.position.y, 0);
-            var sw = Instantiate(ShockwavePrefab, pos, Quaternion.identity, ShockwaveSpawnTransform);
-            var playerTransform = mgr.GetPlayer().transform;
-            Vector3 direction = playerTransform.position - sw.transform.position;
-            var rot = Quaternion.LookRotation(Vector3.forward, -direction);
-            //Vector3 newDirection = Vector3.RotateTowards(transform.forward, direction, 1.6f, 1.0f);
-            //sw.transform.Rotate(newDirection);
-            sw.transform.rotation = rot;
-            sw.GetComponent<Shockwave>().Velocity = (direction * Attack1Speed * Time.deltaTime);
-            _cooldown += 0.001f;
-        }
-        else
-        {
-            _cooldown += Time.deltaTime;
-            if (_cooldown >= Attack1CooldownTime)
-            {
-                _cooldown = 0.0f;
-                _state = BossState.IDLE;
-            }
-        }
-    }
+    //private void DebugAttackOne()
+    //{
+    //    if (_cooldown == 0.0f)
+    //    {
+    //        var pos = new Vector3(ShockwaveSpawnTransform.position.x, ShockwaveSpawnTransform.position.y, 0);
+    //        var sw = Instantiate(ShockwavePrefab, pos, Quaternion.identity, ShockwaveSpawnTransform);
+    //        var playerTransform = mgr.GetPlayer().transform;
+    //        Vector3 direction = playerTransform.position - sw.transform.position;
+    //        var rot = Quaternion.LookRotation(Vector3.forward, -direction);
+    //        //Vector3 newDirection = Vector3.RotateTowards(transform.forward, direction, 1.6f, 1.0f);
+    //        //sw.transform.Rotate(newDirection);
+    //        sw.transform.rotation = rot;
+    //        sw.GetComponent<Shockwave>().Velocity = (direction * Attack1Speed * Time.deltaTime);
+    //        _cooldown += 0.001f;
+    //    }
+    //    else
+    //    {
+    //        _cooldown += Time.deltaTime;
+    //        if (_cooldown >= Attack1CooldownTime)
+    //        {
+    //            _cooldown = 0.0f;
+    //            _state = BossState.IDLE;
+    //        }
+    //    }
+    //}
 
     private void HandleAttackOne()
     {
-        if (_cooldown == 0.0f && !largeShockSpawn)
+        if (_cooldown == 0.0f)
         {
-            largeShockSpawn = true;
-            var sw = Instantiate(ShockwavePrefab, ShockwaveSpawnTransform.position, Quaternion.identity, ShockwaveSpawnTransform);
-            var playerTransform = mgr.GetPlayer().transform;
-            Vector3 direction = playerTransform.position - sw.transform.position;
-            Vector3 newDirection = Vector3.RotateTowards(transform.forward, direction, 1.6f, 1.0f);
-            sw.GetComponent<Shockwave>().Velocity = (direction * Attack1Speed * Time.deltaTime);
-        }
+			var pos = new Vector3(ShockwaveSpawnTransform.position.x, ShockwaveSpawnTransform.position.y, 0);
+			var sw = Instantiate(ShockwavePrefab, pos, Quaternion.identity, ShockwaveSpawnTransform);
+			var playerTransform = mgr.GetPlayer().transform;
+			Vector3 direction = playerTransform.position - sw.transform.position;
+			var rot = Quaternion.LookRotation(Vector3.forward, -direction);
+			sw.transform.rotation = rot;
+			sw.GetComponent<Shockwave>().Velocity = (direction * Attack1Speed);
+            sw.GetComponent<Shockwave>().TimeToLive = 7;
+			_cooldown += 0.001f;
+		}
         else
         {
             _cooldown += Time.deltaTime;
             if (_cooldown >= Attack1CooldownTime)
             {
-                largeShockSpawn = false;
                 _cooldown = 0.0f;
                 _state = BossState.IDLE;
             }

@@ -812,6 +812,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: Attack1Speed
+      value: 1.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
       propertyPath: _completionDoor
       value: 
       objectReference: {fileID: 145179903}
@@ -819,6 +823,10 @@ PrefabInstance:
       propertyPath: _completionTravelpoint
       value: 
       objectReference: {fileID: 145179902}
+    - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: DurationToDetermineAttack
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8473564945793958502, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
       propertyPath: m_RootOrder
       value: 4
