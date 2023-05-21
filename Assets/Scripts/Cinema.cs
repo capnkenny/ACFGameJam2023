@@ -7,6 +7,7 @@ public class Cinema : MonoBehaviour
     public PlayableDirector timeline;
     public int SceneToTravelTo;
     public LevelLoad loader;
+    public PlayState playState;
 
     private bool doneTransitioning = false;
     private bool playing = false;
@@ -21,6 +22,7 @@ public class Cinema : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        playState = timeline.state;
         if (loader.GetAnimationFinished())
         {
             doneTransitioning = true;
@@ -34,12 +36,9 @@ public class Cinema : MonoBehaviour
         if (playing)
         {
             timer += Time.deltaTime;
-            if (timeline.state != PlayState.Playing)
+            if (timeline.state != PlayState.Playing || (timeline.state == PlayState.Playing && timer >= timeline.duration))
             {
-                if (timer >= timeline.duration)
-                {
-                    SceneManager.LoadScene(SceneToTravelTo);
-                }
+                SceneManager.LoadScene(SceneToTravelTo);
             }
         }
     }
