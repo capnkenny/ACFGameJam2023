@@ -492,7 +492,7 @@ MonoBehaviour:
   TasteFactor: 0
   SmellFactor: 0
   SightFactor: 0
-  HearingFactor: 1.75
+  HearingFactor: 1.25
   TouchFactor: 0
   IsIncremental: 0
   MovementSpeed: 1.5

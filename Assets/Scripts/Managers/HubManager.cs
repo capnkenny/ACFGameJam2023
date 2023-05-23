@@ -77,7 +77,12 @@ public class HubManager : MonoBehaviour
             pos.z = levelText.collider.transform.position.z;
             if (levelText.collider.bounds.Contains(pos))
             {
-                levelText.text.SetText($"Proceed to Level {_mgr.playerData.Level} ->");
+                if (_mgr.playerData.Level == 2)
+                {
+					levelText.text.SetText($"Proceed to Level: ->\nThe Revenge of Airhorn Jim");
+				}
+                else
+                    levelText.text.SetText($"Proceed to Level {_mgr.playerData.Level} ->");
                 levelText.text.gameObject.SetActive(true);
             }
             else if (levelText.text.gameObject.activeSelf)

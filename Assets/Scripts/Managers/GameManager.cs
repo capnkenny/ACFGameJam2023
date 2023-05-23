@@ -252,6 +252,11 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(index);
     }
 
+    public void CompleteBossBattle(PlayerData _)
+    {
+        TransitionToLevel(-10);
+    }
+
     public PlayerController SpawnPlayer()
     {
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");

@@ -4,6 +4,7 @@ public class Door : MonoBehaviour
 {
     public bool DoorOpened;
     public bool DoorEnabled;
+    public bool EndRoomDoor;
 
     public Travelpoint DoorPoint;
     public GameObject SnapPoint;
@@ -23,10 +24,19 @@ public class Door : MonoBehaviour
     {
         if (!DoorEnabled)
         {
-            DoorFrame.sprite = WallSprite;
-            DoorClosed.SetActive(true);
-            DoorClosed.GetComponent<SpriteRenderer>().enabled = false;
-            DoorOpen.SetActive(false);
+            if (!EndRoomDoor)
+            {
+                DoorFrame.sprite = WallSprite;
+                DoorClosed.SetActive(true);
+                DoorClosed.GetComponent<SpriteRenderer>().enabled = false;
+                DoorOpen.SetActive(false);
+            }
+            else
+            {
+                DoorEnabled = true;
+				DoorOpen.SetActive(true);
+				DoorClosed.SetActive(false);
+			}
         }
         else
         {

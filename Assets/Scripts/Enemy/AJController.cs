@@ -6,6 +6,7 @@ public class AJController : EnemyController
     public AudioSource BossMusic;
     public AudioSource ShockSound;
 	public AudioSource MiniShockSound;
+    public AudioSource DizzySound;
 
 	[Header("Durations (s)")]
     public float StunDurationInSeconds;
@@ -69,8 +70,7 @@ public class AJController : EnemyController
 	private void Awake()
     {
         _state = BossState.LOADING;
-        _completionDoor.DoorOpened = false;
-        _completionDoor.DoorEnabled = true;
+        
         musicPitch = BossMusic.pitch;
         soundPitch = ShockSound.pitch;
     }
@@ -117,8 +117,12 @@ public class AJController : EnemyController
                         {
                             deathTriggered = true;
                             _animator.SetTrigger("Dying");
-                        }
-                        break;
+						}
+						else if (_animator.GetCurrentAnimatorStateInfo(0).length >= 1.0f)
+						{
+							DestroyImmediate(this.gameObject);
+						}
+						break;
                     }
                 case BossState.IDLE:
                     {
@@ -175,7 +179,9 @@ public class AJController : EnemyController
                 if (manager != null)
                 {
                     mgr = manager;
-                    _completionTravelpoint.SetDelegate(CompleteBossBattle, mgr.playerData);
+					_completionDoor.DoorOpened = false;
+					_completionDoor.DoorEnabled = true;
+					_completionTravelpoint.SetDelegate(mgr.CompleteBossBattle, mgr.playerData);
                     manager.EnableGameUI();
                     loaded = true;
                     _healthBar.UpdateSlider(Health, Health);
@@ -204,6 +210,10 @@ public class AJController : EnemyController
 
     private void HandleStun()
     {
+        if (!DizzySound.isPlaying)
+        {
+            DizzySound.Play();
+        }
         _stunTimer += Time.deltaTime;
         if (_stunTimer >= StunDurationInSeconds)
         {
@@ -216,14 +226,13 @@ public class AJController : EnemyController
 
     private void HandleDeath()
     {
+        Debug.Log("Airhorn Jim is dead");
         mgr.DisableGameUI();
         BossMusic.Stop();
         ShockSound.Stop();
         MiniShockSound.Stop();
-        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Dead") && _animator.GetCurrentAnimatorStateInfo(0).length >= 1.0f)
-        {
-            _completionDoor.DoorOpened = true;
-        }
+        _completionDoor.DoorOpened = true;
+        _state = BossState.DYING;
     }
 
     private void HandleHurt()
@@ -245,17 +254,6 @@ public class AJController : EnemyController
 				_hurtTimer += Time.deltaTime;
 			}
         }
-    }
-
-    private void CompleteBossBattle(PlayerData data)
-    {
-        var player = GameObject.FindGameObjectWithTag("Player");
-        var pc = player.GetComponent<PlayerController>();
-        var pd = pc.UpdatePlayerData(data, data.Level + 1);
-        mgr.playerData = pd;
-        mgr.DisableGameUI();
-
-        mgr.TransitionToLevel(-10);
     }
 
     private void HandleAttackOne()

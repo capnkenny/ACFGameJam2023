@@ -844,9 +844,9 @@ public class LevelGenerator : MonoBehaviour
 
             gm.DisableGameUI();
         }
-        
 
-        LoadToLevel(4); //fix later maybe ¯\_(ツ)_/¯
+
+        gmo.GetComponent<GameManager>().TransitionToLevel(-1);
     }
 
     private void LoadToLevel(int level)
