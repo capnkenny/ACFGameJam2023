@@ -18,3 +18,8 @@ You only have second-hand information about here./w 1
 That won't stop you though./w 1
 You've got this.../w 2 
 /c./w 1./w 1./w 1right?/w 3
+
+
+/cNow you find yourself greeted by the Shopkeep, and handed a Soaking Super Sword to aid in safe travels./w 3
+Only you shall see what keeps the Koi from their home... /w 2
+/cDefend yourself, and defeat whatever may lie ahead in Dr. Deezix's realms.../w 5
