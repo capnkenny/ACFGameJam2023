@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class AJController : EnemyController
 {
-    [Header("Durations (s)")]
+    [Header("Music Objects")]
+    public AudioSource BossMusic;
+    public AudioSource ShockSound;
+	public AudioSource MiniShockSound;
+
+	[Header("Durations (s)")]
     public float StunDurationInSeconds;
     public float HurtDurationInSeconds;
     public float Attack1Duration;
@@ -30,6 +35,10 @@ public class AJController : EnemyController
 
     [Header("Attack 2")]
     public float Attack2CooldownTime;
+    public float DelayBetweenWaves;
+    public int WavesWaveCount;
+    private float attack2Delay = 0.0f;
+    private int waveClock = 0;
 
     [Header("Attack 3")]
     public float Attack3CooldownTime;
@@ -49,11 +58,21 @@ public class AJController : EnemyController
     [SerializeField]
     private Travelpoint _completionTravelpoint;
 
-    private void Awake()
+    [SerializeField]
+    private MiniwaveManager _waveMgr;
+	[SerializeField]
+	private SensoryBar _healthBar;
+
+    private float musicPitch;
+    private float soundPitch;
+
+	private void Awake()
     {
         _state = BossState.LOADING;
         _completionDoor.DoorOpened = false;
         _completionDoor.DoorEnabled = true;
+        musicPitch = BossMusic.pitch;
+        soundPitch = ShockSound.pitch;
     }
 
     private void Update()
@@ -61,17 +80,25 @@ public class AJController : EnemyController
         Init();
 
         if (mgr != null && mgr.state == GameState.PLAYING && !mgr.GetPlayer().Dead)
+        {
             stepForward = true;
+        }
         else
             stepForward = false;
 
         if (!Dead && stepForward)
         {
+            _healthBar.SensoryValue = Health;
             switch (_state)
             {
                 case BossState.ATTACKONE:
                     {
                         HandleAttackOne();
+                        break;
+                    }
+                case BossState.ATTACKTWO:
+                    {
+                        HandleAttackTwo();
                         break;
                     }
                 case BossState.STUN:
@@ -111,10 +138,26 @@ public class AJController : EnemyController
             }
 
 
-            if(_state == BossState.LOADING)
+            if (_state == BossState.LOADING)
                 _animator.SetInteger("State", (int)BossState.IDLE);
             else
+            {
                 _animator.SetInteger("State", (int)_state);
+                if (mgr.PlayerInSensoryOverload)
+                {
+                    if(BossMusic.pitch != musicPitch / 2) BossMusic.pitch = musicPitch / 2;
+                    if(ShockSound.pitch != soundPitch / 2) ShockSound.pitch = soundPitch / 2;
+                    if (MiniShockSound.pitch != soundPitch / 2) MiniShockSound.pitch = soundPitch / 2;
+                }
+                else
+                {
+					if (BossMusic.pitch != musicPitch) BossMusic.pitch = musicPitch;
+					if (ShockSound.pitch != soundPitch) ShockSound.pitch = soundPitch;
+					if (MiniShockSound.pitch != soundPitch) MiniShockSound.pitch = soundPitch;
+				}
+            }
+
+
         }
 
         if (Dead)
@@ -133,8 +176,11 @@ public class AJController : EnemyController
                 {
                     mgr = manager;
                     _completionTravelpoint.SetDelegate(CompleteBossBattle, mgr.playerData);
+                    manager.EnableGameUI();
                     loaded = true;
+                    _healthBar.UpdateSlider(Health, Health);
                     _state = BossState.IDLE;
+                    BossMusic.Play();
                 }
             }
         }
@@ -142,13 +188,17 @@ public class AJController : EnemyController
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Soaker") && !Hurt)
-        {
-            Debug.Log("Collision");
-            base.Health -= 5;
-            Hurt = true;
-            _previousState = _state;
-            _state = BossState.HURT;
+        Debug.Log(collision.collider.tag);
+
+         if (collision.collider.CompareTag("Soaker"))
+		{
+            if (!Hurt)
+            {
+                Health -= 5;
+                Hurt = true;
+                _previousState = _state;
+                _state = BossState.HURT;
+            }
         }
     }
 
@@ -166,6 +216,10 @@ public class AJController : EnemyController
 
     private void HandleDeath()
     {
+        mgr.DisableGameUI();
+        BossMusic.Stop();
+        ShockSound.Stop();
+        MiniShockSound.Stop();
         if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Dead") && _animator.GetCurrentAnimatorStateInfo(0).length >= 1.0f)
         {
             _completionDoor.DoorOpened = true;
@@ -176,12 +230,21 @@ public class AJController : EnemyController
     {
         _animator.SetTrigger("Hurt");
 
-
-        Hurt = false;
         if (Dead)
             _state = BossState.DYING;
         else
-            _state = _previousState;
+        {
+            if (_hurtTimer >= HurtDurationInSeconds)
+            {
+                _state = _previousState;
+                Hurt = false;
+                _hurtTimer = 0;
+            }
+            else
+            {
+				_hurtTimer += Time.deltaTime;
+			}
+        }
     }
 
     private void CompleteBossBattle(PlayerData data)
@@ -194,32 +257,6 @@ public class AJController : EnemyController
 
         mgr.TransitionToLevel(-10);
     }
-
-    //private void DebugAttackOne()
-    //{
-    //    if (_cooldown == 0.0f)
-    //    {
-    //        var pos = new Vector3(ShockwaveSpawnTransform.position.x, ShockwaveSpawnTransform.position.y, 0);
-    //        var sw = Instantiate(ShockwavePrefab, pos, Quaternion.identity, ShockwaveSpawnTransform);
-    //        var playerTransform = mgr.GetPlayer().transform;
-    //        Vector3 direction = playerTransform.position - sw.transform.position;
-    //        var rot = Quaternion.LookRotation(Vector3.forward, -direction);
-    //        //Vector3 newDirection = Vector3.RotateTowards(transform.forward, direction, 1.6f, 1.0f);
-    //        //sw.transform.Rotate(newDirection);
-    //        sw.transform.rotation = rot;
-    //        sw.GetComponent<Shockwave>().Velocity = (direction * Attack1Speed * Time.deltaTime);
-    //        _cooldown += 0.001f;
-    //    }
-    //    else
-    //    {
-    //        _cooldown += Time.deltaTime;
-    //        if (_cooldown >= Attack1CooldownTime)
-    //        {
-    //            _cooldown = 0.0f;
-    //            _state = BossState.IDLE;
-    //        }
-    //    }
-    //}
 
     private void HandleAttackOne()
     {
@@ -234,6 +271,7 @@ public class AJController : EnemyController
 			sw.GetComponent<Shockwave>().Velocity = (direction * Attack1Speed);
             sw.GetComponent<Shockwave>().TimeToLive = 7;
 			_cooldown += 0.001f;
+            ShockSound.Play();
 		}
         else
         {
@@ -246,7 +284,33 @@ public class AJController : EnemyController
         }    
     }
 
-    private void HandleIdle()
+	private void HandleAttackTwo()
+	{
+        if (attack2Delay == 0.0f)
+        {
+            _waveMgr.FireWave();
+            MiniShockSound.Play();
+            attack2Delay += 0.001f;
+        }
+        else
+        {
+			attack2Delay += Time.deltaTime;
+		}
+            
+        if (attack2Delay >= DelayBetweenWaves)
+        {
+            attack2Delay = 0.0f;
+            waveClock++;
+        }
+
+        if (waveClock >= WavesWaveCount)
+        {
+            waveClock = 0;
+            _state = BossState.STUN;
+        }
+	}
+
+	private void HandleIdle()
     {
         _actionTimer += Time.deltaTime;
 

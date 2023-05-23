@@ -36,7 +36,7 @@ public class Cinema : MonoBehaviour
         if (playing)
         {
             timer += Time.deltaTime;
-            if (timeline.state != PlayState.Playing || (timeline.state == PlayState.Playing && timer >= timeline.duration))
+            if (timeline.state != PlayState.Playing || (timeline.state == PlayState.Playing && timer >= 21.0f))
             {
                 SceneManager.LoadScene(SceneToTravelTo);
             }

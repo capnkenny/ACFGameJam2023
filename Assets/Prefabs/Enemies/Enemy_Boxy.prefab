@@ -180,7 +180,7 @@ MonoBehaviour:
   TouchFactor: 5
   IsIncremental: 0
   MovementSpeed: 0
-  AttackDamage: 10
+  AttackDamage: 5
   Health: 10
   animator: {fileID: 7095606302902038128}
   Throw: 0

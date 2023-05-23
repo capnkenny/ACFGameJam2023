@@ -276,6 +276,7 @@ public class PlayerController : MonoBehaviour
     {
         Health += dmg;
         ReduceDirectStimulation(sens);
+        Debug.Log($"New Health: {Health}");
     }
 
     public float ProvideSensoryEffect(float tf = 0, float smf = 0, float sif = 0, float hf = 0, float tof = 0)
@@ -306,7 +307,8 @@ public class PlayerController : MonoBehaviour
             SensoryMeter = 0;
             _sensoryOverload = false;
         }
-    }
+		Debug.Log($"New Sensory: {SensoryMeter}");
+	}
 
 
     public PlayerData UpdatePlayerData(PlayerData reference, int level = -1)

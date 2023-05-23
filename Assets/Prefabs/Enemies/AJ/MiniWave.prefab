@@ -641,10 +641,10 @@ GameObject:
   - component: {fileID: 5678082446278511577}
   - component: {fileID: 8182393941411602950}
   - component: {fileID: 7296571628758505984}
-  - component: {fileID: 3725603010933753099}
+  - component: {fileID: 8277688607107816353}
   - component: {fileID: 1871080856208937151}
   m_Layer: 0
-  m_Name: Shockwave
+  m_Name: MiniWave
   m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -659,7 +659,7 @@ Transform:
   m_GameObject: {fileID: 6183857495975382163}
   m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.08, y: 0.12545453, z: 1}
+  m_LocalScale: {x: 0.02, y: 0.031363633, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8033107987542104896}
@@ -741,7 +741,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &3725603010933753099
+--- !u!114 &8277688607107816353
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -750,25 +750,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 6183857495975382163}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecc5b739d2ecbf84e82682d4ba31c42b, type: 3}
+  m_Script: {fileID: 11500000, guid: 0ddc0710681e27e4386b9f7eb598328e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: 10
-  TimeToLive: 0
-  ImpactForce: 0
-  SensoryEffect: 1
-  SensoryEffectValue: 20
-  destroy: 0
-  RedLightChangeInSeconds: 1.5
-  YellowLightChangeInSeconds: 0.5
-  GreenLightChangeInSeconds: 1
-  LightOffChangeInSeconds: 2
+  RedLightChangeInSeconds: 0.75
+  YellowLightChangeInSeconds: 0.25
+  GreenLightChangeInSeconds: 0.5
+  LightOffChangeInSeconds: 1
   Collider: {fileID: 1871080856208937151}
-  rb2d: {fileID: 7296571628758505984}
   Red: {fileID: 9159423219119317148}
   Yellow: {fileID: 4454682899379402818}
   Green: {fileID: 245637620703407108}
-  Velocity: {x: 0, y: 0}
+  MoveSpeed: 1.5
+  Direction: {x: 0, y: 0}
+  Damage: 4
+  TimeToLive: 7
+  ImpactForce: 0
+  SensoryEffect: 1
+  SensoryEffectValue: 10
+  rb2d: {fileID: 7296571628758505984}
 --- !u!60 &1871080856208937151
 PolygonCollider2D:
   m_ObjectHideFlags: 0

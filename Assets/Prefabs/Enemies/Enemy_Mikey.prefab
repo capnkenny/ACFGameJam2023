@@ -496,7 +496,7 @@ MonoBehaviour:
   TouchFactor: 0
   IsIncremental: 0
   MovementSpeed: 1.5
-  AttackDamage: 10
+  AttackDamage: 5
   Health: 3
 --- !u!50 &730282772568127823
 Rigidbody2D:

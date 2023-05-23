@@ -604,6 +604,7 @@ MonoBehaviour:
   timeline: {fileID: 1447668868}
   SceneToTravelTo: 9
   loader: {fileID: 273373934}
+  playState: 0
 --- !u!1 &1589362960
 GameObject:
   m_ObjectHideFlags: 0
@@ -1049,6 +1050,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2162909342899620815, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2162909342899620815, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4529272499580579812, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8473564945793958502, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
       propertyPath: m_RootOrder
       value: 6

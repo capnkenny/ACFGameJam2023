@@ -149,6 +149,25 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &18458155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18458147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef607d3d07655e44b890e4f7d5eecf7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pooledMiniWave: {fileID: 6183857495975382163, guid: 36d2897b4efd78449bbf2b75ff4a2e96, type: 3}
+  numberOfWaves: 5
+  waveCount: 4
+  angleStart: 0
+  angleEnd: 270
+  delay: 2
+  _spawnLocation: {fileID: 564138734}
 --- !u!1001 &232077235
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -402,6 +421,11 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!1 &564138734 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7650657951685938042, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+  m_PrefabInstance: {fileID: 1375431309}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &676633398 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6511912335400611013, guid: 69a72660db977c246b0a84600d6091ef, type: 3}
@@ -730,13 +754,29 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: _waveMgr
+      value: 
+      objectReference: {fileID: 18458155}
+    - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
       propertyPath: Attack1Speed
-      value: 2
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: WavesWaveCount
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
       propertyPath: _completionDoor
       value: 
       objectReference: {fileID: 676633398}
+    - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: DelayBetweenWaves
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: Attack2CooldownTime
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 3011721043739741240, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
       propertyPath: _completionTravelpoint
       value: 
@@ -800,6 +840,10 @@ PrefabInstance:
     - target: {fileID: 8473564945793958503, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
       propertyPath: m_Name
       value: AirhornJim
+      objectReference: {fileID: 0}
+    - target: {fileID: 8473564945793958503, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 543102d6b0083134095a857d8dc4bd91, type: 3}
@@ -1080,7 +1124,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4433962, g: 0.42875576, b: 0.42875576, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1098,7 +1142,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2104964670}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 771.4364, y: 253.315, z: 0}
+  m_LocalPosition: {x: 771.4364, y: 253.315, z: 10}
   m_LocalScale: {x: 36.58, y: 25.38, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

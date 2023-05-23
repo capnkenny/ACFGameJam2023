@@ -99,11 +99,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98435643fa0bd7b45808d369250bc691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: 50
+  Damage: 15
   TimeToLive: 3
   ImpactForce: 5
   SensoryEffect: 1
   SensoryEffectValue: 40
+  destroy: 0
 --- !u!50 &7296571628758505984
 Rigidbody2D:
   serializedVersion: 4
