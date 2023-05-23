@@ -7,6 +7,7 @@ public class AJController : EnemyController
     public AudioSource ShockSound;
 	public AudioSource MiniShockSound;
     public AudioSource DizzySound;
+    public AudioSource PopSound;
 
 	[Header("Durations (s)")]
     public float StunDurationInSeconds;
@@ -233,7 +234,9 @@ public class AJController : EnemyController
         MiniShockSound.Stop();
         _completionDoor.DoorOpened = true;
         _state = BossState.DYING;
-    }
+        PopSound.Play();
+		DestroyImmediate(this.gameObject);
+	}
 
     private void HandleHurt()
     {
